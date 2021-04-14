@@ -20,9 +20,10 @@ mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')
 mobidb_transposed_df = mobidb_original_df.pivot_table(index=['acc'], columns=['feature'], values='content_fraction').fillna(0)
 mobidb_transposed_df.to_csv(r'data/mobidb_transposed_df.csv', index=True)
 ### extract required data from the datafram
-mobidb_transposed_df_column_names_lst = mobidb_transposed_df.columns.str.split(',').tolist() #column names list contains dif features (dif predictors for dif plots, 78 features = 78 plots)
+mobidb_transposed_df_features_lst = mobidb_transposed_df.columns.str.split(',').tolist() #column names list contains dif features (dif predictors for dif plots, 78 features = 78 plots)
 
 #TODO: filter you file with different feature
+#find content_fraction for each of the features iterating through all the proteins list
 
 
 #TODO: draw each plot
