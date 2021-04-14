@@ -6,4 +6,8 @@ Initialiazing the project
 4- added data folder to gitignore 
 5- Excluded the data folder.[ right-click it in the Project tool window and select Mark Directory as | Excluded.] for speeding up the IDE performance
 *Excluded files remain a part of a project, but are ignored by code completion, navigation, indexing, and inspections.
-
+_________________
+Aim of the project:
+- To transverse mobiDB chart in a that row are prot accession numbers and columns are protein features and the values are the content fraction.
+- With the described table, we can plot several charts using different features, this features give different disorder percentage based on different criterias. 
+- Add other columns to this chart/dataframe. 
