@@ -1,39 +1,48 @@
-#Start date = April 14th
+# Start date = April 14th
 ### import
 import itertools
 
 import pandas as pd
 import matplotlib.pyplot as plt
 
-#TODO: explain each variable and abbreviations in the beginning, define your standard naming system
-mobidb_features_lst = [] #setting the transversed dataframe's column names which are the feature/predictor names as list values
-mobidb_predictors_cont_fra_dict = {}
+# TODO: explain each variable and abbreviations in the beginning, define your standard naming system
+mobidb_features_lst = []  # setting the transversed dataframe's column names which are the feature/predictor names as
+# list values,#column names list contains dif features (dif predictors for dif plots, 78 features = 78 plots)
+mobidb_predictors_cont_fra_dict = {}  # dict with each feature as key and the associated list of content_fractions as
+# values
+mobidb_each_cont_fra_lst = []  # # content_fraction of homo sapiens list based on each feature,
+# it changes with the for loop iteration
+
+
 ### methods
 def drawplot(plot_input_lst, bins_amount, isDense, xLabel, yLabel, png_file_name):
     plt.hist(plot_input_lst, bins=bins_amount,
-             density=isDense)  # density=True shows comparison percentage in y axis (that value compared to whole data)
+             density=isDense)
     plt.xlabel(xLabel)
     plt.ylabel(yLabel)
     plt.show()
     file_format = ".png"
-    plt.savefig(png_file_name+file_format)
+    plt.savefig(png_file_name + file_format)
+
 
 ### import your files
 mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')
-#transpose the mobidb_original_df and keep only the necessary data
-mobidb_transposed_df = mobidb_original_df.pivot_table(index=['acc'], columns=['feature'], values='content_fraction').fillna(0)
+# transpose the mobidb_original_df and keep only the necessary data
+mobidb_transposed_df = mobidb_original_df.pivot_table(index=['acc'], columns=['feature'],
+                                                      values='content_fraction').fillna(0)
 mobidb_transposed_df.to_csv(r'data/mobidb_transposed_df.csv', index=True)
 ### extract required data from the dataframe
-mobidb_features_lst = mobidb_transposed_df.columns.str.split(',').tolist() #column names list contains dif features (dif predictors for dif plots, 78 features = 78 plots)
-mobidb_features_lst = list(itertools.chain(*mobidb_features_lst)) #list of lists to a flat list
-#get each column's content as a list and set it as dict value (keys are predictor's name(feature's name))
+mobidb_features_lst = mobidb_transposed_df.columns.str.split(',').tolist()
+mobidb_features_lst = list(itertools.chain(*mobidb_features_lst))  # list of lists to a flat list
+# get each column's content as a list and set it as dict value (keys are predictor's name(feature's name))
 for each_feature in mobidb_features_lst:
-    mobidb_each_cont_fra_lst = mobidb_transposed_df[each_feature].tolist()  # content_fraction of homo sapiens list based on each feature
+    mobidb_each_cont_fra_lst = mobidb_transposed_df[each_feature].tolist()
     mobidb_predictors_cont_fra_dict[each_feature] = mobidb_each_cont_fra_lst
 ### draw each plot
 for each_feature_name in mobidb_features_lst:
-    drawplot(mobidb_predictors_cont_fra_dict[each_feature_name], 20, True, each_feature_name, "Protein Count", each_feature_name ) #maybe need to use str() for the file name and x axis label
+    drawplot(mobidb_predictors_cont_fra_dict[each_feature_name], 20, True, each_feature_name, "Protein Count",
+             each_feature_name)  # maybe need to use str() for the file name and x axis label
 
-#TODO: Draw comparative plots
+# TODO: Draw comparative plots
 
-#TODO: check if it is needed to add zeros and sum = 75088 instead of 75052 //or omitted data:/ too much zeros
+# TODO: check if it is needed to add zeros and sum = 75088 instead of 75052 //or omitted data:/ too much zeros
