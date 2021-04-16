@@ -33,9 +33,10 @@ for each_feature in mobidb_features_lst:
 #TODO: draw each plot
 print(len(mobidb_predictors_cont_fra_dict["curated-phase_separation-merge"]))
 #for lst_of_cont_fra_dict_value in mobidb_predictors_cont_fra_dict:
+plot_count = 0
 for each_feature_name in mobidb_features_lst:
     drawplot(mobidb_predictors_cont_fra_dict[each_feature_name], 20, True, each_feature_name, "Protein Count", each_feature_name ) #maybe need to use str() for the file name and x axis label
 
 #TODO: Draw comparative plots
-
-#TODO: make a version of the same code with added zeros and sum = 75088 instead of 75052 //or omitted data:/ too much zeros
+#TODO: figure out what each mobiDB feature(predictor) does and extract the protein ACCs that could be useful in interpretation about the diseases
+#TODO: check if it is needed make a version of the same code with added zeros and sum = 75088 instead of 75052 //or omitted data:/ too much zeros
