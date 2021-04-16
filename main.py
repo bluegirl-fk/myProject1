@@ -15,7 +15,8 @@ def drawplot(plot_input_lst, bins_amount, isDense, xLabel, yLabel, png_file_name
     plt.xlabel(xLabel)
     plt.ylabel(yLabel)
     plt.show()
-    plt.savefig(png_file_name.png)
+    file_format = ".png"
+    plt.savefig(png_file_name+file_format)
 
 ### import your files
 mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')
@@ -26,11 +27,15 @@ mobidb_transposed_df.to_csv(r'data/mobidb_transposed_df.csv', index=True)
 mobidb_features_lst = mobidb_transposed_df.columns.str.split(',').tolist() #column names list contains dif features (dif predictors for dif plots, 78 features = 78 plots)
 mobidb_features_lst = list(itertools.chain(*mobidb_features_lst)) #list of lists to a flat list
 #get each column's content as a list and set it as dict value (keys are predictor's name(feature's name))
-print(mobidb_features_lst)
 for each_feature in mobidb_features_lst:
     mobidb_each_cont_fra_lst = mobidb_transposed_df[each_feature].tolist()  # content_fraction of homo sapiens list based on each feature
     mobidb_predictors_cont_fra_dict[each_feature] = mobidb_each_cont_fra_lst
 #TODO: draw each plot
-#TODO: Draw comparative plots
-#TODO: other stuff
+print(len(mobidb_predictors_cont_fra_dict["curated-phase_separation-merge"]))
+#for lst_of_cont_fra_dict_value in mobidb_predictors_cont_fra_dict:
+for each_feature_name in mobidb_features_lst:
+    drawplot(mobidb_predictors_cont_fra_dict[each_feature_name], 20, True, each_feature_name, "Protein Count", each_feature_name ) #maybe need to use str() for the file name and x axis label
 
+#TODO: Draw comparative plots
+
+#TODO: make a version of the same code with added zeros and sum = 75088 instead of 75052 //or omitted data:/ too much zeros
