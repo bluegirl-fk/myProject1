@@ -30,13 +30,10 @@ mobidb_features_lst = list(itertools.chain(*mobidb_features_lst)) #list of lists
 for each_feature in mobidb_features_lst:
     mobidb_each_cont_fra_lst = mobidb_transposed_df[each_feature].tolist()  # content_fraction of homo sapiens list based on each feature
     mobidb_predictors_cont_fra_dict[each_feature] = mobidb_each_cont_fra_lst
-#TODO: draw each plot
-print(len(mobidb_predictors_cont_fra_dict["curated-phase_separation-merge"]))
-#for lst_of_cont_fra_dict_value in mobidb_predictors_cont_fra_dict:
-plot_count = 0
+### draw each plot
 for each_feature_name in mobidb_features_lst:
     drawplot(mobidb_predictors_cont_fra_dict[each_feature_name], 20, True, each_feature_name, "Protein Count", each_feature_name ) #maybe need to use str() for the file name and x axis label
 
 #TODO: Draw comparative plots
-#TODO: figure out what each mobiDB feature(predictor) does and extract the protein ACCs that could be useful in interpretation about the diseases
-#TODO: check if it is needed make a version of the same code with added zeros and sum = 75088 instead of 75052 //or omitted data:/ too much zeros
+
+#TODO: check if it is needed to add zeros and sum = 75088 instead of 75052 //or omitted data:/ too much zeros
