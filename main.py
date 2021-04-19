@@ -11,6 +11,8 @@ mobidb_features_lst = []  # setting the transversed dataframe's column names whi
 mobidb_predictors_cont_fra_dict = {}  # dict with each feature as key and the associated list of content_fractions as
 # values
 cont_fra_temp_lst = []  # # content_fraction of homo sapiens list based on each feature,
+
+
 # it changes with the for loop iteration
 
 
@@ -20,9 +22,10 @@ def drawplot(plot_input_lst, bins_amount, isDense, xLabel, yLabel, png_file_name
              density=isDense)
     plt.xlabel(xLabel)
     plt.ylabel(yLabel)
+    file_format = '.png'
+    plt.savefig('graphs/' + png_file_name + file_format)
     plt.show()
-    file_format = ".png"
-    plt.savefig(png_file_name + file_format)
+
 
 
 ### import files
@@ -40,7 +43,7 @@ for each_feature in mobidb_features_lst:
     mobidb_predictors_cont_fra_dict[each_feature] = cont_fra_temp_lst
 ### draw each plot
 for each_feature_name in mobidb_features_lst:
-    drawplot(mobidb_predictors_cont_fra_dict[each_feature_name], 20, True, each_feature_name, "Protein Count",
+    drawplot(mobidb_predictors_cont_fra_dict[each_feature_name], 40, True, each_feature_name, "Protein Count",
              each_feature_name)  # maybe need to use str() for the file name and x axis label
 
 # TODO: Draw comparative plots
