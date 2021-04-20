@@ -30,22 +30,35 @@ def drawplot(plot_input_lst, bins_amount, isDense, xLabel, yLabel, png_file_name
 
 ### import files
 mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')
+disease_acc_df = pd.read_csv('data/diseases.tab', sep='\t')
+### manipulate imported files
 # transpose the mobidb_original_df and keep only the necessary data
 mobidb_transposed_df = mobidb_original_df.pivot_table(index=['acc'], columns=['feature'],
                                                       values='content_fraction').fillna(0)
 mobidb_transposed_df.to_csv(r'data/mobidb_transposed_df.csv', index=True)
-### extract required data from the dataframe
+#make disease_acc_df into list of protein ACCs
+disease_acc_lst = disease_acc_df['Entry'].to_list()
+### extract required data from the mobidb tansposed dataframe
 mobidb_features_lst = mobidb_transposed_df.columns.str.split(',').tolist()
 mobidb_features_lst = list(itertools.chain(*mobidb_features_lst))  # list of lists to a flat list
 # get each column's content as a list and set it as dict value (keys are predictor's name(feature's name))
 for each_feature in mobidb_features_lst:
     cont_fra_temp_lst = mobidb_transposed_df[each_feature].tolist()
     mobidb_predictors_cont_fra_dict[each_feature] = cont_fra_temp_lst
-### draw each plot
-for each_feature_name in mobidb_features_lst:
-    drawplot(mobidb_predictors_cont_fra_dict[each_feature_name], 10, True, each_feature_name, "Protein Count",
-             each_feature_name)  # maybe need to use str() for the file name and x axis label
+### draw each plot of whole homo sapiens proteins with content fraction based on each feature
+# for each_feature_name in mobidb_features_lst:
+#     drawplot(mobidb_predictors_cont_fra_dict[each_feature_name], 10, True, "Content Fraction based on " + each_feature_name, "Protein Count",
+#              each_feature_name)  # maybe need to use str() for the file name and x axis label
 
 # TODO: Draw comparative plots
+# extract content fraction of our disease ACC list and convert it to a list
+disease_cont_fra_temp_lst= [] #temp cuz it changes with each iteration through the features
+disease_cont_fra_dict = {}
+for each_feature in mobidb_features_lst:
+    for each_acc in disease_acc_lst:
+        disease_cont_fra_temp_lst.append(list(mobidb_transposed_df.loc[mobidb_transposed_df['acc'] == each_acc]))
+        disease_cont_fra_dict[each_feature] = disease_cont_fra_temp_lst
+
+
 
 # TODO: check if it is needed to add zeros and sum = 75088 instead of 75052 //or omitted data:/ too much zeros
