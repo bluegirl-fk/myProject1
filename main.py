@@ -17,13 +17,14 @@ disease_predictors_cont_fra_dict = {}  # dict with each feature as key and the a
 
 
 ### methods
-def drawplot(plot_input_lst, bins, is_dense, x_label, y_label, png_file_name):
+def drawplot(plot_input_lst, bins, is_dense, x_label, y_label, png_file_name, subdirectory):
     plt.hist(plot_input_lst, bins=bins,
              density=is_dense)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
+    sub_directory = subdirectory #homosapiens or disease
     file_format = '.png'
-    plt.savefig('graphs/normal/' + png_file_name + '_normal' + file_format)
+    plt.savefig('graphs/'+sub_directory+'/' + png_file_name + file_format)
     plt.show()
 
 
@@ -60,18 +61,23 @@ for each_feature in mobidb_features_lst:
     mobidb_predictors_cont_fra_dict[each_feature] = cont_fra_temp_lst
 ### draw each plot of whole homo sapiens proteins with content fraction based on each feature
 for each_feature in mobidb_features_lst[1:]: ##cuz the fist item is 'acc' and we don't need it for the plots, just need the content fraction
-    drawplot(mobidb_predictors_cont_fra_dict[each_feature], 30, True, "Content Fraction based on " + each_feature, "Protein Count",
-             each_feature)
-
-### comparative histogram
+    drawplot(mobidb_predictors_cont_fra_dict[each_feature], 30, True, each_feature + '_homosapiens', "Protein Count(relative)",
+             each_feature, 'homosapiens')
+#plot for diseases
 for each_feature in mobidb_features_lst:
     disease_cont_fra_temp_lst = disease_mobidb_df[each_feature].tolist()
     disease_predictors_cont_fra_dict[each_feature] = disease_cont_fra_temp_lst
 
+for each_feature in mobidb_features_lst[1:]:
+     drawplot(disease_predictors_cont_fra_dict[each_feature], 30, False, each_feature + '_Disease', 'Protein count',each_feature+'_disease','disease')
+
+### comparative histogram
+
+
 for each_feature in mobidb_features_lst[
                     1:]:  # cuz the fist item is 'acc' and we don't need it for the plots, just need the content fraction
     compare_plot(mobidb_predictors_cont_fra_dict[each_feature], disease_predictors_cont_fra_dict[each_feature], 30,
-                 True, x_label=each_feature + '_comparison', y_label='proteins count', png_file_name=each_feature,
+                 True, x_label=each_feature + '_comparison', y_label='proteins count(relative)', png_file_name=each_feature,
                  first_label= 'all_disordered_Pr.s', second_label= 'disease_Pr.s')
 
-# TODO: check if it is needed to add zeros and sum = 75088 instead of 75052 //or omitted data:/ too much zeros
+
