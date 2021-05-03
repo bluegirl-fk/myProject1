@@ -50,12 +50,22 @@ disease_mobidb_df = mobidb_transposed_df[mobidb_transposed_df['acc'].isin(diseas
 
 ## 3d matrix
 disease_mobidb_matrix = (disease_mobidb_df.iloc[:, 1:].to_numpy() <= 1.) * disease_mobidb_df.iloc[:, 1:].to_numpy()
-disease_3d_matrix = np.zeros((disease_mobidb_matrix.shape[0], disease_mobidb_matrix.shape[1], 11))
+# Replace "np.nan" with 0 to initialize the full matrix with zeros
+disease_3d_matrix = np.full((disease_mobidb_matrix.shape[0], disease_mobidb_matrix.shape[1], 11), np.nan) #can also make this 101 to have more precise results
+
 for i in range(disease_mobidb_matrix.shape[0]):
     for j in range(disease_mobidb_matrix.shape[1]):
         if disease_mobidb_matrix[i, j] != 0: #find a way to neglect unreal zeros
-            k = int(round(disease_mobidb_matrix[i, j] * 10)) #how much does this affect the results?
+            k = int(round(disease_mobidb_matrix[i, j] * 10)) #can also make this 100 to have more precise results
             disease_3d_matrix[i, j, k] = 1
+
+# Replace NaN with zeros for rows containing at least one value
+for i in range(disease_3d_matrix.shape[0]):
+    for j in range(disease_3d_matrix.shape[1]):
+        if 1.0 in disease_3d_matrix[i][j]:
+            disease_3d_matrix[i][j][np.isnan(disease_3d_matrix[i][j])] = 0
+
+disease_3d_matrix_sum = np.nansum(disease_3d_matrix, axis=0)
 
 ## Dictionary Homo sapiens
 for each_feature in mobidb_features_lst:
