@@ -90,30 +90,27 @@ for i in range(disease_3d_matrix.shape[0]):
             disease_3d_matrix[i][j][np.isnan(disease_3d_matrix[i][j])] = 0
 
 disease_3d_matrix_sum = np.nansum(disease_3d_matrix, axis=0)
+disease_3d_matrix_sum = disease_3d_matrix_sum / disease_3d_matrix_sum.max(axis=1)[:,None]
+
 disease_cont_fract_sum_df = pd.DataFrame(disease_3d_matrix_sum,
                                          columns=['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'],
                                          index=mobidb_features_lst[1:])
 ## heatmaps of Sum
 sns.set()
 fig, ax = plt.subplots(2, 1, figsize=(24, 12))
-
 for i, d in enumerate([mobid_cont_fract_sum_df.transpose(), disease_cont_fract_sum_df.transpose()]):
     labels = d.applymap(lambda v: str(v) if v == d.values.max() else '')
     sns.heatmap(d,
-                cmap="viridis",  # Choose a squential colormap
-                annot_kws={'fontsize': 11},  # Reduce size of label to fit
-                fmt='',  # Interpret labels as strings
-                square=True,  # Force square cells
-                #vmax=1,  # Ensure same
-                #vmin=0,  # color scale
-                linewidth=0.01,  # Add gridlines
-                linecolor="#222",  # Adjust gridline color
-                ax=ax[i],  # Arrange in subplot
+                cmap="viridis",  # squential colormap
+                annot_kws={'fontsize': 11},
+                fmt='',
+                square=True,
+                #vmax=1,
+                #vmin=0,
+                linewidth=0.01,
+                linecolor="#222",
+                ax=ax[i],
                 )
-
-    # cbar = ax[i].collections[0].colorbar
-    # cbar.set_ticks([0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1])
-    # cbar.set_ticklabels(['0%', '10%', '20%', '30%','40%','50%','60%','70%','80%','90%','100%'])
 
 ax[0].set_title('Homo sapiens')
 ax[1].set_title('NDDs')
@@ -123,8 +120,11 @@ ax[0].set_xlabel('mobiDB features')
 ax[1].set_xlabel('mobiDB features')
 
 plt.tight_layout()
-#plt.show()
 plt.savefig('plots/heatmaps/final.png', dpi=120)
+plt.show()
+
+
+
 # hmap_mobidb_cont_fract_sum = sns.heatmap(mobid_cont_fract_sum_df.transpose(), xticklabels=1, yticklabels=True, square=True)
 #
 # plt.title('Mobidb Homo sapiens')
