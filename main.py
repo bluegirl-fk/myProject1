@@ -48,15 +48,36 @@ disease_acc_df = pd.read_csv('data/diseases.tab', sep='\t')
 disease_acc_lst = disease_acc_df['Entry'].to_list()
 disease_mobidb_df = mobidb_transposed_df[mobidb_transposed_df['acc'].isin(disease_acc_lst)]
 
-## 3d matrix
+## 3d matrix mobidb
+mobidb_matrix = (mobidb_transposed_df.iloc[:, 1:].to_numpy() <= 1.) * mobidb_transposed_df.iloc[:, 1:].to_numpy()
+# Replace "np.nan" with 0 to initialize the full matrix with zeros
+mobidb_3d_matrix = np.full((mobidb_matrix.shape[0], mobidb_matrix.shape[1], 11), np.nan)
+#if I make the range 0-101 instead of 0-10, how should I draw the heatmap? divide in ranges of 10 categories? i.e 0-10,11-20,21-30 ?
+for i in range(mobidb_matrix.shape[0]):
+    for j in range(mobidb_matrix.shape[1]):
+        if mobidb_matrix[i, j] != 0:
+            k = int(round(mobidb_matrix[i, j] * 10))
+            mobidb_3d_matrix[i, j, k] = 1
+
+# Replace NaN with zeros for rows containing at least one value
+for i in range(mobidb_3d_matrix.shape[0]):
+    for j in range(mobidb_3d_matrix.shape[1]):
+        if 1.0 in mobidb_3d_matrix[i][j]:
+            mobidb_3d_matrix[i][j][np.isnan(mobidb_3d_matrix[i][j])] = 0
+
+# gives us sum of content_fraction of all given proteins based on each mobidb feature
+mobidb_3d_matrix_sum = np.nansum(mobidb_3d_matrix, axis=0)
+
+
+## 3d matrix for disease
 disease_mobidb_matrix = (disease_mobidb_df.iloc[:, 1:].to_numpy() <= 1.) * disease_mobidb_df.iloc[:, 1:].to_numpy()
 # Replace "np.nan" with 0 to initialize the full matrix with zeros
-disease_3d_matrix = np.full((disease_mobidb_matrix.shape[0], disease_mobidb_matrix.shape[1], 11), np.nan) #can also make this 101 to have more precise results
-
+disease_3d_matrix = np.full((disease_mobidb_matrix.shape[0], disease_mobidb_matrix.shape[1], 11), np.nan)
+#if I make the range 0-101 instead of 0-10, how should I draw the heatmap? divide in ranges of 10 categories? i.e 0-10,11-20,21-30 ?
 for i in range(disease_mobidb_matrix.shape[0]):
     for j in range(disease_mobidb_matrix.shape[1]):
-        if disease_mobidb_matrix[i, j] != 0: #find a way to neglect unreal zeros
-            k = int(round(disease_mobidb_matrix[i, j] * 10)) #can also make this 100 to have more precise results
+        if disease_mobidb_matrix[i, j] != 0:
+            k = int(round(disease_mobidb_matrix[i, j] * 10))
             disease_3d_matrix[i, j, k] = 1
 
 # Replace NaN with zeros for rows containing at least one value
@@ -65,7 +86,9 @@ for i in range(disease_3d_matrix.shape[0]):
         if 1.0 in disease_3d_matrix[i][j]:
             disease_3d_matrix[i][j][np.isnan(disease_3d_matrix[i][j])] = 0
 
+# gives us sum of content_fraction of all given proteins based on each mobidb feature
 disease_3d_matrix_sum = np.nansum(disease_3d_matrix, axis=0)
+
 
 ## Dictionary Homo sapiens
 for each_feature in mobidb_features_lst:
