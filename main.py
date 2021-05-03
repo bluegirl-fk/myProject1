@@ -2,6 +2,7 @@
 import itertools
 
 import numpy as np
+import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -20,7 +21,7 @@ def drawplot(plot_input_lst, bins, is_dense, x_label, y_label, png_file_name, su
     plt.ylabel(y_label)
     sub_directory = subdirectory  # homosapiens or disease
     file_format = '.png'
-    plt.savefig('graphs/' + sub_directory + '/' + png_file_name + file_format)
+    plt.savefig('plots/' + sub_directory + '/' + png_file_name + file_format)
     plt.show()
 
 
@@ -30,9 +31,11 @@ def compare_plot(first_lst, second_lst, bins, is_dense, first_label, second_labe
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     file_format = '.png'
-    plt.savefig('graphs/compare/' + png_file_name + '_compare' + file_format)
+    plt.savefig('plots/compare/' + png_file_name + '_compare' + file_format)
     plt.show()
 
+
+# TODO: make matrix maker methods, one with nan as Damiano did, one without like you did before
 
 # if __name__ == '__main__':
 ## Files import and manipulation
@@ -52,7 +55,7 @@ disease_mobidb_df = mobidb_transposed_df[mobidb_transposed_df['acc'].isin(diseas
 mobidb_matrix = (mobidb_transposed_df.iloc[:, 1:].to_numpy() <= 1.) * mobidb_transposed_df.iloc[:, 1:].to_numpy()
 # Replace "np.nan" with 0 to initialize the full matrix with zeros
 mobidb_3d_matrix = np.full((mobidb_matrix.shape[0], mobidb_matrix.shape[1], 11), np.nan)
-#if I make the range 0-101 instead of 0-10, how should I draw the heatmap? divide in ranges of 10 categories? i.e 0-10,11-20,21-30 ?
+# if I make the range 0-101 instead of 0-10, how should I draw the heatmap? divide in ranges of 10 categories? i.e 0-10,11-20,21-30 ?
 for i in range(mobidb_matrix.shape[0]):
     for j in range(mobidb_matrix.shape[1]):
         if mobidb_matrix[i, j] != 0:
@@ -67,12 +70,14 @@ for i in range(mobidb_3d_matrix.shape[0]):
 
 # gives us sum of content_fraction of all given proteins based on each mobidb feature
 mobidb_3d_matrix_sum = np.nansum(mobidb_3d_matrix, axis=0)
-
+mobid_cont_fract_sum_df = pd.DataFrame(mobidb_3d_matrix_sum,
+                                       columns=['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'],
+                                       index=mobidb_features_lst[1:])
 
 ## 3d matrix disease
 disease_mobidb_matrix = (disease_mobidb_df.iloc[:, 1:].to_numpy() <= 1.) * disease_mobidb_df.iloc[:, 1:].to_numpy()
 disease_3d_matrix = np.full((disease_mobidb_matrix.shape[0], disease_mobidb_matrix.shape[1], 11), np.nan)
-#if I make the range 0-101 instead of 0-10, how should I draw the heatmap? divide in ranges of 10 categories? i.e 0-10,11-20,21-30 ?
+# if I make the range 0-101 instead of 0-10, how should I draw the heatmap? divide in ranges of 10 categories? i.e 0-10,11-20,21-30 ?
 for i in range(disease_mobidb_matrix.shape[0]):
     for j in range(disease_mobidb_matrix.shape[1]):
         if disease_mobidb_matrix[i, j] != 0:
@@ -85,7 +90,17 @@ for i in range(disease_3d_matrix.shape[0]):
             disease_3d_matrix[i][j][np.isnan(disease_3d_matrix[i][j])] = 0
 
 disease_3d_matrix_sum = np.nansum(disease_3d_matrix, axis=0)
-
+disease_cont_fract_sum_df = pd.DataFrame(disease_3d_matrix_sum,
+                                         columns=['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'],
+                                         index=mobidb_features_lst[1:])
+## heatmaps of Sum
+sns.set()
+hmap_mobidb_cont_fract_sum = sns.heatmap(mobid_cont_fract_sum_df.transpose(), linewidths=.5)
+# plt.show()
+plt.savefig('plots/heatmaps/' + 'mobidb.png')
+hmap_disease_cont_fract_sum = sns.heatmap(disease_cont_fract_sum_df.transpose(), linewidths=.5)
+# plt.show()
+plt.savefig('plots/heatmaps/' + 'diseases.png')
 
 ## Dictionary Homo sapiens
 for each_feature in mobidb_features_lst:
