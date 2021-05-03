@@ -48,14 +48,14 @@ disease_acc_df = pd.read_csv('data/diseases.tab', sep='\t')
 disease_acc_lst = disease_acc_df['Entry'].to_list()
 disease_mobidb_df = mobidb_transposed_df[mobidb_transposed_df['acc'].isin(disease_acc_lst)]
 
-## 3d matrix for Bayes' theorem
+## 3d matrix
 disease_mobidb_matrix = (disease_mobidb_df.iloc[:, 1:].to_numpy() <= 1.) * disease_mobidb_df.iloc[:, 1:].to_numpy()
-matrix = np.zeros((disease_mobidb_matrix.shape[0], disease_mobidb_matrix.shape[1], 11))
+disease_3d_matrix = np.zeros((disease_mobidb_matrix.shape[0], disease_mobidb_matrix.shape[1], 11))
 for i in range(disease_mobidb_matrix.shape[0]):
     for j in range(disease_mobidb_matrix.shape[1]):
-        if disease_mobidb_matrix[i, j] != 0: #recinsider this if
-            k = int(round(disease_mobidb_matrix[i, j] * 10))
-            matrix[i, j, k] = 1
+        if disease_mobidb_matrix[i, j] != 0: #find a way to neglect unreal zeros
+            k = int(round(disease_mobidb_matrix[i, j] * 10)) #how much does this affect the results?
+            disease_3d_matrix[i, j, k] = 1
 
 ## Dictionary Homo sapiens
 for each_feature in mobidb_features_lst:
