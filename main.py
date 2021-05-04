@@ -10,8 +10,8 @@ mobidb_features_lst = []
 mobidb_predictors_cont_fra_dict = {}
 cont_fra_temp_lst = []
 
-disease_cont_fra_temp_lst = []
-disease_predictors_cont_fra_dict = {}
+ndd_cont_fra_temp_lst = []
+ndd_predictors_cont_fra_dict = {}
 
 
 def drawplot(plot_input_lst, bins, is_dense, x_label, y_label, png_file_name, subdirectory):
@@ -19,7 +19,7 @@ def drawplot(plot_input_lst, bins, is_dense, x_label, y_label, png_file_name, su
              density=is_dense)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
-    sub_directory = subdirectory  # homosapiens or disease
+    sub_directory = subdirectory  # homosapiens or ndd
     file_format = '.png'
     plt.savefig('plots/' + sub_directory + '/' + png_file_name + file_format)
     plt.show()
@@ -67,10 +67,10 @@ def matrix_maker_zeros(input_df, num_3rd_dim):
     return matrix_2d, matrix_3d, matrix_3d_sum
 
 
-def sum_df_generator(input_sum_matrix, index_list):
+def sum_df_generator(input_sum_matrix):
     sum_df = pd.DataFrame(input_sum_matrix,
                           columns=['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'],
-                          index=index_list)
+                          index=mobidb_features_lst[1:])
     return sum_df
 
 
@@ -111,21 +111,34 @@ mobidb_transposed_df.to_csv(r'data/mobidb_transposed_df.csv', index=True)
 mobidb_features_lst = mobidb_transposed_df.columns.str.split(',').tolist()  # this also contains the 'acc' column
 mobidb_features_lst = list(itertools.chain(*mobidb_features_lst))  # flat list
 
-disease_acc_df = pd.read_csv('data/diseases.tab', sep='\t')
-disease_acc_lst = disease_acc_df['Entry'].to_list()
-disease_mobidb_df = mobidb_transposed_df[mobidb_transposed_df['acc'].isin(disease_acc_lst)]
+ndd_acc_df = pd.read_csv('data/diseases.tab', sep='\t')
+ndd_acc_lst = ndd_acc_df['Entry'].to_list()
+ndd_mobidb_df = mobidb_transposed_df[mobidb_transposed_df['acc'].isin(ndd_acc_lst)]
 
 ## Matrix
-mobidb_matrix, mobidb_3d_matrix, mobidb_3d_matrix_sum = matrix_maker_nan(mobidb_transposed_df.iloc[:, 1:], 10)
-disease_matrix, disease_3d_matrix, disease_3d_matrix_sum = matrix_maker_nan(disease_mobidb_df.iloc[:, 1:], 10)
+# with nan
+mobidb_matrix_nan, mobidb_3d_matrix_nan, mobidb_3d_matrix_nan_sum = matrix_maker_nan(mobidb_transposed_df.iloc[:, 1:], 10)
+ndd_matrix_nan, ndd_3d_matrix_nan, ndd_3d_matrix_nan_sum = matrix_maker_nan(ndd_mobidb_df.iloc[:, 1:], 10)
+# with zeros
+mobidb_matrix_zeros, mobidb_3d_matrix_zeros, mobidb_3d_matrix_zeros_sum = matrix_maker_zeros(mobidb_transposed_df.iloc[:, 1:], 10)
+ndd_matrix_zeros, ndd_3d_matrix_zeros, ndd_3d_matrix_zeros_sum = matrix_maker_zeros(ndd_mobidb_df.iloc[:, 1:], 10)
 
 ## Sum df for heat map
-mobidb_cont_fract_sum_df = sum_df_generator(mobidb_3d_matrix_sum, mobidb_features_lst[1:])
-disease_cont_fract_sum_df = sum_df_generator(disease_3d_matrix_sum, mobidb_features_lst[1:])
+mobidb_cont_fract_sum_df = sum_df_generator(mobidb_3d_matrix_nan_sum)
+ndd_cont_fract_sum_df = sum_df_generator(ndd_3d_matrix_nan_sum)
+
+## Difference of the sum arrays
 #TODO: find the difference of two matrices
+#should I use the ones with Nan or zero?
+#with nan
+sum_difference_matrix_nan = mobidb_3d_matrix_nan_sum - ndd_3d_matrix_nan_sum
+sum_difference_df_nan = sum_df_generator(sum_difference_matrix_nan)
+#with zeros
+sum_difference_matrix_zeros = mobidb_3d_matrix_zeros_sum - ndd_3d_matrix_zeros_sum
+sum_difference_df_zeros = sum_df_generator(sum_difference_matrix_zeros)
 
 ## heatmaps
-draw_heatmaps(sum_df_1=mobidb_cont_fract_sum_df.T, title_1='Homo sapiens', sum_df_2=disease_cont_fract_sum_df.T,
+draw_heatmaps(sum_df_1=mobidb_cont_fract_sum_df.T, title_1='Homo sapiens', sum_df_2=ndd_cont_fract_sum_df.T,
               title_2='NDDs', ylabel='Disorder %', xlabel='mobiDB features', saving_rout='plots/heatmaps/Hmaps.png')
 
 ## Dictionary Homo sapiens
@@ -142,18 +155,18 @@ for each_feature in mobidb_features_lst[
 
 ## Dictionary Disease
 for each_feature in mobidb_features_lst:
-    disease_cont_fra_temp_lst = disease_mobidb_df[each_feature].tolist()
-    disease_predictors_cont_fra_dict[each_feature] = disease_cont_fra_temp_lst
+    ndd_cont_fra_temp_lst = ndd_mobidb_df[each_feature].tolist()
+    ndd_predictors_cont_fra_dict[each_feature] = ndd_cont_fra_temp_lst
 
-## plot for diseases
+## plot for ndds
 for each_feature in mobidb_features_lst[1:]:
-    drawplot(disease_predictors_cont_fra_dict[each_feature], 30, False, each_feature + '_Disease', 'Protein count',
-             each_feature + '_disease', 'disease')
+    drawplot(ndd_predictors_cont_fra_dict[each_feature], 30, False, each_feature + '_ndd', 'Protein count',
+             each_feature + '_ndd', 'ndd')
 
-## comparative histogram (homosapiens Vs. disease)
+## comparative histogram (homosapiens Vs. ndd)
 for each_feature in mobidb_features_lst[
                     1:]:
-    compare_plot(mobidb_predictors_cont_fra_dict[each_feature], disease_predictors_cont_fra_dict[each_feature], 30,
+    compare_plot(mobidb_predictors_cont_fra_dict[each_feature], ndd_predictors_cont_fra_dict[each_feature], 30,
                  True, x_label=each_feature + '_comparison', y_label='proteins count(relative)',
                  png_file_name=each_feature,
-                 first_label='all_disordered_Pr.s', second_label='disease_Pr.s')
+                 first_label='all_disordered_Pr.s', second_label='ndd_Pr.s')
