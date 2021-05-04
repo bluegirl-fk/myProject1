@@ -35,6 +35,22 @@ def compare_plot(first_lst, second_lst, bins, is_dense, first_label, second_labe
     plt.show()
 
 
+def matrix_maker_2d_3d(input_df, number_3rd_dim):
+    matrix_2d = (input_df.to_numpy() <= 1.) * input_df.to_numpy()  # <=1 cuz it indicates disorder percentage(c_f)
+    matrix_3d = np.full((matrix_2d.shape[0], matrix_2d.shape[1], number_3rd_dim + 1), np.nan)
+    for i in range(matrix_2d.shape[0]):
+        for j in range(matrix_2d.shape[1]):
+            if matrix_2d[i, j] != 0:
+                k = int(round(matrix_2d[i, j] * number_3rd_dim))
+                matrix_3d[i, j, k] = 1
+    # Replace NaN with zeros for rows containing at least one value
+    for i in range(matrix_3d.shape[0]):
+        for j in range(matrix_3d.shape[1]):
+            if 1.0 in matrix_3d[i][j]:
+                matrix_3d[i][j][np.isnan(matrix_3d[i][j])] = 0
+    return matrix_2d, matrix_3d
+
+
 # TODO: make matrix maker methods, one with nan as Damiano did, one without like you did before
 
 # if __name__ == '__main__':
@@ -51,22 +67,8 @@ disease_acc_df = pd.read_csv('data/diseases.tab', sep='\t')
 disease_acc_lst = disease_acc_df['Entry'].to_list()
 disease_mobidb_df = mobidb_transposed_df[mobidb_transposed_df['acc'].isin(disease_acc_lst)]
 
-## 3d matrix mobidb
-mobidb_matrix = (mobidb_transposed_df.iloc[:, 1:].to_numpy() <= 1.) * mobidb_transposed_df.iloc[:, 1:].to_numpy()
-# Replace "np.nan" with 0 to initialize the full matrix with zeros
-mobidb_3d_matrix = np.full((mobidb_matrix.shape[0], mobidb_matrix.shape[1], 11), np.nan)
-for i in range(mobidb_matrix.shape[0]):
-    for j in range(mobidb_matrix.shape[1]):
-        if mobidb_matrix[i, j] != 0:
-            k = int(round(mobidb_matrix[i, j] * 10))
-            mobidb_3d_matrix[i, j, k] = 1
-
-# Replace NaN with zeros for rows containing at least one value
-for i in range(mobidb_3d_matrix.shape[0]):
-    for j in range(mobidb_3d_matrix.shape[1]):
-        if 1.0 in mobidb_3d_matrix[i][j]:
-            mobidb_3d_matrix[i][j][np.isnan(mobidb_3d_matrix[i][j])] = 0
-
+## Matrix
+mobidb_matrix, mobidb_3d_matrix = matrix_maker_2d_3d(mobidb_transposed_df.iloc[:, 1:], 10)
 # gives us sum of content_fraction of all given proteins based on each mobidb feature
 mobidb_3d_matrix_sum = np.nansum(mobidb_3d_matrix, axis=0)
 mobid_cont_fract_sum_df = pd.DataFrame(mobidb_3d_matrix_sum,
@@ -88,7 +90,7 @@ for i in range(disease_3d_matrix.shape[0]):
             disease_3d_matrix[i][j][np.isnan(disease_3d_matrix[i][j])] = 0
 
 disease_3d_matrix_sum = np.nansum(disease_3d_matrix, axis=0)
-disease_3d_matrix_sum = disease_3d_matrix_sum / disease_3d_matrix_sum.max(axis=1)[:,None]
+disease_3d_matrix_sum = disease_3d_matrix_sum / disease_3d_matrix_sum.max(axis=1)[:, None]
 disease_cont_fract_sum_df = pd.DataFrame(disease_3d_matrix_sum,
                                          columns=['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'],
                                          index=mobidb_features_lst[1:])
@@ -102,8 +104,8 @@ for i, d in enumerate([mobid_cont_fract_sum_df.transpose(), disease_cont_fract_s
                 annot_kws={'fontsize': 11},
                 fmt='',
                 square=True,
-                #vmax=1,
-                #vmin=0,
+                # vmax=1,
+                # vmin=0,
                 linewidth=0.01,
                 linecolor="#222",
                 ax=ax[i],
