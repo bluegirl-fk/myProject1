@@ -62,7 +62,7 @@ def matrix_maker_zeros(input_df, num_3rd_dim):
     matrix_3d = np.zeros((matrix_2d.shape[0], matrix_2d.shape[1], num_3rd_dim + 1))
     for i in range(matrix_2d.shape[0]):
         for j in range(matrix_2d.shape[1]):
-            #if matrix_2d[i, j] != 0:
+            # if matrix_2d[i, j] != 0:
             k = int(round(matrix_2d[i, j] * num_3rd_dim))
             matrix_3d[i, j, k] = 1
     matrix_3d_sum = np.sum(matrix_3d, axis=0)
@@ -77,23 +77,22 @@ def sum_df_generator(input_sum_matrix):
     return sum_df
 
 
-def draw_heatmaps(data, titles, saving_rout):
+def draw_heatmaps(data, titles, saving_rout):  # from stackabuse.com/ultimate-guide-to-heatmaps-in-seaborn-with-python/
     sns.set()
     fig, axes = plt.subplots(len(data), 1, figsize=(12 * len(data), 12))
     for i, (ax, d, t) in enumerate(zip(axes.reshape(-1), data, titles)):
-        #labels = d.applymap(lambda v: str(v) if v == d.values.max() else '')
         sb = sns.heatmap(d,
-                    cmap="viridis",  # sequential colormap
-                    annot_kws={'fontsize': 11},
-                    fmt='',
-                    square=True,
-                    # vmax=1,
-                    # vmin=0,
-                    linewidth=0.01,
-                    linecolor="#222",
-                    ax=ax,
-                    vmin=-1.0, vmax=1.0
-                    )
+                         cmap="viridis",  # sequential colormap
+                         annot_kws={'fontsize': 11},
+                         fmt='',
+                         square=True,
+                         # vmax=1,
+                         # vmin=0,
+                         linewidth=0.01,
+                         linecolor="#222",
+                         ax=ax,
+                         vmin=-1.0, vmax=1.0
+                         )
         ax.set_title(t)
         # ax.set_ylabel(ylabel)
         if i < (len(data) - 1):
@@ -120,7 +119,6 @@ ndd_acc_df = pd.read_csv('data/diseases.tab', sep='\t')
 ndd_acc_lst = ndd_acc_df['Entry'].to_list()
 ndd_mobidb_df = mobidb_transposed_df[mobidb_transposed_df['acc'].isin(ndd_acc_lst)]
 
-
 ## Matrix
 # with nan
 _, mobidb_3d_matrix_nan, mobidb_3d_matrix_nan_sum = matrix_maker_nan(mobidb_transposed_df.iloc[:, 1:], 10)
@@ -140,6 +138,7 @@ draw_heatmaps([mobidb_cont_fract_sum_df.T, ndd_cont_fract_sum_df.T, sum_differen
               saving_rout='plots/heatmaps/Hmaps.png')
 
 import sys
+
 sys.exit(0)
 
 ## Dictionary Homo sapiens
