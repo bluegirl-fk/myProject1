@@ -122,6 +122,7 @@ disease_matrix, disease_3d_matrix, disease_3d_matrix_sum = matrix_maker_nan(dise
 ## Sum df for heat map
 mobidb_cont_fract_sum_df = sum_df_generator(mobidb_3d_matrix_sum, mobidb_features_lst[1:])
 disease_cont_fract_sum_df = sum_df_generator(disease_3d_matrix_sum, mobidb_features_lst[1:])
+#TODO: find the difference of two matrices
 
 ## heatmaps
 draw_heatmaps(sum_df_1=mobidb_cont_fract_sum_df.T, title_1='Homo sapiens', sum_df_2=disease_cont_fract_sum_df.T,
