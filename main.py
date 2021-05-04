@@ -125,23 +125,14 @@ ndd_mobidb_df = mobidb_transposed_df[mobidb_transposed_df['acc'].isin(ndd_acc_ls
 # with nan
 _, mobidb_3d_matrix_nan, mobidb_3d_matrix_nan_sum = matrix_maker_nan(mobidb_transposed_df.iloc[:, 1:], 10)
 _, ndd_3d_matrix_nan, ndd_3d_matrix_nan_sum = matrix_maker_nan(ndd_mobidb_df.iloc[:, 1:], 10)
-# with zeros
-#mobidb_matrix_zeros, mobidb_3d_matrix_zeros, mobidb_3d_matrix_zeros_sum = matrix_maker_zeros(mobidb_transposed_df.iloc[:, 1:], 10)
-#ndd_matrix_zeros, ndd_3d_matrix_zeros, ndd_3d_matrix_zeros_sum = matrix_maker_zeros(ndd_mobidb_df.iloc[:, 1:], 10)
 
 ## Sum df for heat map
 mobidb_cont_fract_sum_df = sum_df_generator(mobidb_3d_matrix_nan_sum)
 ndd_cont_fract_sum_df = sum_df_generator(ndd_3d_matrix_nan_sum)
 
-## Difference of the sum arrays
-#TODO: find the difference of two matrices
-#should I use the ones with Nan or zero?
-#with nan
+## Difference of the sum arrays(with nan)
 sum_difference_matrix_nan = mobidb_3d_matrix_nan_sum - ndd_3d_matrix_nan_sum
 sum_difference_df_nan = sum_df_generator(sum_difference_matrix_nan)
-#with zeros
-#sum_difference_matrix_zeros = mobidb_3d_matrix_zeros_sum - ndd_3d_matrix_zeros_sum
-#sum_difference_df_zeros = sum_df_generator(sum_difference_matrix_zeros)
 
 ## heatmaps
 draw_heatmaps([mobidb_cont_fract_sum_df.T, ndd_cont_fract_sum_df.T, sum_difference_df_nan.T],
