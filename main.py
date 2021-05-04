@@ -67,16 +67,15 @@ disease_acc_df = pd.read_csv('data/diseases.tab', sep='\t')
 disease_acc_lst = disease_acc_df['Entry'].to_list()
 disease_mobidb_df = mobidb_transposed_df[mobidb_transposed_df['acc'].isin(disease_acc_lst)]
 
-## Matrix mobidb
+## Matrix
 mobidb_matrix, mobidb_3d_matrix = matrix_maker_2d_3d(mobidb_transposed_df.iloc[:, 1:], 10)
-# gives us sum of content_fraction of all given proteins based on each mobidb feature
+disease_matrix, disease_3d_matrix = matrix_maker_2d_3d(disease_mobidb_df.iloc[:, 1:], 10)
+# sum of Pr.s with same content_fraction for each feature
 mobidb_3d_matrix_sum = np.nansum(mobidb_3d_matrix, axis=0)
+mobidb_3d_matrix_sum = mobidb_3d_matrix_sum / mobidb_3d_matrix_sum.max(axis=1)[:, None]
 mobid_cont_fract_sum_df = pd.DataFrame(mobidb_3d_matrix_sum,
                                        columns=['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'],
                                        index=mobidb_features_lst[1:])
-
-## Matrix disease
-disease_matrix, disease_3d_matrix = matrix_maker_2d_3d(disease_mobidb_df.iloc[:, 1:], 10)
 
 disease_3d_matrix_sum = np.nansum(disease_3d_matrix, axis=0)
 disease_3d_matrix_sum = disease_3d_matrix_sum / disease_3d_matrix_sum.max(axis=1)[:, None]
