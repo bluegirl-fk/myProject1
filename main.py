@@ -73,6 +73,31 @@ def sum_df_generator(input_sum_matrix, index_list):
                           index=index_list)
     return sum_df
 
+def draw_heatmaps(sum_df_1,title_1,  sum_df_2, title_2, ylabel, xlabel, saving_rout):
+    sns.set()
+    fig, ax = plt.subplots(2, 1, figsize=(24, 12))
+    for i, d in enumerate([sum_df_1, sum_df_2]):
+        labels = d.applymap(lambda v: str(v) if v == d.values.max() else '')
+        sns.heatmap(d,
+                    cmap="viridis",  # sequential colormap
+                    annot_kws={'fontsize': 11},
+                    fmt='',
+                    square=True,
+                    # vmax=1,
+                    # vmin=0,
+                    linewidth=0.01,
+                    linecolor="#222",
+                    ax=ax[i],
+                    )
+    ax[0].set_title(title_1)
+    ax[1].set_title(title_2)
+    ax[0].set_ylabel(ylabel)
+    ax[1].set_ylabel(ylabel)
+    ax[0].set_xlabel(xlabel)
+    ax[1].set_xlabel(xlabel)
+    plt.tight_layout()
+    plt.savefig(saving_rout, dpi=120)
+    plt.show()
 
 # if __name__ == '__main__':
 ## Files import and manipulation
@@ -96,61 +121,35 @@ disease_matrix, disease_3d_matrix, disease_3d_matrix_sum = matrix_maker_nan(dise
 mobidb_cont_fract_sum_df = sum_df_generator(mobidb_3d_matrix_sum, mobidb_features_lst[1:])
 disease_cont_fract_sum_df = sum_df_generator(disease_3d_matrix_sum, mobidb_features_lst[1:])
 
-# TODO: heatmap maker function
 ## heatmaps
-sns.set()
-fig, ax = plt.subplots(2, 1, figsize=(24, 12))
-for i, d in enumerate([mobidb_cont_fract_sum_df.transpose(), disease_cont_fract_sum_df.transpose()]):
-    labels = d.applymap(lambda v: str(v) if v == d.values.max() else '')
-    sns.heatmap(d,
-                cmap="viridis",  # sequential colormap
-                annot_kws={'fontsize': 11},
-                fmt='',
-                square=True,
-                # vmax=1,
-                # vmin=0,
-                linewidth=0.01,
-                linecolor="#222",
-                ax=ax[i],
-                )
+draw_heatmaps(sum_df_1=mobidb_cont_fract_sum_df.T, title_1='Homo sapiens', sum_df_2=disease_cont_fract_sum_df.T, title_2='NDDs', ylabel='Disorder %', xlabel='mobiDB features', saving_rout='plots/heatmaps/Hmaps.png' )
 
-ax[0].set_title('Homo sapiens')
-ax[1].set_title('NDDs')
-ax[0].set_ylabel('Disorder %')
-ax[1].set_ylabel('Disorder %')
-ax[0].set_xlabel('mobiDB features')
-ax[1].set_xlabel('mobiDB features')
+## Dictionary Homo sapiens
+for each_feature in mobidb_features_lst:
+    cont_fra_temp_lst = mobidb_transposed_df[each_feature].tolist()
+    mobidb_predictors_cont_fra_dict[each_feature] = cont_fra_temp_lst
 
-plt.tight_layout()
-plt.savefig('plots/heatmaps/final.png', dpi=120)
-plt.show()
-#
-# ## Dictionary Homo sapiens
-# for each_feature in mobidb_features_lst:
-#     cont_fra_temp_lst = mobidb_transposed_df[each_feature].tolist()
-#     mobidb_predictors_cont_fra_dict[each_feature] = cont_fra_temp_lst
-#
-# ## Plot for homosapiens
-# for each_feature in mobidb_features_lst[
-#                     1:]:
-#     drawplot(mobidb_predictors_cont_fra_dict[each_feature], 30, True, each_feature + '_homosapiens',
-#              "Protein Count(relative)",
-#              each_feature, 'homosapiens')
-#
-# ## Dictionary Disease
-# for each_feature in mobidb_features_lst:
-#     disease_cont_fra_temp_lst = disease_mobidb_df[each_feature].tolist()
-#     disease_predictors_cont_fra_dict[each_feature] = disease_cont_fra_temp_lst
-#
-# ## plot for diseases
-# for each_feature in mobidb_features_lst[1:]:
-#     drawplot(disease_predictors_cont_fra_dict[each_feature], 30, False, each_feature + '_Disease', 'Protein count',
-#              each_feature + '_disease', 'disease')
-#
-# ## comparative histogram (homosapiens Vs. disease)
-# for each_feature in mobidb_features_lst[
-#                     1:]:
-#     compare_plot(mobidb_predictors_cont_fra_dict[each_feature], disease_predictors_cont_fra_dict[each_feature], 30,
-#                  True, x_label=each_feature + '_comparison', y_label='proteins count(relative)',
-#                  png_file_name=each_feature,
-#                  first_label='all_disordered_Pr.s', second_label='disease_Pr.s')
+## Plot for homosapiens
+for each_feature in mobidb_features_lst[
+                    1:]:
+    drawplot(mobidb_predictors_cont_fra_dict[each_feature], 30, True, each_feature + '_homosapiens',
+             "Protein Count(relative)",
+             each_feature, 'homosapiens')
+
+## Dictionary Disease
+for each_feature in mobidb_features_lst:
+    disease_cont_fra_temp_lst = disease_mobidb_df[each_feature].tolist()
+    disease_predictors_cont_fra_dict[each_feature] = disease_cont_fra_temp_lst
+
+## plot for diseases
+for each_feature in mobidb_features_lst[1:]:
+    drawplot(disease_predictors_cont_fra_dict[each_feature], 30, False, each_feature + '_Disease', 'Protein count',
+             each_feature + '_disease', 'disease')
+
+## comparative histogram (homosapiens Vs. disease)
+for each_feature in mobidb_features_lst[
+                    1:]:
+    compare_plot(mobidb_predictors_cont_fra_dict[each_feature], disease_predictors_cont_fra_dict[each_feature], 30,
+                 True, x_label=each_feature + '_comparison', y_label='proteins count(relative)',
+                 png_file_name=each_feature,
+                 first_label='all_disordered_Pr.s', second_label='disease_Pr.s')
