@@ -53,8 +53,18 @@ def matrix_maker_nan(input_df, num_3rd_dim):
     matrix_3d_sum = matrix_3d_sum / matrix_3d_sum.max(axis=1)[:, None]
     return matrix_2d, matrix_3d, matrix_3d_sum
 
+def matrix_maker_zeros(input_df, num_3rd_dim):
+    matrix_2d = (input_df.to_numpy() <= 1.) * input_df.to_numpy()
+    matrix_3d = np.zeros(matrix_2d.shape[0], matrix_2d[1], num_3rd_dim+1)
+    for i in range(matrix_2d.shape[0]):
+        for j in range(matrix_2d.shape[1]):
+            if matrix_2d[i, j] != 0:
+                k = int(round(matrix_2d[i, j] * num_3rd_dim))
+                matrix_3d[i, j, k] = 1
+    matrix_3d_sum = np.sum(matrix_3d, axis=0)
+    matrix_3d_sum = matrix_3d_sum / matrix_3d_sum.max(axis=1)[:, None]
+    return matrix_2d, matrix_3d, matrix_3d_sum
 
-# TODO: make matrix maker method with the zeros
 
 # if __name__ == '__main__':
 ## Files import and manipulation
