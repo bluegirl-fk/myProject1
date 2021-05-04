@@ -43,11 +43,14 @@ def matrix_maker_nan(input_df, num_3rd_dim):
             if matrix_2d[i, j] != 0:
                 k = int(round(matrix_2d[i, j] * num_3rd_dim))
                 matrix_3d[i, j, k] = 1
+
+    #
     # Replace NaN with zeros for rows containing at least one value
-    for i in range(matrix_3d.shape[0]):
-        for j in range(matrix_3d.shape[1]):
-            if 1.0 in matrix_3d[i][j]:
-                matrix_3d[i][j][np.isnan(matrix_3d[i][j])] = 0
+    # for i in range(matrix_3d.shape[0]):
+    #     for j in range(matrix_3d.shape[1]):
+    #         if 1.0 in matrix_3d[i][j]:
+    #             matrix_3d[i][j][np.isnan(matrix_3d[i][j])] = 0
+
     # sum of Pr.s with same content_fraction for each feature
     matrix_3d_sum = np.nansum(matrix_3d, axis=0)
     matrix_3d_sum = matrix_3d_sum / matrix_3d_sum.max(axis=1)[:, None]
@@ -56,12 +59,12 @@ def matrix_maker_nan(input_df, num_3rd_dim):
 
 def matrix_maker_zeros(input_df, num_3rd_dim):
     matrix_2d = (input_df.to_numpy() <= 1.) * input_df.to_numpy()
-    matrix_3d = np.zeros(matrix_2d.shape[0], matrix_2d.shape[1], num_3rd_dim + 1)
+    matrix_3d = np.zeros((matrix_2d.shape[0], matrix_2d.shape[1], num_3rd_dim + 1))
     for i in range(matrix_2d.shape[0]):
         for j in range(matrix_2d.shape[1]):
-            if matrix_2d[i, j] != 0:
-                k = int(round(matrix_2d[i, j] * num_3rd_dim))
-                matrix_3d[i, j, k] = 1
+            #if matrix_2d[i, j] != 0:
+            k = int(round(matrix_2d[i, j] * num_3rd_dim))
+            matrix_3d[i, j, k] = 1
     matrix_3d_sum = np.sum(matrix_3d, axis=0)
     matrix_3d_sum = matrix_3d_sum / matrix_3d_sum.max(axis=1)[:, None]
     return matrix_2d, matrix_3d, matrix_3d_sum
@@ -69,17 +72,17 @@ def matrix_maker_zeros(input_df, num_3rd_dim):
 
 def sum_df_generator(input_sum_matrix):
     sum_df = pd.DataFrame(input_sum_matrix,
-                          columns=['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'],
+                          columns=['0', ' ', '20', ' ', '40', ' ', '60', ' ', '80', ' ', '100'],
                           index=mobidb_features_lst[1:])
     return sum_df
 
 
-def draw_heatmaps(sum_df_1, title_1, sum_df_2, title_2, ylabel, xlabel, saving_rout):
+def draw_heatmaps(data, titles, saving_rout):
     sns.set()
-    fig, ax = plt.subplots(2, 1, figsize=(24, 12))
-    for i, d in enumerate([sum_df_1, sum_df_2]):
-        labels = d.applymap(lambda v: str(v) if v == d.values.max() else '')
-        sns.heatmap(d,
+    fig, axes = plt.subplots(len(data), 1, figsize=(12 * len(data), 12))
+    for i, (ax, d, t) in enumerate(zip(axes.reshape(-1), data, titles)):
+        #labels = d.applymap(lambda v: str(v) if v == d.values.max() else '')
+        sb = sns.heatmap(d,
                     cmap="viridis",  # sequential colormap
                     annot_kws={'fontsize': 11},
                     fmt='',
@@ -88,17 +91,19 @@ def draw_heatmaps(sum_df_1, title_1, sum_df_2, title_2, ylabel, xlabel, saving_r
                     # vmin=0,
                     linewidth=0.01,
                     linecolor="#222",
-                    ax=ax[i],
+                    ax=ax,
+                    vmin=-1.0, vmax=1.0
                     )
-    ax[0].set_title(title_1)
-    ax[1].set_title(title_2)
-    ax[0].set_ylabel(ylabel)
-    ax[1].set_ylabel(ylabel)
-    ax[0].set_xlabel(xlabel)
-    ax[1].set_xlabel(xlabel)
+        ax.set_title(t)
+        # ax.set_ylabel(ylabel)
+        if i < (len(data) - 1):
+            sb.set(xticklabels=[])
+            sb.set(xlabel=None)
     plt.tight_layout()
     plt.savefig(saving_rout, dpi=120)
     plt.show()
+
+    return
 
 
 # if __name__ == '__main__':
@@ -115,13 +120,14 @@ ndd_acc_df = pd.read_csv('data/diseases.tab', sep='\t')
 ndd_acc_lst = ndd_acc_df['Entry'].to_list()
 ndd_mobidb_df = mobidb_transposed_df[mobidb_transposed_df['acc'].isin(ndd_acc_lst)]
 
+
 ## Matrix
 # with nan
-mobidb_matrix_nan, mobidb_3d_matrix_nan, mobidb_3d_matrix_nan_sum = matrix_maker_nan(mobidb_transposed_df.iloc[:, 1:], 10)
-ndd_matrix_nan, ndd_3d_matrix_nan, ndd_3d_matrix_nan_sum = matrix_maker_nan(ndd_mobidb_df.iloc[:, 1:], 10)
+_, mobidb_3d_matrix_nan, mobidb_3d_matrix_nan_sum = matrix_maker_nan(mobidb_transposed_df.iloc[:, 1:], 10)
+_, ndd_3d_matrix_nan, ndd_3d_matrix_nan_sum = matrix_maker_nan(ndd_mobidb_df.iloc[:, 1:], 10)
 # with zeros
-mobidb_matrix_zeros, mobidb_3d_matrix_zeros, mobidb_3d_matrix_zeros_sum = matrix_maker_zeros(mobidb_transposed_df.iloc[:, 1:], 10)
-ndd_matrix_zeros, ndd_3d_matrix_zeros, ndd_3d_matrix_zeros_sum = matrix_maker_zeros(ndd_mobidb_df.iloc[:, 1:], 10)
+#mobidb_matrix_zeros, mobidb_3d_matrix_zeros, mobidb_3d_matrix_zeros_sum = matrix_maker_zeros(mobidb_transposed_df.iloc[:, 1:], 10)
+#ndd_matrix_zeros, ndd_3d_matrix_zeros, ndd_3d_matrix_zeros_sum = matrix_maker_zeros(ndd_mobidb_df.iloc[:, 1:], 10)
 
 ## Sum df for heat map
 mobidb_cont_fract_sum_df = sum_df_generator(mobidb_3d_matrix_nan_sum)
@@ -134,12 +140,16 @@ ndd_cont_fract_sum_df = sum_df_generator(ndd_3d_matrix_nan_sum)
 sum_difference_matrix_nan = mobidb_3d_matrix_nan_sum - ndd_3d_matrix_nan_sum
 sum_difference_df_nan = sum_df_generator(sum_difference_matrix_nan)
 #with zeros
-sum_difference_matrix_zeros = mobidb_3d_matrix_zeros_sum - ndd_3d_matrix_zeros_sum
-sum_difference_df_zeros = sum_df_generator(sum_difference_matrix_zeros)
+#sum_difference_matrix_zeros = mobidb_3d_matrix_zeros_sum - ndd_3d_matrix_zeros_sum
+#sum_difference_df_zeros = sum_df_generator(sum_difference_matrix_zeros)
 
 ## heatmaps
-draw_heatmaps(sum_df_1=mobidb_cont_fract_sum_df.T, title_1='Homo sapiens', sum_df_2=ndd_cont_fract_sum_df.T,
-              title_2='NDDs', ylabel='Disorder %', xlabel='mobiDB features', saving_rout='plots/heatmaps/Hmaps.png')
+draw_heatmaps([mobidb_cont_fract_sum_df.T, ndd_cont_fract_sum_df.T, sum_difference_df_nan.T],
+              ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
+              saving_rout='plots/heatmaps/Hmaps.png')
+
+import sys
+sys.exit(0)
 
 ## Dictionary Homo sapiens
 for each_feature in mobidb_features_lst:
