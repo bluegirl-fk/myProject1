@@ -53,9 +53,10 @@ def matrix_maker_nan(input_df, num_3rd_dim):
     matrix_3d_sum = matrix_3d_sum / matrix_3d_sum.max(axis=1)[:, None]
     return matrix_2d, matrix_3d, matrix_3d_sum
 
+
 def matrix_maker_zeros(input_df, num_3rd_dim):
     matrix_2d = (input_df.to_numpy() <= 1.) * input_df.to_numpy()
-    matrix_3d = np.zeros(matrix_2d.shape[0], matrix_2d[1], num_3rd_dim+1)
+    matrix_3d = np.zeros(matrix_2d.shape[0], matrix_2d[1], num_3rd_dim + 1)
     for i in range(matrix_2d.shape[0]):
         for j in range(matrix_2d.shape[1]):
             if matrix_2d[i, j] != 0:
@@ -64,6 +65,13 @@ def matrix_maker_zeros(input_df, num_3rd_dim):
     matrix_3d_sum = np.sum(matrix_3d, axis=0)
     matrix_3d_sum = matrix_3d_sum / matrix_3d_sum.max(axis=1)[:, None]
     return matrix_2d, matrix_3d, matrix_3d_sum
+
+
+def sum_df_generator(input_sum_matrix, index_list):
+    sum_df = pd.DataFrame(input_sum_matrix,
+                          columns=['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'],
+                          index=index_list)
+    return sum_df
 
 
 # if __name__ == '__main__':
@@ -80,17 +88,15 @@ disease_acc_df = pd.read_csv('data/diseases.tab', sep='\t')
 disease_acc_lst = disease_acc_df['Entry'].to_list()
 disease_mobidb_df = mobidb_transposed_df[mobidb_transposed_df['acc'].isin(disease_acc_lst)]
 
-## Matrix and sum df for heat map
+## Matrix
 mobidb_matrix, mobidb_3d_matrix, mobidb_3d_matrix_sum = matrix_maker_nan(mobidb_transposed_df.iloc[:, 1:], 10)
-mobidb_cont_fract_sum_df = pd.DataFrame(mobidb_3d_matrix_sum,
-                                       columns=['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'],
-                                       index=mobidb_features_lst[1:])
-
 disease_matrix, disease_3d_matrix, disease_3d_matrix_sum = matrix_maker_nan(disease_mobidb_df.iloc[:, 1:], 10)
-disease_cont_fract_sum_df = pd.DataFrame(disease_3d_matrix_sum,
-                                         columns=['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'],
-                                         index=mobidb_features_lst[1:])
-#TODO: heatmap maker function
+
+## Sum df for heat map
+mobidb_cont_fract_sum_df = sum_df_generator(mobidb_3d_matrix_sum, mobidb_features_lst[1:])
+disease_cont_fract_sum_df = sum_df_generator(disease_3d_matrix_sum, mobidb_features_lst[1:])
+
+# TODO: heatmap maker function
 ## heatmaps
 sns.set()
 fig, ax = plt.subplots(2, 1, figsize=(24, 12))
