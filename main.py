@@ -56,7 +56,7 @@ def matrix_maker_nan(input_df, num_3rd_dim):
 
 def matrix_maker_zeros(input_df, num_3rd_dim):
     matrix_2d = (input_df.to_numpy() <= 1.) * input_df.to_numpy()
-    matrix_3d = np.zeros(matrix_2d.shape[0], matrix_2d[1], num_3rd_dim + 1)
+    matrix_3d = np.zeros(matrix_2d.shape[0], matrix_2d.shape[1], num_3rd_dim + 1)
     for i in range(matrix_2d.shape[0]):
         for j in range(matrix_2d.shape[1]):
             if matrix_2d[i, j] != 0:
