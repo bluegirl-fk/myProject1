@@ -35,13 +35,13 @@ def compare_plot(first_lst, second_lst, bins, is_dense, first_label, second_labe
     plt.show()
 
 
-def matrix_maker_2d_3d(input_df, number_3rd_dim):
+def matrix_maker_nan(input_df, num_3rd_dim):
     matrix_2d = (input_df.to_numpy() <= 1.) * input_df.to_numpy()  # <=1 cuz it indicates disorder percentage(c_f)
-    matrix_3d = np.full((matrix_2d.shape[0], matrix_2d.shape[1], number_3rd_dim + 1), np.nan)
+    matrix_3d = np.full((matrix_2d.shape[0], matrix_2d.shape[1], num_3rd_dim + 1), np.nan)
     for i in range(matrix_2d.shape[0]):
         for j in range(matrix_2d.shape[1]):
             if matrix_2d[i, j] != 0:
-                k = int(round(matrix_2d[i, j] * number_3rd_dim))
+                k = int(round(matrix_2d[i, j] * num_3rd_dim))
                 matrix_3d[i, j, k] = 1
     # Replace NaN with zeros for rows containing at least one value
     for i in range(matrix_3d.shape[0]):
@@ -71,12 +71,12 @@ disease_acc_lst = disease_acc_df['Entry'].to_list()
 disease_mobidb_df = mobidb_transposed_df[mobidb_transposed_df['acc'].isin(disease_acc_lst)]
 
 ## Matrix and sum df for heat map
-mobidb_matrix, mobidb_3d_matrix, mobidb_3d_matrix_sum = matrix_maker_2d_3d(mobidb_transposed_df.iloc[:, 1:], 10)
+mobidb_matrix, mobidb_3d_matrix, mobidb_3d_matrix_sum = matrix_maker_nan(mobidb_transposed_df.iloc[:, 1:], 10)
 mobidb_cont_fract_sum_df = pd.DataFrame(mobidb_3d_matrix_sum,
                                        columns=['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'],
                                        index=mobidb_features_lst[1:])
 
-disease_matrix, disease_3d_matrix, disease_3d_matrix_sum = matrix_maker_2d_3d(disease_mobidb_df.iloc[:, 1:], 10)
+disease_matrix, disease_3d_matrix, disease_3d_matrix_sum = matrix_maker_nan(disease_mobidb_df.iloc[:, 1:], 10)
 disease_cont_fract_sum_df = pd.DataFrame(disease_3d_matrix_sum,
                                          columns=['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'],
                                          index=mobidb_features_lst[1:])
