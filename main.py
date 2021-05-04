@@ -73,7 +73,8 @@ def sum_df_generator(input_sum_matrix, index_list):
                           index=index_list)
     return sum_df
 
-def draw_heatmaps(sum_df_1,title_1,  sum_df_2, title_2, ylabel, xlabel, saving_rout):
+
+def draw_heatmaps(sum_df_1, title_1, sum_df_2, title_2, ylabel, xlabel, saving_rout):
     sns.set()
     fig, ax = plt.subplots(2, 1, figsize=(24, 12))
     for i, d in enumerate([sum_df_1, sum_df_2]):
@@ -99,6 +100,7 @@ def draw_heatmaps(sum_df_1,title_1,  sum_df_2, title_2, ylabel, xlabel, saving_r
     plt.savefig(saving_rout, dpi=120)
     plt.show()
 
+
 # if __name__ == '__main__':
 ## Files import and manipulation
 mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')
@@ -122,7 +124,8 @@ mobidb_cont_fract_sum_df = sum_df_generator(mobidb_3d_matrix_sum, mobidb_feature
 disease_cont_fract_sum_df = sum_df_generator(disease_3d_matrix_sum, mobidb_features_lst[1:])
 
 ## heatmaps
-draw_heatmaps(sum_df_1=mobidb_cont_fract_sum_df.T, title_1='Homo sapiens', sum_df_2=disease_cont_fract_sum_df.T, title_2='NDDs', ylabel='Disorder %', xlabel='mobiDB features', saving_rout='plots/heatmaps/Hmaps.png' )
+draw_heatmaps(sum_df_1=mobidb_cont_fract_sum_df.T, title_1='Homo sapiens', sum_df_2=disease_cont_fract_sum_df.T,
+              title_2='NDDs', ylabel='Disorder %', xlabel='mobiDB features', saving_rout='plots/heatmaps/Hmaps.png')
 
 ## Dictionary Homo sapiens
 for each_feature in mobidb_features_lst:
