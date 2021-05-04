@@ -92,7 +92,7 @@ disease_3d_matrix_sum = disease_3d_matrix_sum / disease_3d_matrix_sum.max(axis=1
 disease_cont_fract_sum_df = pd.DataFrame(disease_3d_matrix_sum,
                                          columns=['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'],
                                          index=mobidb_features_lst[1:])
-## heatmaps of Sum
+## heatmaps
 sns.set()
 fig, ax = plt.subplots(2, 1, figsize=(24, 12))
 for i, d in enumerate([mobid_cont_fract_sum_df.transpose(), disease_cont_fract_sum_df.transpose()]):
