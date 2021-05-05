@@ -137,7 +137,7 @@ sum_difference_df_nan_norm = sum_df_generator(sum_difference_matrix_nan_norm)
 ## heatmaps
 draw_heatmaps([mobidb_cont_fract_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, sum_difference_df_nan_norm.T],
               ['Homo sapiens', 'Schizophrenia(SCZ)', 'Difference (Homo sapiens - SCZ)'],
-              saving_rout='plots/heatmaps/Hmaps-ADHD.png')
+              saving_rout='plots/heatmaps/Hmaps-SCZ.png')
 
 ## Sum (not normalized) df for stacked histogram
 mobidb_3d_matrix_nan_sum_df = sum_df_generator(mobidb_3d_matrix_nan_sum)
