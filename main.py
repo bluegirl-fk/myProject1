@@ -53,8 +53,8 @@ def matrix_maker_nan(input_df, num_3rd_dim):
 
     # sum of Pr.s with same content_fraction for each feature
     matrix_3d_sum = np.nansum(matrix_3d, axis=0)
-    matrix_3d_sum = matrix_3d_sum / matrix_3d_sum.max(axis=1)[:, None]
-    return matrix_2d, matrix_3d, matrix_3d_sum
+    matrix_3d_sum_normalized = matrix_3d_sum / matrix_3d_sum.max(axis=1)[:, None]
+    return matrix_2d, matrix_3d, matrix_3d_sum, matrix_3d_sum_normalized
 
 
 def matrix_maker_zeros(input_df, num_3rd_dim):
@@ -66,8 +66,8 @@ def matrix_maker_zeros(input_df, num_3rd_dim):
             k = int(round(matrix_2d[i, j] * num_3rd_dim))
             matrix_3d[i, j, k] = 1
     matrix_3d_sum = np.sum(matrix_3d, axis=0)
-    matrix_3d_sum = matrix_3d_sum / matrix_3d_sum.max(axis=1)[:, None]
-    return matrix_2d, matrix_3d, matrix_3d_sum
+    matrix_3d_sum_normalized = matrix_3d_sum / matrix_3d_sum.max(axis=1)[:, None]
+    return matrix_2d, matrix_3d, matrix_3d_sum, matrix_3d_sum_normalized
 
 
 def sum_df_generator(input_sum_matrix):
@@ -121,21 +121,38 @@ ndd_mobidb_df = mobidb_transposed_df[mobidb_transposed_df['acc'].isin(ndd_acc_ls
 
 ## Matrix
 # with nan
-_, mobidb_3d_matrix_nan, mobidb_3d_matrix_nan_sum = matrix_maker_nan(mobidb_transposed_df.iloc[:, 1:], 10)
-_, ndd_3d_matrix_nan, ndd_3d_matrix_nan_sum = matrix_maker_nan(ndd_mobidb_df.iloc[:, 1:], 10)
+_, mobidb_3d_matrix_nan, mobidb_3d_matrix_nan_sum, mobidb_3d_matrix_nan_sum_norm = matrix_maker_nan(
+    mobidb_transposed_df.iloc[:, 1:], 10)
+_, ndd_3d_matrix_nan, ndd_3d_matrix_nan_sum, ndd_3d_matrix_nan_sum_norm = matrix_maker_nan(ndd_mobidb_df.iloc[:, 1:],
+                                                                                           10)
 
-## Sum df for heat map
-mobidb_cont_fract_sum_df = sum_df_generator(mobidb_3d_matrix_nan_sum)
-ndd_cont_fract_sum_df = sum_df_generator(ndd_3d_matrix_nan_sum)
+## Sum_norm df for heat map
+mobidb_cont_fract_sum_norm_df = sum_df_generator(mobidb_3d_matrix_nan_sum_norm)
+ndd_cont_fract_sum_norm_df = sum_df_generator(ndd_3d_matrix_nan_sum_norm)
 
 ## Difference of the sum arrays(with nan)
-sum_difference_matrix_nan = mobidb_3d_matrix_nan_sum - ndd_3d_matrix_nan_sum
-sum_difference_df_nan = sum_df_generator(sum_difference_matrix_nan)
+sum_difference_matrix_nan_norm = mobidb_3d_matrix_nan_sum_norm - ndd_3d_matrix_nan_sum_norm
+sum_difference_df_nan_norm = sum_df_generator(sum_difference_matrix_nan_norm)
 
 ## heatmaps
-draw_heatmaps([mobidb_cont_fract_sum_df.T, ndd_cont_fract_sum_df.T, sum_difference_df_nan.T],
+draw_heatmaps([mobidb_cont_fract_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, sum_difference_df_nan_norm.T],
               ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
               saving_rout='plots/heatmaps/Hmaps.png')
+
+## Sum (not normalized) df for stacked histogram
+mobidb_3d_matrix_nan_sum_df = sum_df_generator(mobidb_3d_matrix_nan_sum)
+ndd_3d_matrix_nan_sum_df = sum_df_generator(ndd_3d_matrix_nan_sum)
+
+## data for stacked histogram of mobiDB and NDD separately
+x1_0_perc_lst = mobidb_3d_matrix_nan_sum_df['0'].to_list()
+x1_20_perc_lst = mobidb_3d_matrix_nan_sum_df['20'].to_list()
+x1_40_perc_lst = mobidb_3d_matrix_nan_sum_df['40'].to_list()
+x1_100_perc_lst = mobidb_3d_matrix_nan_sum_df['100'].to_list()
+plt.figure()
+plt.hist([x1_0_perc_lst, x1_20_perc_lst, x1_40_perc_lst, x1_100_perc_lst],mobidb_features_lst[1:], bins=20, stacked=True, density=True)
+plt.show()
+# apply log()
+#separated 3d_matrix_sum and sum_normalized variables
 
 import sys
 
