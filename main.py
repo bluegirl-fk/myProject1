@@ -115,7 +115,7 @@ mobidb_transposed_df.to_csv(r'data/mobidb_transposed_df.csv', index=True)
 mobidb_features_lst = mobidb_transposed_df.columns.str.split(',').tolist()  # this also contains the 'acc' column
 mobidb_features_lst = list(itertools.chain(*mobidb_features_lst))  # flat list
 
-ndd_acc_df = pd.read_csv('data/diseases.tab', sep='\t')
+ndd_acc_df = pd.read_csv('data/allUniqueEntry.tab', sep='\t')
 ndd_acc_lst = ndd_acc_df['Entry'].to_list()
 ndd_mobidb_df = mobidb_transposed_df[mobidb_transposed_df['acc'].isin(ndd_acc_lst)]
 
