@@ -115,7 +115,7 @@ mobidb_transposed_df.to_csv(r'data/mobidb_transposed_df.csv', index=True)
 mobidb_features_lst = mobidb_transposed_df.columns.str.split(',').tolist()  # this also contains the 'acc' column
 mobidb_features_lst = list(itertools.chain(*mobidb_features_lst))  # flat list
 
-ndd_acc_df = pd.read_csv('data/ADHD157EntryOnly.tab', sep='\t')
+ndd_acc_df = pd.read_csv('data/SCZall391EntryOnly.tab', sep='\t')
 ndd_acc_lst = ndd_acc_df['Entry'].to_list()
 ndd_mobidb_df = mobidb_transposed_df[mobidb_transposed_df['acc'].isin(ndd_acc_lst)]
 
@@ -136,7 +136,7 @@ sum_difference_df_nan_norm = sum_df_generator(sum_difference_matrix_nan_norm)
 
 ## heatmaps
 draw_heatmaps([mobidb_cont_fract_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, sum_difference_df_nan_norm.T],
-              ['Homo sapiens', 'ADHD', 'Difference (Homo sapiens - ADHD)'],
+              ['Homo sapiens', 'Schizophrenia(SCZ)', 'Difference (Homo sapiens - SCZ)'],
               saving_rout='plots/heatmaps/Hmaps-ADHD.png')
 
 ## Sum (not normalized) df for stacked histogram
