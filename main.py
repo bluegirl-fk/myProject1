@@ -115,7 +115,7 @@ mobidb_transposed_df.to_csv(r'data/mobidb_transposed_df.csv', index=True)
 mobidb_features_lst = mobidb_transposed_df.columns.str.split(',').tolist()  # this also contains the 'acc' column
 mobidb_features_lst = list(itertools.chain(*mobidb_features_lst))  # flat list
 
-ndd_acc_df = pd.read_csv('data/allUniqueEntry.tab', sep='\t')
+ndd_acc_df = pd.read_csv('data/ADHD157EntryOnly.tab', sep='\t')
 ndd_acc_lst = ndd_acc_df['Entry'].to_list()
 ndd_mobidb_df = mobidb_transposed_df[mobidb_transposed_df['acc'].isin(ndd_acc_lst)]
 
@@ -136,21 +136,21 @@ sum_difference_df_nan_norm = sum_df_generator(sum_difference_matrix_nan_norm)
 
 ## heatmaps
 draw_heatmaps([mobidb_cont_fract_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, sum_difference_df_nan_norm.T],
-              ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
-              saving_rout='plots/heatmaps/Hmaps.png')
+              ['Homo sapiens', 'ADHD', 'Difference (Homo sapiens - ADHD)'],
+              saving_rout='plots/heatmaps/Hmaps-ADHD.png')
 
 ## Sum (not normalized) df for stacked histogram
 mobidb_3d_matrix_nan_sum_df = sum_df_generator(mobidb_3d_matrix_nan_sum)
 ndd_3d_matrix_nan_sum_df = sum_df_generator(ndd_3d_matrix_nan_sum)
 
 ## data for stacked histogram of mobiDB and NDD separately
-x1_0_perc_lst = mobidb_3d_matrix_nan_sum_df['0'].to_list()
-x1_20_perc_lst = mobidb_3d_matrix_nan_sum_df['20'].to_list()
-x1_40_perc_lst = mobidb_3d_matrix_nan_sum_df['40'].to_list()
-x1_100_perc_lst = mobidb_3d_matrix_nan_sum_df['100'].to_list()
-plt.figure()
-plt.hist([x1_0_perc_lst, x1_20_perc_lst, x1_40_perc_lst, x1_100_perc_lst],mobidb_features_lst[1:], bins=20, stacked=True, density=True)
-plt.show()
+# x1_0_perc_lst = mobidb_3d_matrix_nan_sum_df['0'].to_list()
+# x1_20_perc_lst = mobidb_3d_matrix_nan_sum_df['20'].to_list()
+# x1_40_perc_lst = mobidb_3d_matrix_nan_sum_df['40'].to_list()
+# x1_100_perc_lst = mobidb_3d_matrix_nan_sum_df['100'].to_list()
+# plt.figure()
+# plt.hist([x1_0_perc_lst, x1_20_perc_lst, x1_40_perc_lst, x1_100_perc_lst],mobidb_features_lst[1:], bins=20, stacked=True, density=True)
+# plt.show()
 # apply log()
 #separated 3d_matrix_sum and sum_normalized variables
 
