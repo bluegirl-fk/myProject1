@@ -1,17 +1,10 @@
 # Start date = April 14th
 import itertools
-
+from math import log
 import numpy as np
-# import seaborn as sns
+import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
-
-mobidb_features_lst = []
-mobidb_predictors_cont_fra_dict = {}
-cont_fra_temp_lst = []
-
-ndd_cont_fra_temp_lst = []
-ndd_predictors_cont_fra_dict = {}
 
 
 def drawplot(plot_input_lst, bins, is_dense, x_label, y_label, png_file_name, subdirectory):
@@ -19,9 +12,19 @@ def drawplot(plot_input_lst, bins, is_dense, x_label, y_label, png_file_name, su
              density=is_dense)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
-    sub_directory = subdirectory  # homosapiens or ndd
     file_format = '.png'
-    plt.savefig('plots/' + sub_directory + '/' + png_file_name + file_format)
+    plt.savefig('plots/' + subdirectory + '/' + png_file_name + file_format)
+    plt.show()
+    return
+
+
+def drawplot_log(plot_input_lst, bins, x_label, y_label):
+    hist, bins = np.histogram(plot_input_lst, bins=bins)
+    logbins = np.logspace(np.log10(bins[0]), np.log10(bins[-1]), len(bins))
+    plt.hist(plot_input_lst, bins=logbins)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.xscale('log')
     plt.show()
     return
 
@@ -35,6 +38,7 @@ def compare_plot(first_lst, second_lst, bins, is_dense, first_label, second_labe
     plt.savefig('plots/' + png_file_name + '_compare' + file_format)
     plt.show()
     return
+
 
 def matrix_maker_nan(input_df, num_3rd_dim):
     matrix_2d = (input_df.to_numpy() <= 1.) * input_df.to_numpy()  # <=1 cuz it indicates disorder percentage(c_f)
@@ -77,53 +81,57 @@ def sum_df_generator(input_sum_matrix):
                           index=mobidb_features_lst[1:])
     return sum_df
 
-
-# def draw_heatmaps(data, titles, saving_rout):  # from stackabuse.com/ultimate-guide-to-heatmaps-in-seaborn-with-python/
-#     sns.set()
-#     fig, axes = plt.subplots(len(data), 1, figsize=(12 * len(data), 12))
-#     for i, (ax, d, t) in enumerate(zip(axes.reshape(-1), data, titles)):
-#         sb = sns.heatmap(d,
-#                          cmap="viridis",  # sequential colormap
-#                          annot_kws={'fontsize': 11},
-#                          fmt='',
-#                          square=True,
-#                          # vmax=1,
-#                          # vmin=0,
-#                          linewidth=0.01,
-#                          linecolor="#222",
-#                          ax=ax,
-#                          vmin=-1.0, vmax=1.0
-#                          )
-#         ax.set_title(t)
-#         # ax.set_ylabel(ylabel)
-#         if i < (len(data) - 1):
-#             sb.set(xticklabels=[])
-#             sb.set(xlabel=None)
-#     plt.tight_layout()
-#     plt.savefig(saving_rout, dpi=120)
-#     plt.show()
+    def draw_heatmaps(data, titles, saving_rout):  # from stackabuse.com/ultimate-guide-to-heatmaps-in-seaborn-with
+        # -python/
+        sns.set()
+        fig, axes = plt.subplots(len(data), 1, figsize=(12, 6 * len(data)))
+        for i, (ax, d, t) in enumerate(zip(axes.reshape(-1), data, titles)):
+            sb = sns.heatmap(d,
+                             cmap="viridis",  # sequential colormap
+                             annot_kws={'fontsize': 11},
+                             fmt='',
+                             square=True,
+                             # vmax=1,
+                             # vmin=0,
+                             linewidth=0.01,
+                             linecolor="#222",
+                             ax=ax,
+                             vmin=-1.0, vmax=1.0
+                             )
+            ax.set_title(t)
+            # ax.set_ylabel(ylabel)
+            if i < (len(data) - 1):
+                sb.set(xticklabels=[])
+                sb.set(xlabel=None)
+        plt.tight_layout()
+        plt.savefig(saving_rout, dpi=120)
+        plt.show()
 
     return
 
 
 # if __name__ == '__main__':
-## Files import and manipulation
+## Files import and modify
 mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')
-mobidb_transposed_df = mobidb_original_df.pivot_table(index=['acc'], columns=['feature'],
-                                                      values='content_fraction').fillna(0)
-mobidb_transposed_df = mobidb_transposed_df.reset_index()  # added idx nums manually,ACCs recognized separate column
-mobidb_transposed_df.to_csv(r'data/mobidb_transposed_df.csv', index=True)
-mobidb_features_lst = mobidb_transposed_df.columns.str.split(',').tolist()  # this also contains the 'acc' column
+## for content fraction
+mobidb_pivot_contf_df = mobidb_original_df.pivot_table(index=['acc'], columns=['feature'],
+                                                       values='content_fraction').fillna(0)
+mobidb_pivot_contf_df = mobidb_pivot_contf_df.reset_index()  # added idx nums manually,ACCs recognized separate column
+mobidb_pivot_contf_df.to_csv(r'data/mobidb_pivot_contf_df.csv', index=True)
+mobidb_features_lst = mobidb_pivot_contf_df.columns.str.split(',').tolist()  # this also contains the 'acc' column
 mobidb_features_lst = list(itertools.chain(*mobidb_features_lst))  # flat list
 
 ndd_acc_df = pd.read_csv('data/allUniqueEntry.tab', sep='\t')
 ndd_acc_lst = ndd_acc_df['Entry'].to_list()
-ndd_mobidb_df = mobidb_transposed_df[mobidb_transposed_df['acc'].isin(ndd_acc_lst)]
+ndd_mobidb_df = mobidb_pivot_contf_df[mobidb_pivot_contf_df['acc'].isin(ndd_acc_lst)]
+## for Length
+unique_mobidb_original_df = mobidb_original_df.drop_duplicates(subset='acc', keep='last')  # deleted duplicates
+mobidb_pivot_length_df = unique_mobidb_original_df[['acc', 'length']]
 
 ## Matrix
 # with nan
 _, mobidb_3d_matrix_nan, mobidb_3d_matrix_nan_sum, mobidb_3d_matrix_nan_sum_norm = matrix_maker_nan(
-    mobidb_transposed_df.iloc[:, 1:], 10)
+    mobidb_pivot_contf_df.iloc[:, 1:], 10)
 _, ndd_3d_matrix_nan, ndd_3d_matrix_nan_sum, ndd_3d_matrix_nan_sum_norm = matrix_maker_nan(ndd_mobidb_df.iloc[:, 1:],
                                                                                            10)
 
@@ -144,27 +152,21 @@ sum_difference_df_nan_norm = sum_df_generator(sum_difference_matrix_nan_norm)
 mobidb_3d_matrix_nan_sum_df = sum_df_generator(mobidb_3d_matrix_nan_sum)
 ndd_3d_matrix_nan_sum_df = sum_df_generator(ndd_3d_matrix_nan_sum)
 
-# # data for stacked histogram of mobiDB and NDD separately x1_0_perc_lst = mobidb_3d_matrix_nan_sum_df['0'].to_list(
-# ) x1_20_perc_lst = mobidb_3d_matrix_nan_sum_df['20'].to_list() x1_40_perc_lst = mobidb_3d_matrix_nan_sum_df[
-# '40'].to_list() x1_100_perc_lst = mobidb_3d_matrix_nan_sum_df['100'].to_list() plt.figure() plt.hist([
-# x1_0_perc_lst, x1_20_perc_lst, x1_40_perc_lst, x1_100_perc_lst],mobidb_features_lst[1:], bins=20, stacked=True,
-# density=True) plt.show() apply log() separated 3d_matrix_sum and sum_normalized variables
+import sys
 
-# import sys
-#
-# sys.exit(0)
+sys.exit(0)
 
 ## Dictionary Homo sapiens
 for each_feature in mobidb_features_lst:
-    cont_fra_temp_lst = mobidb_transposed_df[each_feature].tolist()
+    cont_fra_temp_lst = mobidb_pivot_contf_df[each_feature].tolist()
     mobidb_predictors_cont_fra_dict[each_feature] = cont_fra_temp_lst
 
 ## Plot for homosapiens
-# for each_feature in mobidb_features_lst[
-#                     1:]:
-#     drawplot(mobidb_predictors_cont_fra_dict[each_feature], 30, True, each_feature + '_homosapiens',
-#              "Protein Count(relative)",
-#              each_feature, 'homosapiens')
+for each_feature in mobidb_features_lst[
+                    1:]:
+    drawplot(mobidb_predictors_cont_fra_dict[each_feature], 30, True, each_feature + '_homosapiens',
+             "Protein Count(relative)",
+             each_feature, 'homosapiens')
 
 ## Dictionary Disease
 for each_feature in mobidb_features_lst:
@@ -181,5 +183,9 @@ for each_feature in mobidb_features_lst[
                     1:]:
     compare_plot(mobidb_predictors_cont_fra_dict[each_feature], ndd_predictors_cont_fra_dict[each_feature], 30,
                  True, x_label=each_feature + '_comparison', y_label='proteins count(relative)',
-                 png_file_name='/NDD-all-hist/compare/'+each_feature,
+                 png_file_name='/NDD-all-hist/compare/' + each_feature,
                  first_label='Homo sapiens Pr.s', second_label='NDD Pr.s')
+
+# test log hist
+# for each_feature in mobidb_features_lst[1:]:
+#     drawplot_log(mobidb_predictors_cont_fra_dict[each_feature], 10, each_feature + '_NDD', 'Protein count')
