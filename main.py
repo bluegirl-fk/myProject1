@@ -116,7 +116,7 @@ mobidb_transposed_df.to_csv(r'data/mobidb_transposed_df.csv', index=True)
 mobidb_features_lst = mobidb_transposed_df.columns.str.split(',').tolist()  # this also contains the 'acc' column
 mobidb_features_lst = list(itertools.chain(*mobidb_features_lst))  # flat list
 
-ndd_acc_df = pd.read_csv('data/ADHD157EntryOnly.tab', sep='\t')
+ndd_acc_df = pd.read_csv('data/SCZall391EntryOnly.tab', sep='\t')
 ndd_acc_lst = ndd_acc_df['Entry'].to_list()
 ndd_mobidb_df = mobidb_transposed_df[mobidb_transposed_df['acc'].isin(ndd_acc_lst)]
 
@@ -160,11 +160,11 @@ for each_feature in mobidb_features_lst:
     mobidb_predictors_cont_fra_dict[each_feature] = cont_fra_temp_lst
 
 ## Plot for homosapiens
-for each_feature in mobidb_features_lst[
-                    1:]:
-    drawplot(mobidb_predictors_cont_fra_dict[each_feature], 30, True, each_feature + '_homosapiens',
-             "Protein Count(relative)",
-             each_feature, 'homosapiens')
+# for each_feature in mobidb_features_lst[
+#                     1:]:
+#     drawplot(mobidb_predictors_cont_fra_dict[each_feature], 30, True, each_feature + '_homosapiens',
+#              "Protein Count(relative)",
+#              each_feature, 'homosapiens')
 
 ## Dictionary Disease
 for each_feature in mobidb_features_lst:
@@ -173,13 +173,13 @@ for each_feature in mobidb_features_lst:
 
 ## plot for ndds
 for each_feature in mobidb_features_lst[1:]:
-    drawplot(ndd_predictors_cont_fra_dict[each_feature], 30, False, each_feature + '_ADHD', 'Protein count',
-             each_feature + '_ADHD', 'hist-ADHD/ADHD')
+    drawplot(ndd_predictors_cont_fra_dict[each_feature], 30, False, each_feature + '_SCZ', 'Protein count',
+             each_feature + '_SCZ', 'hist-SCZ/SCZ')
 
 ## comparative histogram (homosapiens Vs. ndd)
 for each_feature in mobidb_features_lst[
                     1:]:
     compare_plot(mobidb_predictors_cont_fra_dict[each_feature], ndd_predictors_cont_fra_dict[each_feature], 30,
                  True, x_label=each_feature + '_comparison', y_label='proteins count(relative)',
-                 png_file_name='/hist-ADHD/compare/'+each_feature,
-                 first_label='Homo sapiens Pr.s', second_label='ADHD Pr.s')
+                 png_file_name='/hist-SCZ/compare/'+each_feature,
+                 first_label='Homo sapiens Pr.s', second_label='SCZ Pr.s')
