@@ -142,7 +142,7 @@ _, mobidb_3d_matrix_nan, mobidb_3d_matrix_nan_sum, mobidb_3d_matrix_nan_sum_norm
     mobidb_pivot_contf_df.iloc[:, 1:], 10)
 _, ndd_3d_matrix_nan, ndd_3d_matrix_nan_sum, ndd_3d_matrix_nan_sum_norm = matrix_maker_nan(ndd_mobidb_df.iloc[:, 1:],
                                                                                            10)
-## data frame with one row containing Sum of columns of matrix_3d_sum (for histogram based on distribution of heatmap)
+## columns sum of matrix_3d_sum df to get prot count per feature (for histogram based on distribution of heatmap)
 mobidb_columns_sum_df = pd.DataFrame([mobidb_3d_matrix_nan_sum.T.sum(axis=0)], columns=mobidb_features_lst[1:], index=['Proteins count'])
 ndd_columns_sum_df = pd.DataFrame([ndd_3d_matrix_nan_sum.T.sum(axis=0)], columns=mobidb_features_lst[1:], index=['Proteins count'])
 ## Sum_norm df for heat map
