@@ -88,31 +88,32 @@ def sum_df_generator(input_sum_matrix):
                           index=mobidb_features_lst[1:])
     return sum_df
 
-    def draw_heatmaps(data, titles, saving_rout):  # from stackabuse.com/ultimate-guide-to-heatmaps-in-seaborn-with
-        # -python/
-        sns.set()
-        fig, axes = plt.subplots(len(data), 1, figsize=(12, 6 * len(data)))
-        for i, (ax, d, t) in enumerate(zip(axes.reshape(-1), data, titles)):
-            sb = sns.heatmap(d,
-                             cmap="viridis",  # sequential colormap
-                             annot_kws={'fontsize': 11},
-                             fmt='',
-                             square=True,
-                             # vmax=1,
-                             # vmin=0,
-                             linewidth=0.01,
-                             linecolor="#222",
-                             ax=ax,
-                             vmin=-1.0, vmax=1.0
-                             )
-            ax.set_title(t)
-            # ax.set_ylabel(ylabel)
-            if i < (len(data) - 1):
-                sb.set(xticklabels=[])
-                sb.set(xlabel=None)
-        plt.tight_layout()
-        plt.savefig(saving_rout, dpi=120)
-        plt.show()
+
+def draw_heatmaps(data, titles, saving_rout):  # from stackabuse.com/ultimate-guide-to-heatmaps-in-seaborn-with
+    # -python/
+    sns.set()
+    fig, axes = plt.subplots(len(data), 1, figsize=(12, 6 * len(data)))
+    for i, (ax, d, t) in enumerate(zip(axes.reshape(-1), data, titles)):
+        sb = sns.heatmap(d,
+                         cmap="viridis",  # sequential colormap
+                         annot_kws={'fontsize': 11},
+                         fmt='',
+                         square=True,
+                         # vmax=1,
+                         # vmin=0,
+                         linewidth=0.01,
+                         linecolor="#222",
+                         ax=ax,
+                         vmin=-1.0, vmax=1.0
+                         )
+        ax.set_title(t)
+        # ax.set_ylabel(ylabel)
+        if i < (len(data) - 1):
+            sb.set(xticklabels=[])
+            sb.set(xlabel=None)
+    plt.tight_layout()
+    plt.savefig(saving_rout, dpi=120)
+    plt.show()
 
     return
 
@@ -141,10 +142,9 @@ _, mobidb_3d_matrix_nan, mobidb_3d_matrix_nan_sum, mobidb_3d_matrix_nan_sum_norm
     mobidb_pivot_contf_df.iloc[:, 1:], 10)
 _, ndd_3d_matrix_nan, ndd_3d_matrix_nan_sum, ndd_3d_matrix_nan_sum_norm = matrix_maker_nan(ndd_mobidb_df.iloc[:, 1:],
                                                                                            10)
-## Sum of columns of matrix_3d_sum (List for plotting histogram based on distribution of heatmap)
-mobidb_columns_sum_lst = mobidb_3d_matrix_nan_sum.T.sum(axis=0).tolist()
-ndd_columns_sum_lst = ndd_3d_matrix_nan_sum.T.sum(axis=0).tolist()
-
+## data frame with one row containing Sum of columns of matrix_3d_sum (for histogram based on distribution of heatmap)
+mobidb_columns_sum_df = pd.DataFrame([mobidb_3d_matrix_nan_sum.T.sum(axis=0)], columns=mobidb_features_lst[1:], index=['Proteins count'])
+ndd_columns_sum_df = pd.DataFrame([ndd_3d_matrix_nan_sum.T.sum(axis=0)], columns=mobidb_features_lst[1:], index=['Proteins count'])
 ## Sum_norm df for heat map
 mobidb_cont_fract_sum_norm_df = sum_df_generator(mobidb_3d_matrix_nan_sum_norm)
 ndd_cont_fract_sum_norm_df = sum_df_generator(ndd_3d_matrix_nan_sum_norm)
@@ -154,51 +154,51 @@ sum_difference_matrix_nan_norm = mobidb_3d_matrix_nan_sum_norm - ndd_3d_matrix_n
 sum_difference_df_nan_norm = sum_df_generator(sum_difference_matrix_nan_norm)
 
 ## heatmaps
-# draw_heatmaps([mobidb_cont_fract_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, sum_difference_df_nan_norm.T],
-#               ['Homo sapiens', 'Attention Deficit Hyperactivity Disorder(ADHD)', 'Difference (Homo sapiens - ADHD)'],
-#               saving_rout='plots/heatmaps/Hmaps-ADHD.png')
+draw_heatmaps([mobidb_cont_fract_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, sum_difference_df_nan_norm.T],
+              ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
+              saving_rout='plots/heatmaps/Hmaps-HS-NDD.png')
 
-# import sys
-#
-# sys.exit(0)
+import sys
 
-# ## Dictionary Homo sapiens
-# for each_feature in mobidb_features_lst:
-#     cont_fra_temp_lst = mobidb_pivot_contf_df[each_feature].tolist()
-#     mobidb_predictors_cont_fra_dict[each_feature] = cont_fra_temp_lst
-#
-# ## Plot for homosapiens
-# for each_feature in mobidb_features_lst[
-#                     1:]:
-#     drawplot(mobidb_predictors_cont_fra_dict[each_feature], 30, True, each_feature + '_homosapiens',
-#              "Protein Count(relative)",
-#              each_feature, 'homosapiens')
-#
-# ## Dictionary Disease
-# for each_feature in mobidb_features_lst:
-#     ndd_cont_fra_temp_lst = ndd_mobidb_df[each_feature].tolist()
-#     ndd_predictors_cont_fra_dict[each_feature] = ndd_cont_fra_temp_lst
-#
-# ## plot for ndds
-# for each_feature in mobidb_features_lst[1:]:
-#     drawplot(ndd_predictors_cont_fra_dict[each_feature], 30, False, each_feature + '_NDD', 'Protein count',
-#              each_feature + '_NDD', 'NDD-all-hist/NDD')
-#
-# ## comparative histogram (homosapiens Vs. ndd)
-# for each_feature in mobidb_features_lst[
-#                     1:]:
-#     compare_plot(mobidb_predictors_cont_fra_dict[each_feature], ndd_predictors_cont_fra_dict[each_feature], 30,
-#                  True, x_label=each_feature + '_comparison', y_label='proteins count(relative)',
-#                  png_file_name='/NDD-all-hist/compare/' + each_feature,
-#                  first_label='Homo sapiens Pr.s', second_label='NDD Pr.s')
+sys.exit(0)
+
+## Dictionary Homo sapiens
+for each_feature in mobidb_features_lst:
+    cont_fra_temp_lst = mobidb_pivot_contf_df[each_feature].tolist()
+    mobidb_predictors_cont_fra_dict[each_feature] = cont_fra_temp_lst
+
+## Plot for homosapiens
+for each_feature in mobidb_features_lst[
+                    1:]:
+    drawplot(mobidb_predictors_cont_fra_dict[each_feature], 30, True, each_feature + '_homosapiens',
+             "Protein Count(relative)",
+             each_feature, 'homosapiens')
+
+## Dictionary Disease
+for each_feature in mobidb_features_lst:
+    ndd_cont_fra_temp_lst = ndd_mobidb_df[each_feature].tolist()
+    ndd_predictors_cont_fra_dict[each_feature] = ndd_cont_fra_temp_lst
+
+## plot for ndds
+for each_feature in mobidb_features_lst[1:]:
+    drawplot(ndd_predictors_cont_fra_dict[each_feature], 30, False, each_feature + '_NDD', 'Protein count',
+             each_feature + '_NDD', 'NDD-all-hist/NDD')
+
+## comparative histogram (homosapiens Vs. ndd)
+for each_feature in mobidb_features_lst[
+                    1:]:
+    compare_plot(mobidb_predictors_cont_fra_dict[each_feature], ndd_predictors_cont_fra_dict[each_feature], 30,
+                 True, x_label=each_feature + '_comparison', y_label='proteins count(relative)',
+                 png_file_name='/NDD-all-hist/compare/' + each_feature,
+                 first_label='Homo sapiens Pr.s', second_label='NDD Pr.s')
 
 ## histogram sum of prot numbers for each feature
 # drawplot(plot_input_lst=mobidb_columns_sum_lst, bins=30,is_dense=False, x_label='Mobidb features',  )
 
-plt.hist([mobidb_features_lst[1:], ndd_columns_sum_lst], bins=40, density=False)
-plt.xlabel('mobidb features')
-plt.ylabel('proteins count')
-plt.show()
+# plt.hist([mobidb_features_lst[1:], ndd_columns_sum_lst], bins=40, density=False)
+# plt.xlabel('mobidb features')
+# plt.ylabel('proteins count')
+# plt.show()
 # test log hist
 # for each_feature in mobidb_features_lst[1:]:
 #     drawplot_log(mobidb_predictors_cont_fra_dict[each_feature], 10, each_feature + '_NDD', 'Protein count')
