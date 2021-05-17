@@ -89,8 +89,7 @@ def sum_df_generator(input_sum_matrix):
     return sum_df
 
 
-def draw_heatmaps(data, titles, saving_rout):  # from stackabuse.com/ultimate-guide-to-heatmaps-in-seaborn-with
-    # -python/
+def draw_heatmaps(data, titles, saving_rout):  # www.stackabuse.com/ultimate-guide-to-heatmaps-in-seaborn-with-python/
     sns.set()
     fig, axes = plt.subplots(len(data), 1, figsize=(12, 6 * len(data)))
     for i, (ax, d, t) in enumerate(zip(axes.reshape(-1), data, titles)):
@@ -143,8 +142,36 @@ _, mobidb_3d_matrix_nan, mobidb_3d_matrix_nan_sum, mobidb_3d_matrix_nan_sum_norm
 _, ndd_3d_matrix_nan, ndd_3d_matrix_nan_sum, ndd_3d_matrix_nan_sum_norm = matrix_maker_nan(ndd_mobidb_df.iloc[:, 1:],
                                                                                            10)
 ## columns sum of matrix_3d_sum df to get prot count per feature (for histogram based on distribution of heatmap)
-mobidb_columns_sum_df = pd.DataFrame([mobidb_3d_matrix_nan_sum.T.sum(axis=0)], columns=mobidb_features_lst[1:], index=['Proteins count'])
-ndd_columns_sum_df = pd.DataFrame([ndd_3d_matrix_nan_sum.T.sum(axis=0)], columns=mobidb_features_lst[1:], index=['Proteins count'])
+mobidb_columns_sum_df = pd.DataFrame([mobidb_3d_matrix_nan_sum.T.sum(axis=0)], columns=mobidb_features_lst[1:],
+                                     index=['Proteins count'])
+ndd_columns_sum_df = pd.DataFrame([ndd_3d_matrix_nan_sum.T.sum(axis=0)], columns=mobidb_features_lst[1:],
+                                  index=['Proteins count'])
+mobidb_columns_sum_df = mobidb_columns_sum_df.T.reset_index()
+ndd_columns_sum_df = ndd_columns_sum_df.T.reset_index()
+mobidb_columns_sum_df.columns = ['Features', 'Protein count']
+ndd_columns_sum_df.columns = ['Features', 'Protein count']
+
+## sum histograms (features distribution)
+# TODO: fix the xticklabels
+
+plt.figure(figsize=(36, 36))
+sns.set_style("ticks")
+g = sns.barplot(x="Features", y="Protein count", data=mobidb_columns_sum_df)
+# sns.despine(trim=True, offset=2)
+g.set_xticklabels(mobidb_columns_sum_df['Features'], rotation=55)
+plt.tight_layout()
+plt.savefig('plots/feature distribution/mobidb.png')
+plt.show()
+
+plt.figure(figsize=(36, 36))
+sns.set_style("ticks")
+g = sns.barplot(x="Features", y="Protein count", data=ndd_columns_sum_df)
+# sns.despine(trim=True, offset=2)
+g.set_xticklabels(ndd_columns_sum_df['Features'], rotation=55)
+plt.tight_layout()
+plt.savefig('plots/feature distribution/ndd.png')
+plt.show()
+
 ## Sum_norm df for heat map
 mobidb_cont_fract_sum_norm_df = sum_df_generator(mobidb_3d_matrix_nan_sum_norm)
 ndd_cont_fract_sum_norm_df = sum_df_generator(ndd_3d_matrix_nan_sum_norm)
@@ -192,13 +219,3 @@ for each_feature in mobidb_features_lst[
                  png_file_name='/NDD-all-hist/compare/' + each_feature,
                  first_label='Homo sapiens Pr.s', second_label='NDD Pr.s')
 
-## histogram sum of prot numbers for each feature
-# drawplot(plot_input_lst=mobidb_columns_sum_lst, bins=30,is_dense=False, x_label='Mobidb features',  )
-
-# plt.hist([mobidb_features_lst[1:], ndd_columns_sum_lst], bins=40, density=False)
-# plt.xlabel('mobidb features')
-# plt.ylabel('proteins count')
-# plt.show()
-# test log hist
-# for each_feature in mobidb_features_lst[1:]:
-#     drawplot_log(mobidb_predictors_cont_fra_dict[each_feature], 10, each_feature + '_NDD', 'Protein count')
