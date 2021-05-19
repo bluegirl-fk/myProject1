@@ -151,19 +151,23 @@ ndd_columns_sum_df = ndd_columns_sum_df.T.reset_index()
 mobidb_columns_sum_df.columns = ['Features', 'Protein count']
 ndd_columns_sum_df.columns = ['Features', 'Protein count']
 
-## Gene4denovo data, read gene names, separate the semicolon ones, delete duplicates
+## Gene4denovo data, read gene names, separate the semicolon ones, delete duplicates, add _HUMAN suffix
 gene4dn_genes_df = pd.read_csv('data/gene4denovo-anot-gene-envGene.txt')
-gene4dn_genes_df['Gene.refGene'] = gene4dn_genes_df['Gene.refGene'].apply(lambda x: x.split(';')[0]) # try this later:
+gene4dn_genes_df['Gene.refGene'] = gene4dn_genes_df['Gene.refGene'].apply(lambda x: x.split(';')[0])  # try this later:
 # to prevent losing the after semicolon items:
 # https://stackoverflow.com/questions/17116814/pandas-how-do-i-split-text-in-a-column-into-multiple-rows
-
-#gene4dn_genes_df['Gene.refGene'] = gene4dn_genes_df['Gene.refGene'].astype(str) + '_HUMAN'
+gene4dn_genes_df.drop_duplicates(subset='Gene.refGene', keep='first', inplace=True)  # later set ignore_index = True
+# gene4dn_genes_df['Gene.refGene'] = gene4dn_genes_df['Gene.refGene'].astype(str) + '_HUMAN'
+# adding _human does not work cuz these are not entry names, they are gene names, it's better to check the gene names
+# in uniprot file and if string from refGene is found in gene name cell of uniprot DB then you can select the
+# entry names in a dif column you should also keep in mind to be able to distinguish this gene by disease,
+# it's better to add a column to this db containing the corresponding diseases
 
 import sys
 
 sys.exit(0)
 
- ## sum histograms (features distribution)
+## sum histograms (features distribution)
 mobidb_cont_fract_sum_norm_df = sum_df_generator(mobidb_3d_matrix_nan_sum_norm)
 ndd_cont_fract_sum_norm_df = sum_df_generator(ndd_3d_matrix_nan_sum_norm)
 
@@ -195,7 +199,6 @@ g.set_xticklabels('')
 plt.tight_layout()
 plt.savefig('plots/feature distribution/ndd-no-xticklabel.png')
 plt.show()
-
 
 ## Dictionary Homo sapiens
 for each_feature in mobidb_features_lst:
