@@ -155,12 +155,15 @@ uniprot_df = pd.read_csv('data/uniprot-proteome_UP000005640.tab', sep='\t')  # (
 genes4dn_df = pd.read_csv('data/gene4denovo/genes4dn.txt', sep='\t')  # (8271, 13)
 genes4dn_gene_names_lst = genes4dn_df['Gene_names'].tolist()
 merged_uniprot_gene4dn_df = pd.merge(genes4dn_df, uniprot_df, on="Gene_names")  # (28491, 16) fix later, data deleted
-gene4dn_annotations = pd.read_csv('data/gene4denovo/All_De_novo_mutations_and_annotations_1.2.txt', sep='\t', encoding='cp1252', low_memory=False)
-ensembel_geneid_lst = gene4dn_annotations['Gene.ensGene'].tolist()
+gene4dn_annotations_df = pd.read_csv('data/gene4denovo/All_De_novo_mutations_and_annotations_1.2.txt', sep='\t', encoding='cp1252', low_memory=False)  # (670082, 155)
+ensembel_geneid_lst = gene4dn_annotations_df['Gene.ensGene'].tolist()
 with open('data/ensembel_genes.txt', 'w') as f:
     for item in ensembel_geneid_lst:
         f.write("%s\n" % item)
 
+gene_id_converted_df = pd.read_csv('data/ens_id_to_uniprot_acc.txt', sep='\t')
+converted_merged_unip_gene4d_df = pd.merge(merged_uniprot_gene4dn_df, gene_id_converted_df, on="acc")  # (22966, 19)
+# check again !
 
 import sys
 
