@@ -1,6 +1,5 @@
 # Start date = April 14th
 import itertools
-import math
 import numpy as np
 import seaborn as sns
 import pandas as pd
@@ -151,17 +150,17 @@ ndd_columns_sum_df = ndd_columns_sum_df.T.reset_index()
 mobidb_columns_sum_df.columns = ['Features', 'Protein count']
 ndd_columns_sum_df.columns = ['Features', 'Protein count']
 
-## Gene4denovo data, read gene names, separate the semicolon ones, delete duplicates, add _HUMAN suffix
-gene4dn_genes_df = pd.read_csv('data/gene4denovo-anot-gene-envGene.txt')
-gene4dn_genes_df['Gene.refGene'] = gene4dn_genes_df['Gene.refGene'].apply(lambda x: x.split(';')[0])  # try this later:
-# to prevent losing the after semicolon items:
-# https://stackoverflow.com/questions/17116814/pandas-how-do-i-split-text-in-a-column-into-multiple-rows
-gene4dn_genes_df.drop_duplicates(subset='Gene.refGene', keep='first', inplace=True)  # later set ignore_index = True
-# gene4dn_genes_df['Gene.refGene'] = gene4dn_genes_df['Gene.refGene'].astype(str) + '_HUMAN'
-# adding _human does not work cuz these are not entry names, they are gene names, it's better to check the gene names
-# in uniprot file and if string from refGene is found in gene name cell of uniprot DB then you can select the
-# entry names in a dif column you should also keep in mind to be able to distinguish this gene by disease,
-# it's better to add a column to this db containing the corresponding diseases
+## Gene4denovo data, read gene names, merge with uniprot based on gene names, (delete acc duplicates)
+uniprot_df = pd.read_csv('data/uniprot-proteome_UP000005640.tab', sep='\t')  # (75776, 4)
+genes4dn_df = pd.read_csv('data/gene4denovo/genes4dn.txt', sep='\t')  # (8271, 13)
+genes4dn_gene_names_lst = genes4dn_df['Gene_names'].tolist()
+merged_uniprot_gene4dn_df = pd.merge(genes4dn_df, uniprot_df, on="Gene_names")  # (28491, 16) fix later, data deleted
+gene4dn_annotations = pd.read_csv('data/gene4denovo/All_De_novo_mutations_and_annotations_1.2.txt', sep='\t', encoding='cp1252', low_memory=False)
+ensembel_geneid_lst = gene4dn_annotations['Gene.ensGene'].tolist()
+with open('data/ensembel_genes.txt', 'w') as f:
+    for item in ensembel_geneid_lst:
+        f.write("%s\n" % item)
+
 
 import sys
 
