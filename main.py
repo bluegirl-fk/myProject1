@@ -151,11 +151,17 @@ ndd_columns_sum_df = ndd_columns_sum_df.T.reset_index()
 mobidb_columns_sum_df.columns = ['Features', 'Protein count']
 ndd_columns_sum_df.columns = ['Features', 'Protein count']
 
-## Gene4denovo data
+## Gene4denovo data, read gene names, separate the semicolon ones, delete duplicates
 gene4dn_genes_df = pd.read_csv('data/gene4denovo-anot-gene-envGene.txt')
-# gene4denovo_all_mutation = pd.read_csv('data/gene4denovo/All_De_novo_mutations_1.2.txt', sep='\t')
-# gene4denovo_all_annotation = pd.read_csv('data/gene4denovo/All_De_novo_mutations_and_annotations_1.2.txt', sep='\t',
-#                                          encoding='cp1252', low_memory=False)
+gene4dn_genes_df['Gene.refGene'] = gene4dn_genes_df['Gene.refGene'].apply(lambda x: x.split(';')[0]) # try this later:
+# to prevent losing the after semicolon items:
+# https://stackoverflow.com/questions/17116814/pandas-how-do-i-split-text-in-a-column-into-multiple-rows
+
+#gene4dn_genes_df['Gene.refGene'] = gene4dn_genes_df['Gene.refGene'].astype(str) + '_HUMAN'
+
+import sys
+
+sys.exit(0)
 
  ## sum histograms (features distribution)
 mobidb_cont_fract_sum_norm_df = sum_df_generator(mobidb_3d_matrix_nan_sum_norm)
@@ -189,9 +195,6 @@ g.set_xticklabels('')
 plt.tight_layout()
 plt.savefig('plots/feature distribution/ndd-no-xticklabel.png')
 plt.show()
-import sys
-
-sys.exit(0)
 
 
 ## Dictionary Homo sapiens
