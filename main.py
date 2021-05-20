@@ -26,7 +26,7 @@ def drawplot(plot_input_lst, yscale, bins, is_dense, x_label, y_label, png_file_
 
 
 def draw_barplot(figsize_a, figsize_b, xlabel, ylabel, data, xticklabel, yscale, save_rout):  # input is DF, not list
-    plt.figure(figsize=(int(figsize_a), int(figsize_b))) #bigger figsize to have xticklabels shown
+    plt.figure(figsize=(int(figsize_a), int(figsize_b)))  # bigger figsize to have xticklabels shown
     sns.set_style("ticks")
     g = sns.barplot(x=xlabel, y=ylabel, data=data)
     # sns.despine(trim=True, offset=2)
@@ -94,32 +94,32 @@ def sum_df_generator(input_sum_matrix):
     return sum_df
 
 
-# def draw_heatmaps(data, titles, saving_rout):  # www.stackabuse.com/ultimate-guide-to-heatmaps-in-seaborn-with-python/
-#     sns.set()
-#     fig, axes = plt.subplots(len(data), 1, figsize=(12, 6 * len(data)))
-#     for i, (ax, d, t) in enumerate(zip(axes.reshape(-1), data, titles)):
-#         sb = sns.heatmap(d,
-#                          cmap="viridis",  # sequential colormap
-#                          annot_kws={'fontsize': 11},
-#                          fmt='',
-#                          square=True,
-#                          # vmax=1,
-#                          # vmin=0,
-#                          linewidth=0.01,
-#                          linecolor="#222",
-#                          ax=ax,
-#                          vmin=-1.0, vmax=1.0
-#                          )
-#         ax.set_title(t)
-#         # ax.set_ylabel(ylabel)
-#         if i < (len(data) - 1):
-#             sb.set(xticklabels=[])
-#             sb.set(xlabel=None)
-#     plt.tight_layout()
-#     plt.savefig(saving_rout, dpi=120)
-#     plt.show()
-#
-#     return
+def draw_heatmaps(data, titles, saving_rout):  # www.stackabuse.com/ultimate-guide-to-heatmaps-in-seaborn-with-python/
+    sns.set()
+    fig, axes = plt.subplots(len(data), 1, figsize=(12 * len(data), 12))
+    for i, (ax, d, t) in enumerate(zip(axes.reshape(-1), data, titles)):
+        sb = sns.heatmap(d,
+                         cmap="viridis",  # sequential colormap
+                         annot_kws={'fontsize': 11},
+                         fmt='',
+                         square=True,
+                         # vmax=1,
+                         # vmin=0,
+                         linewidth=0.01,
+                         linecolor="#222",
+                         ax=ax,
+                         vmin=-1.0, vmax=1.0
+                         )
+        ax.set_title(t)
+        # ax.set_ylabel(ylabel)
+        if i < (len(data) - 1):
+            sb.set(xticklabels=[])
+            sb.set(xlabel=None)
+    plt.tight_layout()
+    plt.savefig(saving_rout, dpi=120)
+    plt.show()
+
+    return
 
 
 # if __name__ == '__main__':
@@ -174,32 +174,31 @@ ndd_cont_fract_sum_norm_df = sum_df_generator(ndd_3d_matrix_nan_sum_norm)
 sum_difference_matrix_nan_norm = mobidb_3d_matrix_nan_sum_norm - ndd_3d_matrix_nan_sum_norm
 sum_difference_df_nan_norm = sum_df_generator(sum_difference_matrix_nan_norm)
 
+## heatmaps
+draw_heatmaps([mobidb_cont_fract_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, sum_difference_df_nan_norm.T],
+              ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
+              saving_rout='plots/heatmaps/Hmaps1.png')
 
-# ## heatmaps
-# draw_heatmaps([mobidb_cont_fract_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, sum_difference_df_nan_norm.T],
-#               ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
-#               saving_rout='plots/heatmaps/Hmaps-HS-NDD.png')
-
-
-## distribution heat map plot
-draw_barplot(figsize_a='12', figsize_b='6', xlabel='Features', ylabel='Protein count', data=mobidb_columns_sum_df, xticklabel='', yscale='log', save_rout='plots/log/hist-hmaps-distribution/mobidb-log.png')
-draw_barplot(figsize_a='12', figsize_b='6', xlabel='Features', ylabel='Protein count', data=ndd_columns_sum_df, xticklabel='', yscale='log', save_rout='plots/log/hist-hmaps-distribution/ndd-log.png')
-
-## Dictionary Homo sapiens
-for each_feature in mobidb_features_lst:
-    cont_fra_temp_lst = mobidb_pivot_contf_df[each_feature].tolist()
-    mobidb_predictors_cont_fra_dict[each_feature] = cont_fra_temp_lst
-
-# TODO: check bins and isDense for comparison plots
-
+# ## distribution heat map plot
+# draw_barplot(figsize_a='12', figsize_b='6', xlabel='Features', ylabel='Protein count', data=mobidb_columns_sum_df,
+#              xticklabel='', yscale='log', save_rout='plots/log/hist-hmaps-distribution/mobidb-log.png')
+# draw_barplot(figsize_a='12', figsize_b='6', xlabel='Features', ylabel='Protein count', data=ndd_columns_sum_df,
+#              xticklabel='', yscale='log', save_rout='plots/log/hist-hmaps-distribution/ndd-log.png')
+#
+# ## Dictionary Homo sapiens
+# for each_feature in mobidb_features_lst:
+#     cont_fra_temp_lst = mobidb_pivot_contf_df[each_feature].tolist()
+#     mobidb_predictors_cont_fra_dict[each_feature] = cont_fra_temp_lst
+#
+# # TODO: check bins and isDense for comparison plots
+#
 # ## Plot for homosapiens
 # for each_feature in mobidb_features_lst[
 #                     1:]:
 #     drawplot(mobidb_predictors_cont_fra_dict[each_feature], 'log', 30, True, each_feature + '_homosapiens',
 #              "Protein Count(relative)",
 #              'plots/log/hist-all-homo sapiens/' + each_feature)
-
-
+#
 # ## Dictionary Disease
 # for each_feature in mobidb_features_lst:
 #     ndd_cont_fra_temp_lst = ndd_mobidb_df[each_feature].tolist()
@@ -209,9 +208,11 @@ for each_feature in mobidb_features_lst:
 # for each_feature in mobidb_features_lst[1:]:
 #     drawplot(ndd_predictors_cont_fra_dict[each_feature], 'log', 30, False, each_feature + '_NDD', 'Protein count',
 #              'plots/log/hist-all-NDD/SCZ/' + each_feature + '_SCZ')
-
-# # comparative histogram (homosapiens Vs. ndd) for each_feature in mobidb_features_lst[ 1:]: compare_plot(
-# first_lst=mobidb_predictors_cont_fra_dict[each_feature], second_lst=ndd_predictors_cont_fra_dict[each_feature],
-# yscale='log',bins=30, is_dense=False, x_label=each_feature + '_comparison', y_label='proteins count(relative)',
-# first_label='Homo sapiens Pr.s', second_label='NDD Pr.s', png_file_name='plots/log/hist-comparison' '-homoS-NDD/' +
-# each_feature)
+#
+# # comparative histogram (homosapiens Vs. ndd)
+# for each_feature in mobidb_features_lst[1:]:
+#     compare_plot(first_lst=mobidb_predictors_cont_fra_dict[each_feature],
+#                  second_lst=ndd_predictors_cont_fra_dict[each_feature], yscale='log', bins=30, is_dense=False,
+#                  x_label=each_feature + '_comparison', y_label='proteins count(relative)',
+#                  first_label='Homo sapiens Pr.s', second_label='NDD Pr.s',
+#                  png_file_name='plots/log/hist-comparison' '-homoS-NDD/' + each_feature)
