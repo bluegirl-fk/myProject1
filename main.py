@@ -21,7 +21,7 @@ def drawplot(plot_input_lst, yscale, bins, is_dense, x_label, y_label, png_file_
     file_format = '.png'
     plt.yscale(yscale)
     plt.savefig(png_file_name + file_format)
-    #plt.show()
+    plt.show()
     return
 
 
@@ -46,7 +46,7 @@ def compare_plot(first_lst, second_lst, yscale,bins, is_dense, first_label, seco
     file_format = '.png'
     plt.yscale(yscale)
     plt.savefig(png_file_name + '_compare' + file_format)
-    #plt.show()
+    plt.show()
     return
 
 
@@ -163,40 +163,40 @@ genes4dn_acc_merge_df = pd.merge(genes4dn_orig_df, genes4dn_acc_df, on='geneslis
 # import sys
 #
 # sys.exit(0)
-#
-# ## sum histograms (features distribution)
-# mobidb_cont_fract_sum_norm_df = sum_df_generator(mobidb_3d_matrix_nan_sum_norm)
-# ndd_cont_fract_sum_norm_df = sum_df_generator(ndd_3d_matrix_nan_sum_norm)
-#
-# ## Difference of the sum arrays(with nan)
-# sum_difference_matrix_nan_norm = mobidb_3d_matrix_nan_sum_norm - ndd_3d_matrix_nan_sum_norm
-# sum_difference_df_nan_norm = sum_df_generator(sum_difference_matrix_nan_norm)
-#
-# ## heatmaps
-# draw_heatmaps([mobidb_cont_fract_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, sum_difference_df_nan_norm.T],
-#               ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
-#               saving_rout='plots/heatmaps/Hmaps-HS-NDD.png')
-# # TODO: turn these two into methods later
 
-# ## distribution heat map plot
-# plt.figure(figsize=(12, 6))
-# sns.set_style("ticks")
-# g = sns.barplot(x="Features", y="Protein count", data=mobidb_columns_sum_df)
-# # sns.despine(trim=True, offset=2)
-# g.set_xticklabels('')
-# sns.color_palette("pastel")
-# plt.tight_layout()
-# plt.savefig('plots/feature distribution/mobidb-no-xticklabel.png')
-# plt.show()
-#
-# plt.figure(figsize=(12, 6))
-# sns.set_style("ticks")
-# g = sns.barplot(x="Features", y="Protein count", data=ndd_columns_sum_df)
-# # sns.despine(trim=True, offset=2)
-# g.set_xticklabels('')
-# plt.tight_layout()
-# plt.savefig('plots/feature distribution/ndd-no-xticklabel.png')
-# plt.show()
+## sum histograms (features distribution)
+mobidb_cont_fract_sum_norm_df = sum_df_generator(mobidb_3d_matrix_nan_sum_norm)
+ndd_cont_fract_sum_norm_df = sum_df_generator(ndd_3d_matrix_nan_sum_norm)
+
+## Difference of the sum arrays(with nan)
+sum_difference_matrix_nan_norm = mobidb_3d_matrix_nan_sum_norm - ndd_3d_matrix_nan_sum_norm
+sum_difference_df_nan_norm = sum_df_generator(sum_difference_matrix_nan_norm)
+
+## heatmaps
+draw_heatmaps([mobidb_cont_fract_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, sum_difference_df_nan_norm.T],
+              ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
+              saving_rout='plots/heatmaps/Hmaps-HS-NDD.png')
+# TODO: turn these two into methods later
+
+## distribution heat map plot
+plt.figure(figsize=(12, 6))
+sns.set_style("ticks")
+g = sns.barplot(x="Features", y="Protein count", data=mobidb_columns_sum_df)
+# sns.despine(trim=True, offset=2)
+g.set_xticklabels('')
+sns.color_palette("pastel")
+plt.tight_layout()
+plt.savefig('plots/feature distribution/mobidb-no-xticklabel.png')
+plt.show()
+
+plt.figure(figsize=(12, 6))
+sns.set_style("ticks")
+g = sns.barplot(x="Features", y="Protein count", data=ndd_columns_sum_df)
+# sns.despine(trim=True, offset=2)
+g.set_xticklabels('')
+plt.tight_layout()
+plt.savefig('plots/feature distribution/ndd-no-xticklabel.png')
+plt.show()
 
 ## Dictionary Homo sapiens
 for each_feature in mobidb_features_lst:
@@ -221,64 +221,13 @@ for each_feature in mobidb_features_lst:
 ## plot for ndds
 for each_feature in mobidb_features_lst[1:]:
     drawplot(ndd_predictors_cont_fra_dict[each_feature], 'log',30, False, each_feature + '_NDD', 'Protein count',
-             'plots/log/hist-all-NDD/all-ndd' + each_feature + '_NDD')
-#TODO: check the isDense, is it useful with log?
+             'plots/log/hist-all-NDD/all-ndd/' + each_feature + '_NDD')
+#  TODO: check the isDense
 ## comparative histogram (homosapiens Vs. ndd)
 for each_feature in mobidb_features_lst[
                     1:]:
     compare_plot(first_lst=mobidb_predictors_cont_fra_dict[each_feature], second_lst=ndd_predictors_cont_fra_dict[each_feature], yscale='log',bins=30,
                  is_dense=False, x_label=each_feature + '_comparison', y_label='proteins count(relative)',
-                 first_label='Homo sapiens Pr.s', second_label='NDD Pr.s', png_file_name='plots/log/hist-comparison-homoS-NDD/' + each_feature)
-#
-# for each_feature in mobidb_features_lst[1:]:
-#     drawplot_log(mobidb_predictors_cont_fra_dict[each_feature], 30, 'Features', 'protein count')
-# # # TODO: work on the log again, add x tick labels, see if it also works for feature distribution
-# # ## log plots
-# # # for each_feature in mobidb_features_lst[1:]:
-# # #     a = [pow(10, i) for i in range(10)]
-# # #     plt.subplot(2, 1, 1)
-# # #     plt.plot(mobidb_predictors_cont_fra_dict[each_feature], color='blue', lw=2)
-# # #     plt.set_xtick
-# # #     plt.yscale('log')
-# # #     plt.show()
-# #
-# # # other method
-# # # data = ((3, 1000), (10, 3), (100, 30), (500, 800), (50, 1))
-# # # dim = len(data[0])
-# # # w = 0.75
-# # # dimw = w / dim
-# # #
-# # # fig, ax = plt.subplots()
-# # # x = np.arange(len(data))
-# # # for i in range(len(data[0])):
-# # #     y = [d[i] for d in data]
-# # #     b = ax.bar(x + i * dimw, y, dimw, bottom=0.001)
-# # #
-# # # ax.set_xticks(x + dimw / 2)
-# # # ax.set_xticklabels(map(str, x))
-# # # ax.set_yscale('log')
-# # #
-# # # ax.set_xlabel('x')
-# # # ax.set_ylabel('y')
-# # #
-# # # plt.show()
-# # # other method
-# # labels = ['G1', 'G2', 'G3', 'G4', 'G5']
-# # men_means = [20, 34, 30, 35, 27]
-# # women_means = [25, 32, 34, 20, 25]
-# #
-# # x = np.arange(len(labels))  # the label locations
-# # width = 0.35  # the width of the bars
-# #
-# # fig, ax = plt.subplots()
-# # rects1 = ax.bar(x - width / 2, men_means, width, label='Men')
-# # rects2 = ax.bar(x + width / 2, women_means, width, label='Women')
-# #
-# # # Add some text for labels, title and custom x-axis tick labels, etc.
-# # ax.set_ylabel('Scores')
-# # ax.set_title('Scores by group and gender')
-# # ax.set_xticks(x)
-# # ax.set_xticklabels(labels)
-# # ax.legend()
-# # fig.tight_layout()
-# # plt.show()
+                 first_label='Homo sapiens Pr.s', second_label='NDD Pr.s', png_file_name='plots/log/hist-comparison'
+                                                                                         '-homoS-NDD/' + each_feature)
+
