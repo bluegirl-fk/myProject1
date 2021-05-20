@@ -100,7 +100,8 @@ def draw_heatmaps(data, titles, saving_rout):  # www.stackabuse.com/ultimate-gui
     for i, (ax, d, t) in enumerate(zip(axes.reshape(-1), data, titles)):
         sb = sns.heatmap(d,
                          cmap="viridis",  # sequential colormap
-                         annot_kws={'fontsize': 11},
+                         annot=False,
+                         annot_kws={'fontsize': 6},
                          fmt='',
                          square=True,
                          # vmax=1,
@@ -178,6 +179,17 @@ sum_difference_df_nan_norm = sum_df_generator(sum_difference_matrix_nan_norm)
 draw_heatmaps([mobidb_cont_fract_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, sum_difference_df_nan_norm.T],
               ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
               saving_rout='plots/heatmaps/Hmaps1.png')
+# TODO: set 'Features as a separate column this time, not as index, is it index in the merged df?'
+mobidb_cont_fract_sum_norm_df.index = mobidb_cont_fract_sum_norm_df.index.set_names(['Features'])
+ndd_cont_fract_sum_norm_df.index = ndd_cont_fract_sum_norm_df.index.set_names(['Features'])
+merged_mobidb_hmap_df = pd.merge(mobidb_columns_sum_df, mobidb_cont_fract_sum_norm_df, on='Features').set_index('Features')
+merged_ndd_hmap_df = pd.merge(ndd_columns_sum_df, ndd_cont_fract_sum_norm_df, on='Features').set_index('Features')
+
+draw_heatmaps([merged_mobidb_hmap_df.T, merged_ndd_hmap_df.T, sum_difference_df_nan_norm.T],
+              ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
+              saving_rout='plots/heatmaps/Hmap_with_sum.png')
+# do the same for ndd and draw hmap
+
 
 # ## distribution heat map plot
 # draw_barplot(figsize_a='12', figsize_b='6', xlabel='Features', ylabel='Protein count', data=mobidb_columns_sum_df,
@@ -216,3 +228,23 @@ draw_heatmaps([mobidb_cont_fract_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, su
 #                  x_label=each_feature + '_comparison', y_label='proteins count(relative)',
 #                  first_label='Homo sapiens Pr.s', second_label='NDD Pr.s',
 #                  png_file_name='plots/log/hist-comparison' '-homoS-NDD/' + each_feature)
+
+# fig = plt.figure(figsize = (20,10))
+# mask = np.zeros_like(pv)
+# mask[np.tril_indices_from(mask)] = True
+# #with sns.axes_style("white"):
+# ax = sns.heatmap(pv, annot=True, cmap="YlGnBu",mask=mask, linecolor='b', cbar = False)
+# ax.xaxis.tick_top()
+# plt.xticks(rotation=90)
+#
+# fig = plt.figure(figsize=(20,15))
+# ax1 = plt.subplot2grid((20,20), (0,0), colspan=19, rowspan=19)
+# ax2 = plt.subplot2grid((20,20), (19,0), colspan=19, rowspan=1)
+# ax3 = plt.subplot2grid((20,20), (0,19), colspan=1, rowspan=19)
+# mask = np.zeros_like(pv)
+# mask[np.tril_indices_from(mask)] = True
+# sns.heatmap(pv, ax=ax1, annot=True, cmap="YlGnBu",mask=mask, linecolor='b', cbar = False)
+# ax1.xaxis.tick_top()
+# ax1.set_xticklabels(pv.columns,rotation=40)
+# sns.heatmap((pd.DataFrame(pv.sum(axis=0))).transpose(), ax=ax2,  annot=True, cmap="YlGnBu", cbar=False, xticklabels=False, yticklabels=False)
+# sns.heatmap(pd.DataFrame(pv.sum(axis=1)), ax=ax3,  annot=True, cmap="YlGnBu", cbar=False, xticklabels=False, yticklabels=False)
