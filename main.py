@@ -221,7 +221,7 @@ for each_feature in mobidb_features_lst:
 ## plot for ndds
 for each_feature in mobidb_features_lst[1:]:
     drawplot(ndd_predictors_cont_fra_dict[each_feature], 'log',30, False, each_feature + '_NDD', 'Protein count',
-             'plots/log/hist-all-NDD' + each_feature + '_NDD')
+             'plots/log/hist-all-NDD/all-ndd' + each_feature + '_NDD')
 #TODO: check the isDense, is it useful with log?
 ## comparative histogram (homosapiens Vs. ndd)
 for each_feature in mobidb_features_lst[
