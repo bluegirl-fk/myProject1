@@ -158,7 +158,8 @@ mobidb_columns_sum_df.columns = ['Features', 'Protein count']
 ndd_columns_sum_df.columns = ['Features', 'Protein count']
 
 ## Gene4denovo  (delete acc duplicates)
-uniprot_df = pd.read_csv('data/uniprot-proteome_UP000005640.tab', sep='\t')  # (75776, 4)
+gene4dn_all_annotations_df = pd.read_csv('data/gene4denovo/All_De_novo_mutations_and_annotations_1.2.txt',
+                                      sep='\t', encoding='cp1252', low_memory=False)  # (670082, 155)
 genes4dn_orig_df = pd.read_csv('data/gene4denovo/genes4dn.txt', sep='\t')  # (8271, 13)
 genes4dn_acc_df = pd.read_csv('data/uniprot-gene4dn-acc.tab', sep='\t')  # (8039, 7)
 genes4dn_acc_merge_df = pd.merge(genes4dn_orig_df, genes4dn_acc_df, on='geneslist')  # (48060, 19)
@@ -179,7 +180,7 @@ sum_difference_df_nan_norm = sum_df_generator(sum_difference_matrix_nan_norm)
 draw_heatmaps([mobidb_cont_fract_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, sum_difference_df_nan_norm.T],
               ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
               saving_rout='plots/heatmaps/Hmaps1.png')
-# TODO: set 'Features as a separate column this time, not as index, is it index in the merged df?'
+
 mobidb_cont_fract_sum_norm_df.index = mobidb_cont_fract_sum_norm_df.index.set_names(['Features'])
 ndd_cont_fract_sum_norm_df.index = ndd_cont_fract_sum_norm_df.index.set_names(['Features'])
 merged_mobidb_hmap_df = pd.merge(mobidb_columns_sum_df, mobidb_cont_fract_sum_norm_df, on='Features').set_index('Features')
@@ -188,7 +189,6 @@ merged_ndd_hmap_df = pd.merge(ndd_columns_sum_df, ndd_cont_fract_sum_norm_df, on
 draw_heatmaps([merged_mobidb_hmap_df.T, merged_ndd_hmap_df.T, sum_difference_df_nan_norm.T],
               ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
               saving_rout='plots/heatmaps/Hmap_with_sum.png')
-
 
 ## distribution heat map plot
 draw_barplot(figsize_a='12', figsize_b='6', xlabel='Features', ylabel='Protein count', data=mobidb_columns_sum_df,
