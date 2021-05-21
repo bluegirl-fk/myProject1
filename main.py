@@ -164,9 +164,7 @@ genes4dn_orig_df = pd.read_csv('data/gene4denovo/genes4dn.txt', sep='\t')  # (82
 genes4dn_acc_df = pd.read_csv('data/uniprot-gene4dn-acc.tab', sep='\t')  # (8039, 7)
 genes4dn_acc_merge_df = pd.merge(genes4dn_orig_df, genes4dn_acc_df, on='geneslist')  # (48060, 19)
 
-import sys
 
-sys.exit(0)
 
 ## sum histograms (features distribution)
 mobidb_cont_fract_sum_norm_df = sum_df_generator(mobidb_3d_matrix_nan_sum_norm)
@@ -196,12 +194,15 @@ draw_barplot(figsize_a='12', figsize_b='6', xlabel='Features', ylabel='Protein c
 draw_barplot(figsize_a='12', figsize_b='6', xlabel='Features', ylabel='Protein count', data=ndd_columns_sum_df,
              xticklabel='', yscale='log', save_rout='plots/log/hist-hmaps-distribution/ndd-log.png')
 
+import sys
+
+sys.exit(0)
 ## Dictionary Homo sapiens
 for each_feature in mobidb_features_lst:
     cont_fra_temp_lst = mobidb_pivot_contf_df[each_feature].tolist()
     mobidb_predictors_cont_fra_dict[each_feature] = cont_fra_temp_lst
 
-# TODO: check bins and isDense for comparison plots
+# TODO: check bins - also isDense for comparison plots
 
 ## Plot for homosapiens
 for each_feature in mobidb_features_lst[
@@ -227,23 +228,3 @@ for each_feature in mobidb_features_lst[1:]:
                  x_label=each_feature + '_comparison', y_label='proteins count(relative)',
                  first_label='Homo sapiens Pr.s', second_label='NDD Pr.s',
                  png_file_name='plots/log/hist-comparison' '-homoS-NDD/' + each_feature)
-
-# fig = plt.figure(figsize = (20,10))
-# mask = np.zeros_like(pv)
-# mask[np.tril_indices_from(mask)] = True
-# #with sns.axes_style("white"):
-# ax = sns.heatmap(pv, annot=True, cmap="YlGnBu",mask=mask, linecolor='b', cbar = False)
-# ax.xaxis.tick_top()
-# plt.xticks(rotation=90)
-#
-# fig = plt.figure(figsize=(20,15))
-# ax1 = plt.subplot2grid((20,20), (0,0), colspan=19, rowspan=19)
-# ax2 = plt.subplot2grid((20,20), (19,0), colspan=19, rowspan=1)
-# ax3 = plt.subplot2grid((20,20), (0,19), colspan=1, rowspan=19)
-# mask = np.zeros_like(pv)
-# mask[np.tril_indices_from(mask)] = True
-# sns.heatmap(pv, ax=ax1, annot=True, cmap="YlGnBu",mask=mask, linecolor='b', cbar = False)
-# ax1.xaxis.tick_top()
-# ax1.set_xticklabels(pv.columns,rotation=40)
-# sns.heatmap((pd.DataFrame(pv.sum(axis=0))).transpose(), ax=ax2,  annot=True, cmap="YlGnBu", cbar=False, xticklabels=False, yticklabels=False)
-# sns.heatmap(pd.DataFrame(pv.sum(axis=1)), ax=ax3,  annot=True, cmap="YlGnBu", cbar=False, xticklabels=False, yticklabels=False)
