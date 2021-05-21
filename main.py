@@ -138,8 +138,8 @@ ndd_acc_df = pd.read_csv('data/allUniqueEntry.tab', sep='\t')
 ndd_acc_lst = ndd_acc_df['Entry'].to_list()
 ndd_mobidb_df = mobidb_pivot_contf_df[mobidb_pivot_contf_df['acc'].isin(ndd_acc_lst)]
 ## for Length
-unique_mobidb_original_df = mobidb_original_df.drop_duplicates(subset='acc', keep='last')  # deleted duplicates
-mobidb_pivot_length_df = unique_mobidb_original_df[['acc', 'length']]
+mobidb_pivot_length_df = mobidb_original_df.pivot_table(index=['acc'], columns=['feature'],
+                                                       values='length').fillna(0)  # (75052, 78)
 
 ## Matrix
 # with nan
@@ -147,6 +147,9 @@ _, mobidb_3d_matrix_nan, mobidb_3d_matrix_nan_sum, mobidb_3d_matrix_nan_sum_norm
     mobidb_pivot_contf_df.iloc[:, 1:], 10)
 _, ndd_3d_matrix_nan, ndd_3d_matrix_nan_sum, ndd_3d_matrix_nan_sum_norm = matrix_maker_nan(ndd_mobidb_df.iloc[:, 1:],
                                                                                            10)
+# for length
+_, mobidb_3d_len_matrix, mobidb_3d_len_matrix_sum, _ = matrix_maker_nan(mobidb_pivot_length_df.iloc[:,:], 10)
+# is not working correctly, should be fixed
 ## columns sum of matrix_3d_sum df to get prot count per feature (for histogram based on distribution of heatmap)
 mobidb_columns_sum_df = pd.DataFrame([mobidb_3d_matrix_nan_sum.T.sum(axis=0)], columns=mobidb_features_lst[1:],
                                      index=['Proteins count'])
@@ -159,14 +162,12 @@ ndd_columns_sum_df.columns = ['Features', 'Protein count']
 
 ## Gene4denovo  (delete acc duplicates)
 gene4dn_all_annotations_df = pd.read_csv('data/gene4denovo/All_De_novo_mutations_and_annotations_1.2.txt',
-                                      sep='\t', encoding='cp1252', low_memory=False)  # (670082, 155)
+                                         sep='\t', encoding='cp1252', low_memory=False)  # (670082, 155)
 genes4dn_orig_df = pd.read_csv('data/gene4denovo/genes4dn.txt', sep='\t')  # (8271, 13)
 genes4dn_acc_df = pd.read_csv('data/uniprot-gene4dn-acc.tab', sep='\t')  # (8039, 7)
 genes4dn_acc_merge_df = pd.merge(genes4dn_orig_df, genes4dn_acc_df, on='geneslist')  # (48060, 19)
 
-
-
-## sum histograms (features distribution)
+## sum dataframes
 mobidb_cont_fract_sum_norm_df = sum_df_generator(mobidb_3d_matrix_nan_sum_norm)
 ndd_cont_fract_sum_norm_df = sum_df_generator(ndd_3d_matrix_nan_sum_norm)
 
@@ -181,7 +182,8 @@ draw_heatmaps([mobidb_cont_fract_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, su
 
 mobidb_cont_fract_sum_norm_df.index = mobidb_cont_fract_sum_norm_df.index.set_names(['Features'])
 ndd_cont_fract_sum_norm_df.index = ndd_cont_fract_sum_norm_df.index.set_names(['Features'])
-merged_mobidb_hmap_df = pd.merge(mobidb_columns_sum_df, mobidb_cont_fract_sum_norm_df, on='Features').set_index('Features')
+merged_mobidb_hmap_df = pd.merge(mobidb_columns_sum_df, mobidb_cont_fract_sum_norm_df, on='Features').set_index(
+    'Features')
 merged_ndd_hmap_df = pd.merge(ndd_columns_sum_df, ndd_cont_fract_sum_norm_df, on='Features').set_index('Features')
 
 draw_heatmaps([merged_mobidb_hmap_df.T, merged_ndd_hmap_df.T, sum_difference_df_nan_norm.T],
