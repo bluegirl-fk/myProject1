@@ -1,5 +1,7 @@
 # Start date = April 14th
 import itertools
+
+import matplotlib.pyplot
 import numpy as np
 import seaborn as sns
 import pandas as pd
@@ -139,7 +141,7 @@ ndd_acc_lst = ndd_acc_df['Entry'].to_list()
 ndd_mobidb_df = mobidb_pivot_contf_df[mobidb_pivot_contf_df['acc'].isin(ndd_acc_lst)]
 ## for Length
 mobidb_pivot_length_df = mobidb_original_df.pivot_table(index=['acc'], columns=['feature'],
-                                                       values='length').fillna(0)  # (75052, 78)
+                                                        values='length').fillna(0)  # (75052, 78)
 
 ## Matrix
 # with nan
@@ -148,24 +150,24 @@ _, mobidb_3d_matrix_nan, mobidb_3d_matrix_nan_sum, mobidb_3d_matrix_nan_sum_norm
 _, ndd_3d_matrix_nan, ndd_3d_matrix_nan_sum, ndd_3d_matrix_nan_sum_norm = matrix_maker_nan(ndd_mobidb_df.iloc[:, 1:],
                                                                                            10)
 
-# Add the length statistics here. Use vstack or hstack
-# mobidb_3d_matrix_nan_sum
-# mobidb_3d_matrix_nan_sum_norm
-# ndd_3d_matrix_nan_sum
-# ndd_3d_matrix_nan_sum_norm
-
-#ax.hist(dataset_len, bins=np.arange(0, 1000, 10))
-
-# for length
-matrix_2d_length = (mobidb_pivot_length_df.to_numpy() <= 1.) * mobidb_pivot_length_df.to_numpy()
-matrix_3d_length = np.zeros((matrix_2d_length.shape[0], matrix_2d_length.shape[1], 10 + 1))
-for i in range(matrix_2d_length.shape[0]):
-    for j in range(matrix_2d_length.shape[1]):
-        # if matrix_2d[i, j] != 0:
-        k = int(round(matrix_2d_length[i, j] * 10))
-        matrix_3d_length[i, j, k] = 1
-matrix_3d_sum = np.sum(matrix_3d_length, axis=0)
-matrix_3d_sum_normalized = matrix_3d_sum / matrix_3d_sum.max(axis=1)[:, None]
+# # Add the length statistics here. Use vstack or hstack
+# # mobidb_3d_matrix_nan_sum
+# # mobidb_3d_matrix_nan_sum_norm
+# # ndd_3d_matrix_nan_sum
+# # ndd_3d_matrix_nan_sum_norm
+#
+# #ax.hist(dataset_len, bins=np.arange(0, 1000, 10))
+#
+# # for length
+# matrix_2d_length = (mobidb_pivot_length_df.to_numpy() <= 1.) * mobidb_pivot_length_df.to_numpy()
+# matrix_3d_length = np.zeros((matrix_2d_length.shape[0], matrix_2d_length.shape[1], 10 + 1))
+# for i in range(matrix_2d_length.shape[0]):
+#     for j in range(matrix_2d_length.shape[1]):
+#         # if matrix_2d[i, j] != 0:
+#         k = int(round(matrix_2d_length[i, j] * 10))
+#         matrix_3d_length[i, j, k] = 1
+# matrix_3d_sum = np.sum(matrix_3d_length, axis=0)
+# matrix_3d_sum_normalized = matrix_3d_sum / matrix_3d_sum.max(axis=1)[:, None]
 
 
 ## columns sum of matrix_3d_sum df to get prot count per feature (for histogram based on distribution of heatmap)
@@ -177,16 +179,19 @@ mobidb_columns_sum_df = mobidb_columns_sum_df.T.reset_index()
 ndd_columns_sum_df = ndd_columns_sum_df.T.reset_index()
 mobidb_columns_sum_df.columns = ['Features', 'Protein count']
 ndd_columns_sum_df.columns = ['Features', 'Protein count']
-
-## Gene4denovo  (delete acc duplicates)
-gene4dn_all_annotations_df = pd.read_csv('data/gene4denovo/All_De_novo_mutations_and_annotations_1.2.txt',
-                                         sep='\t', encoding='cp1252', low_memory=False)  # (670082, 155)
-# filter this columns : exonic,ENSG00000115020,-,nonsynonymous SNV,
-# ENSG00000115020:ENST00000452564:exon19:c.2929T>A:p.S977T,
-# ENSG00000115020:ENST00000264380:exon20:c.3097T>A:p.S1033T,-,-,-,-,-,-,-,-,-,-,-,-,-,
-genes4dn_orig_df = pd.read_csv('data/gene4denovo/genes4dn.txt', sep='\t')  # (8271, 13)
-genes4dn_acc_df = pd.read_csv('data/uniprot-gene4dn-acc.tab', sep='\t')  # (8039, 7)
-genes4dn_acc_merge_df = pd.merge(genes4dn_orig_df, genes4dn_acc_df, on='geneslist')  # (48060, 19)
+mobidb_cols_sum_lst = mobidb_columns_sum_df['Protein count']
+mobidb_cols_sum_lst = [int(x) for x in mobidb_cols_sum_lst]
+ndd_cols_sum_lst = ndd_columns_sum_df['Protein count']
+ndd_cols_sum_lst = [int(x) for x in ndd_cols_sum_lst]
+# ## Gene4denovo  (delete acc duplicates)
+# gene4dn_all_annotations_df = pd.read_csv('data/gene4denovo/All_De_novo_mutations_and_annotations_1.2.txt',
+#                                          sep='\t', encoding='cp1252', low_memory=False)  # (670082, 155)
+# # filter this columns : exonic,ENSG00000115020,-,nonsynonymous SNV,
+# # ENSG00000115020:ENST00000452564:exon19:c.2929T>A:p.S977T,
+# # ENSG00000115020:ENST00000264380:exon20:c.3097T>A:p.S1033T,-,-,-,-,-,-,-,-,-,-,-,-,-,
+# genes4dn_orig_df = pd.read_csv('data/gene4denovo/genes4dn.txt', sep='\t')  # (8271, 13)
+# genes4dn_acc_df = pd.read_csv('data/uniprot-gene4dn-acc.tab', sep='\t')  # (8039, 7)
+# genes4dn_acc_merge_df = pd.merge(genes4dn_orig_df, genes4dn_acc_df, on='geneslist')  # (48060, 19)
 
 ## sum dataframes
 mobidb_cont_fract_sum_norm_df = sum_df_generator(mobidb_3d_matrix_nan_sum_norm)
@@ -197,26 +202,27 @@ sum_difference_matrix_nan_norm = mobidb_3d_matrix_nan_sum_norm - ndd_3d_matrix_n
 sum_difference_df_nan_norm = sum_df_generator(sum_difference_matrix_nan_norm)
 
 ## heatmaps
-draw_heatmaps([mobidb_cont_fract_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, sum_difference_df_nan_norm.T],
-              ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
-              saving_rout='plots/heatmaps/Hmaps1.png')
+# draw_heatmaps([mobidb_cont_fract_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, sum_difference_df_nan_norm.T],
+#               ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
+#               saving_rout='plots/heatmaps/Hmaps1.png')
+#
+# mobidb_cont_fract_sum_norm_df.index = mobidb_cont_fract_sum_norm_df.index.set_names(['Features'])
+# ndd_cont_fract_sum_norm_df.index = ndd_cont_fract_sum_norm_df.index.set_names(['Features'])
+# merged_mobidb_hmap_df = pd.merge(mobidb_columns_sum_df, mobidb_cont_fract_sum_norm_df, on='Features').set_index(
+#     'Features')
+# merged_ndd_hmap_df = pd.merge(ndd_columns_sum_df, ndd_cont_fract_sum_norm_df, on='Features').set_index('Features')
+#
+# draw_heatmaps([merged_mobidb_hmap_df.T, merged_ndd_hmap_df.T, sum_difference_df_nan_norm.T],
+#               ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
+#               saving_rout='plots/heatmaps/Hmap_with_sum.png')
 
-mobidb_cont_fract_sum_norm_df.index = mobidb_cont_fract_sum_norm_df.index.set_names(['Features'])
-ndd_cont_fract_sum_norm_df.index = ndd_cont_fract_sum_norm_df.index.set_names(['Features'])
-merged_mobidb_hmap_df = pd.merge(mobidb_columns_sum_df, mobidb_cont_fract_sum_norm_df, on='Features').set_index(
-    'Features')
-merged_ndd_hmap_df = pd.merge(ndd_columns_sum_df, ndd_cont_fract_sum_norm_df, on='Features').set_index('Features')
+## distribution heatmap plot
+draw_barplot(figsize_a='40', figsize_b='20', xlabel='Features', ylabel='Protein count', data=mobidb_columns_sum_df,
+             xticklabel=mobidb_cols_sum_lst, yscale='log', save_rout='plots/log/hist-hmaps-distribution/mobidb-log.png')
+draw_barplot(figsize_a='40', figsize_b='20', xlabel='Features', ylabel='Protein count', data=ndd_columns_sum_df,
+             xticklabel=ndd_cols_sum_lst, yscale='log', save_rout='plots/log/hist-hmaps-distribution/ndd-log.png')
 
-draw_heatmaps([merged_mobidb_hmap_df.T, merged_ndd_hmap_df.T, sum_difference_df_nan_norm.T],
-              ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
-              saving_rout='plots/heatmaps/Hmap_with_sum.png')
-
-## distribution heat map plot
-draw_barplot(figsize_a='12', figsize_b='6', xlabel='Features', ylabel='Protein count', data=mobidb_columns_sum_df,
-             xticklabel='', yscale='log', save_rout='plots/log/hist-hmaps-distribution/mobidb-log.png')
-draw_barplot(figsize_a='12', figsize_b='6', xlabel='Features', ylabel='Protein count', data=ndd_columns_sum_df,
-             xticklabel='', yscale='log', save_rout='plots/log/hist-hmaps-distribution/ndd-log.png')
-
+# Protein count
 import sys
 
 sys.exit(0)
@@ -224,7 +230,6 @@ sys.exit(0)
 for each_feature in mobidb_features_lst:
     cont_fra_temp_lst = mobidb_pivot_contf_df[each_feature].tolist()
     mobidb_predictors_cont_fra_dict[each_feature] = cont_fra_temp_lst
-
 
 ## Plot for homosapiens
 for each_feature in mobidb_features_lst[
