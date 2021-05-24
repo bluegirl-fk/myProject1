@@ -147,9 +147,27 @@ _, mobidb_3d_matrix_nan, mobidb_3d_matrix_nan_sum, mobidb_3d_matrix_nan_sum_norm
     mobidb_pivot_contf_df.iloc[:, 1:], 10)
 _, ndd_3d_matrix_nan, ndd_3d_matrix_nan_sum, ndd_3d_matrix_nan_sum_norm = matrix_maker_nan(ndd_mobidb_df.iloc[:, 1:],
                                                                                            10)
+
+# Add the length statistics here. Use vstack or hstack
+# mobidb_3d_matrix_nan_sum
+# mobidb_3d_matrix_nan_sum_norm
+# ndd_3d_matrix_nan_sum
+# ndd_3d_matrix_nan_sum_norm
+
+#ax.hist(dataset_len, bins=np.arange(0, 1000, 10))
+
 # for length
-_, mobidb_3d_len_matrix, mobidb_3d_len_matrix_sum, _ = matrix_maker_nan(mobidb_pivot_length_df.iloc[:,:], 10)
-# is not working correctly, should be fixed
+matrix_2d_length = (mobidb_pivot_length_df.to_numpy() <= 1.) * mobidb_pivot_length_df.to_numpy()
+matrix_3d_length = np.zeros((matrix_2d_length.shape[0], matrix_2d_length.shape[1], 10 + 1))
+for i in range(matrix_2d_length.shape[0]):
+    for j in range(matrix_2d_length.shape[1]):
+        # if matrix_2d[i, j] != 0:
+        k = int(round(matrix_2d_length[i, j] * 10))
+        matrix_3d_length[i, j, k] = 1
+matrix_3d_sum = np.sum(matrix_3d_length, axis=0)
+matrix_3d_sum_normalized = matrix_3d_sum / matrix_3d_sum.max(axis=1)[:, None]
+
+
 ## columns sum of matrix_3d_sum df to get prot count per feature (for histogram based on distribution of heatmap)
 mobidb_columns_sum_df = pd.DataFrame([mobidb_3d_matrix_nan_sum.T.sum(axis=0)], columns=mobidb_features_lst[1:],
                                      index=['Proteins count'])
@@ -163,6 +181,9 @@ ndd_columns_sum_df.columns = ['Features', 'Protein count']
 ## Gene4denovo  (delete acc duplicates)
 gene4dn_all_annotations_df = pd.read_csv('data/gene4denovo/All_De_novo_mutations_and_annotations_1.2.txt',
                                          sep='\t', encoding='cp1252', low_memory=False)  # (670082, 155)
+# filter this columns : exonic,ENSG00000115020,-,nonsynonymous SNV,
+# ENSG00000115020:ENST00000452564:exon19:c.2929T>A:p.S977T,
+# ENSG00000115020:ENST00000264380:exon20:c.3097T>A:p.S1033T,-,-,-,-,-,-,-,-,-,-,-,-,-,
 genes4dn_orig_df = pd.read_csv('data/gene4denovo/genes4dn.txt', sep='\t')  # (8271, 13)
 genes4dn_acc_df = pd.read_csv('data/uniprot-gene4dn-acc.tab', sep='\t')  # (8039, 7)
 genes4dn_acc_merge_df = pd.merge(genes4dn_orig_df, genes4dn_acc_df, on='geneslist')  # (48060, 19)
@@ -204,7 +225,6 @@ for each_feature in mobidb_features_lst:
     cont_fra_temp_lst = mobidb_pivot_contf_df[each_feature].tolist()
     mobidb_predictors_cont_fra_dict[each_feature] = cont_fra_temp_lst
 
-# TODO: check bins - also isDense for comparison plots
 
 ## Plot for homosapiens
 for each_feature in mobidb_features_lst[
