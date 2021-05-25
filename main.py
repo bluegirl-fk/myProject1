@@ -98,30 +98,41 @@ def sum_df_generator(input_sum_matrix):
 
 def draw_heatmaps(data, titles, saving_rout):  # www.stackabuse.com/ultimate-guide-to-heatmaps-in-seaborn-with-python/
     sns.set()
-    fig, axes = plt.subplots(len(data), 1, figsize=(12 * len(data), 12))
-    for i, (ax, d, t) in enumerate(zip(axes.reshape(-1), data, titles)):
-        sb = sns.heatmap(d,
-                         cmap="viridis",  # sequential colormap
-                         annot=False,
-                         annot_kws={'fontsize': 6},
-                         fmt='',
-                         square=True,
-                         # vmax=1,
-                         # vmin=0,
-                         linewidth=0.01,
-                         linecolor="#222",
-                         ax=ax,
-                         vmin=-1.0, vmax=1.0
-                         )
-        ax.set_title(t)
-        # ax.set_ylabel(ylabel)
-        if i < (len(data) - 1):
-            sb.set(xticklabels=[])
-            sb.set(xlabel=None)
-    plt.tight_layout()
+    fig, axes = plt.subplots(len(data) * 2, 1,  figsize=(50 * len(data), 30))
+    for i in range(len(data) * 2):
+        if i % 2 == 0:
+            idx = int(i / 2)
+            sns.heatmap(data[idx],
+                        cmap="viridis",  # sequential colormap
+                        cbar=False,
+                        annot=True,
+                        square=True,
+                        # vmax=1,
+                        # vmin=0,
+                        xticklabels=False,
+                        linewidth=0.01,
+                        linecolor="#222",
+                        ax=axes[i],
+                        vmin=-1.0, vmax=1.0,
+                        yticklabels=False,
+                        annot_kws={'fontsize': 6},
+                        )
+
+            axes[i].set_title(titles[idx])
+            # ax.set_ylabel(ylabel)
+        else:
+            sns.heatmap(data[int((i - 1) / 2)].sum(axis=0).values.reshape(78, 1).transpose(), ax=axes[i],
+                        cmap="viridis",  # sequential colormap
+                        annot=True,
+                        cbar=False,
+                        annot_kws={'fontsize': 6},
+                        fmt=".2",
+                        square=True,
+                        linewidth=0.01,
+                        linecolor="#222", xticklabels=i == len(data) - 1, yticklabels=False)
+
     plt.savefig(saving_rout, dpi=120)
     plt.show()
-
     return
 
 
@@ -204,7 +215,7 @@ sum_difference_df_nan_norm = sum_df_generator(sum_difference_matrix_nan_norm)
 ## heatmaps
 draw_heatmaps([mobidb_cont_fract_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, sum_difference_df_nan_norm.T],
               ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
-              saving_rout='plots/heatmaps/Hmaps1.png')
+              saving_rout='plots/heatmaps/Heatmaps0.png')
 
 # mobidb_cont_fract_sum_norm_df.index = mobidb_cont_fract_sum_norm_df.index.set_names(['Features'])
 # ndd_cont_fract_sum_norm_df.index = ndd_cont_fract_sum_norm_df.index.set_names(['Features'])
@@ -218,7 +229,8 @@ draw_heatmaps([mobidb_cont_fract_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, su
 
 ## distribution heatmap plot
 draw_barplot(figsize_a='40', figsize_b='20', xlabel='Features', ylabel='Protein count', data=mobidb_columns_sum_df,
-             xticklabel=mobidb_cols_sum_lst, yscale='log', save_rout='plots/log/hist-hmaps-distribution/mobidb-log1.png')
+             xticklabel=mobidb_cols_sum_lst, yscale='log',
+             save_rout='plots/log/hist-hmaps-distribution/mobidb-log1.png')
 draw_barplot(figsize_a='40', figsize_b='20', xlabel='Features', ylabel='Protein count', data=ndd_columns_sum_df,
              xticklabel=ndd_cols_sum_lst, yscale='log', save_rout='plots/log/hist-hmaps-distribution/ndd-log1.png')
 
