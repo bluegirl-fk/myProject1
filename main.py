@@ -71,7 +71,7 @@ def matrix_maker_nan(input_df, num_3rd_dim):
     #             matrix_3d[i][j][np.isnan(matrix_3d[i][j])] = 0
 
     # sum of Pr.s with same content_fraction for each feature
-    matrix_3d_sum = np.nansum(matrix_3d, axis=0)
+    matrix_3d_sum = np.nansum(matrix_3d, axis=0, dtype=int)
     matrix_3d_sum_normalized = matrix_3d_sum / matrix_3d_sum.max(axis=1)[:, None]
     return matrix_2d, matrix_3d, matrix_3d_sum, matrix_3d_sum_normalized
 
