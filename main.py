@@ -202,10 +202,10 @@ sum_difference_matrix_nan_norm = mobidb_3d_matrix_nan_sum_norm - ndd_3d_matrix_n
 sum_difference_df_nan_norm = sum_df_generator(sum_difference_matrix_nan_norm)
 
 ## heatmaps
-# draw_heatmaps([mobidb_cont_fract_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, sum_difference_df_nan_norm.T],
-#               ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
-#               saving_rout='plots/heatmaps/Hmaps1.png')
-#
+draw_heatmaps([mobidb_cont_fract_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, sum_difference_df_nan_norm.T],
+              ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
+              saving_rout='plots/heatmaps/Hmaps1.png')
+
 # mobidb_cont_fract_sum_norm_df.index = mobidb_cont_fract_sum_norm_df.index.set_names(['Features'])
 # ndd_cont_fract_sum_norm_df.index = ndd_cont_fract_sum_norm_df.index.set_names(['Features'])
 # merged_mobidb_hmap_df = pd.merge(mobidb_columns_sum_df, mobidb_cont_fract_sum_norm_df, on='Features').set_index(
@@ -218,9 +218,9 @@ sum_difference_df_nan_norm = sum_df_generator(sum_difference_matrix_nan_norm)
 
 ## distribution heatmap plot
 draw_barplot(figsize_a='40', figsize_b='20', xlabel='Features', ylabel='Protein count', data=mobidb_columns_sum_df,
-             xticklabel=mobidb_cols_sum_lst, yscale='log', save_rout='plots/log/hist-hmaps-distribution/mobidb-log.png')
+             xticklabel=mobidb_cols_sum_lst, yscale='log', save_rout='plots/log/hist-hmaps-distribution/mobidb-log1.png')
 draw_barplot(figsize_a='40', figsize_b='20', xlabel='Features', ylabel='Protein count', data=ndd_columns_sum_df,
-             xticklabel=ndd_cols_sum_lst, yscale='log', save_rout='plots/log/hist-hmaps-distribution/ndd-log.png')
+             xticklabel=ndd_cols_sum_lst, yscale='log', save_rout='plots/log/hist-hmaps-distribution/ndd-log1.png')
 
 # Protein count
 import sys
