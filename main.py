@@ -148,7 +148,7 @@ def draw_heatmaps(data, titles, saving_rout):  # www.stackabuse.com/ultimate-gui
 mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')
 ## for content fraction
 mobidb_pivot_contf_df = mobidb_original_df.pivot_table(
-    index=['acc'], columns=['feature'],  values='content_fraction').fillna(0)
+    index=['acc'], columns=['feature'], values='content_fraction').fillna(0)
 mobidb_pivot_contf_df = mobidb_pivot_contf_df.reset_index()  # added idx nums manually,ACCs recognized separate column
 mobidb_pivot_contf_df.to_csv(r'data/mobidb_pivot_contf_df.csv', index=True)
 mobidb_features_lst = mobidb_pivot_contf_df.columns.str.split(',').tolist()  # this also contains the 'acc' column
@@ -161,9 +161,8 @@ ndd_contf_df = mobidb_pivot_contf_df[mobidb_pivot_contf_df['acc'].isin(ndd_acc_l
 mobidb_length_df = mobidb_original_df[['acc', 'length']].drop_duplicates(subset=['acc'])
 mobidb_pivot_length_df = mobidb_original_df.pivot_table(
     index=['acc'], columns=['feature'], values='length').fillna(0)
-mobidb_pivot_length_df = mobidb_pivot_length_df.reset_index() # reset idx to get acc as dif col to search in it
+mobidb_pivot_length_df = mobidb_pivot_length_df.reset_index()  # reset idx to get acc as dif col to search in it
 ndd_length_df = mobidb_pivot_length_df[mobidb_pivot_length_df['acc'].isin(ndd_acc_lst)]  # len(df) = 1089
-
 
 ## Matrix
 # content fraction with nan
@@ -174,25 +173,29 @@ _, ndd_contf_mat, ndd_contf_sum_mat, ndd_contf_sum_norm_mat = matrix_maker_nan(
 
 # Length (Use vstack or hstack ?)
 mobi_len_2d_mat, mobi_len_3d_mat, mobi_len_sum_mat, mobi_len_sum_norm_mat = matrix_maker_nan(
-    input_df=mobidb_pivot_length_df.iloc[:, 1:], max_value=1000, thrd_dim_cells=11, math_oper='/', get_values_in_range=100)
+    input_df=mobidb_pivot_length_df.iloc[:, 1:], max_value=1000, thrd_dim_cells=11, math_oper='/',
+    get_values_in_range=100)
 ndd_len_2d_mat, ndd_len_3d_mat, ndd_len_sum_mat, ndd_len_sum_norm_mat = matrix_maker_nan(
     input_df=ndd_length_df.iloc[:, 1:], max_value=1000, thrd_dim_cells=11, math_oper='/', get_values_in_range=100)
 # ax.hist(dataset_len, bins=np.arange(0, 1000, 10))
 
 ## sum dataframes
 mobi_contf_sum_norm_df = sum_df_generator(mobi_contf_sum_norm_mat,
-                                                 ['0', ' ', '20', ' ', '40', ' ', '60', ' ', '80', ' ', '100'])
+                                          ['0', ' ', '20', ' ', '40', ' ', '60', ' ', '80', ' ', '100'])
 ndd_cont_fract_sum_norm_df = sum_df_generator(ndd_contf_sum_norm_mat,
                                               ['0', ' ', '20', ' ', '40', ' ', '60', ' ', '80', ' ', '100'])
-mobi_len_sum_norm_df = sum_df_generator(mobi_len_sum_norm_mat, [' ', '100', ' ', '300', ' ', '500', ' ', '700', ' ', '900', ''])
-ndd_len_sum_norm_df = sum_df_generator(ndd_len_sum_norm_mat, [' ', '100', ' ', '300', ' ', '500', ' ', '700', ' ', '900', ''])
+mobi_len_sum_norm_df = sum_df_generator(mobi_len_sum_norm_mat,
+                                        [' ', '100', ' ', '300', ' ', '500', ' ', '700', ' ', '900', ''])
+ndd_len_sum_norm_df = sum_df_generator(ndd_len_sum_norm_mat,
+                                       [' ', '100', ' ', '300', ' ', '500', ' ', '700', ' ', '900', ''])
 
 ## Difference of the sum arrays(with nan)
 difference_contf_sum_norm_mat = mobi_contf_sum_norm_mat - ndd_contf_sum_norm_mat
 difference_len_sum_norm_mat = mobi_len_sum_norm_mat - ndd_len_sum_norm_mat
 difference_contf_sum_norm_df = sum_df_generator(difference_contf_sum_norm_mat,
-                                              ['0', ' ', '20', ' ', '40', ' ', '60', ' ', '80', ' ', '100'])
-difference_len_sum_norm_df = sum_df_generator(difference_len_sum_norm_mat, [' ', '100', ' ', '300', ' ', '500', ' ', '700', ' ', '900', ''])
+                                                ['0', ' ', '20', ' ', '40', ' ', '60', ' ', '80', ' ', '100'])
+difference_len_sum_norm_df = sum_df_generator(difference_len_sum_norm_mat,
+                                              [' ', '100', ' ', '300', ' ', '500', ' ', '700', ' ', '900', ''])
 
 ## heatmaps
 draw_heatmaps([mobi_contf_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, difference_contf_sum_norm_df.T],
@@ -203,41 +206,50 @@ draw_heatmaps([mobi_len_sum_norm_df.T, ndd_len_sum_norm_df.T, difference_len_sum
               saving_rout='plots/heatmaps/Heatmaps-Length.png')
 
 # TODO: check the hmap with sum as dif color later and get the code back from github if needed
-# TODO: turn this into a method, think about shorter way maybe
+# TODO: turn this into a method, shorter way
+
 ## columns sum of matrix_3d_sum df to get prot count per feature (for histogram based on distribution of heatmap)
+# content fraction
 mobi_contf_cols_sum_df = pd.DataFrame(
-    [mobi_contf_sum_mat.T.sum(axis=0)], columns=mobidb_features_lst[1:], index=['Proteins count'])
+    [mobi_contf_sum_mat.T.sum(axis=0)], columns=mobidb_features_lst[1:], index=['Protein count'])
 ndd_contf_cols_sum_df = pd.DataFrame(
-    [ndd_contf_sum_mat.T.sum(axis=0)], columns=mobidb_features_lst[1:], index=['Proteins count'])
+    [ndd_contf_sum_mat.T.sum(axis=0)], columns=mobidb_features_lst[1:], index=['Protein count'])
 mobi_contf_cols_sum_df = mobi_contf_cols_sum_df.T.reset_index()
 ndd_contf_cols_sum_df = ndd_contf_cols_sum_df.T.reset_index()
 mobi_contf_cols_sum_df.columns = ['Features', 'Protein count']
 ndd_contf_cols_sum_df.columns = ['Features', 'Protein count']
+
 mobi_contf_cols_sum_lst = mobi_contf_cols_sum_df['Protein count']
 mobi_contf_cols_sum_lst = [int(x) for x in mobi_contf_cols_sum_lst]
 ndd_contf_cols_sum_lst = ndd_contf_cols_sum_df['Protein count']
 ndd_contf_cols_sum_lst = [int(x) for x in ndd_contf_cols_sum_lst]
-#for len
+
+
+
+# length
 mobi_len_cols_sum_df = pd.DataFrame(
-    [mobi_len_sum_mat.T.sum(axis=0)], columns=mobidb_features_lst[1:], index=['Proteins count'])
+    [mobi_len_sum_mat.T.sum(axis=0)], columns=mobidb_features_lst[1:], index=['Protein count'])
 ndd_len_cols_sum_df = pd.DataFrame(
-    [ndd_len_sum_mat.T.sum(axis=0)], columns=mobidb_features_lst[1:], index=['Proteins count'])
-mobi_len_cols_sum_df = mobi_len_cols_sum_df.reset_index()
-ndd_len_cols_sum_df = ndd_len_cols_sum_df.reset_index()
+    [ndd_len_sum_mat.T.sum(axis=0)], columns=mobidb_features_lst[1:], index=['Protein count'])
+mobi_len_cols_sum_df = mobi_len_cols_sum_df.T.reset_index()
+ndd_len_cols_sum_df = ndd_len_cols_sum_df.T.reset_index()
 mobi_len_cols_sum_df.columns = ['Features', 'Protein count']
 ndd_len_cols_sum_df.columns = ['Features', 'Protein count']
+
 mobi_len_cols_sum_lst = mobi_len_cols_sum_df['Protein count']
 mobi_len_cols_sum_lst = [int(x) for x in mobi_len_cols_sum_lst]
 ndd_len_cols_sum_lst = ndd_len_cols_sum_df['Protein count']
 ndd_len_cols_sum_lst = [int(x) for x in ndd_len_cols_sum_lst]
+
 ## distribution heatmap barplot
 draw_barplot(figsize_a='24', figsize_b='12', xlabel='Features', ylabel='Protein count', data=mobi_contf_cols_sum_df,
              xticklabel=mobi_contf_cols_sum_lst, yscale='log',
              save_rout='plots/log/hist-hmaps-distribution/mobidb-log-.png')
 draw_barplot(figsize_a='24', figsize_b='12', xlabel='Features', ylabel='Protein count', data=ndd_contf_cols_sum_df,
-             xticklabel=ndd_contf_cols_sum_lst, yscale='log', save_rout='plots/log/hist-hmaps-distribution/ndd-log-.png')
+             xticklabel=ndd_contf_cols_sum_lst, yscale='log',
+             save_rout='plots/log/hist-hmaps-distribution/ndd-log-.png')
 draw_barplot(figsize_a='24', figsize_b='12', xlabel='Features', ylabel='Protein count', data=mobi_len_cols_sum_df,
-             xticklabel=mobi_len_cols_sum_lst, yscale='log',
+             xticklabel='', yscale='log',
              save_rout='plots/log/hist-hmaps-distribution/mobi-len-log.png')
 draw_barplot(figsize_a='24', figsize_b='12', xlabel='Features', ylabel='Protein count', data=ndd_len_cols_sum_df,
              xticklabel=ndd_len_cols_sum_lst, yscale='log',
