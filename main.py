@@ -54,18 +54,22 @@ def compare_plot(first_lst, second_lst, yscale, bins, is_dense, first_label, sec
     return
 
 
-def matrix_maker_nan(input_df, num_3rd_dim, max_range):
-    # gets df and gives 2d, 3d arrays, the 3rd dim is based on the range of values, e.g: 0-10
-    # matrix_2d = same as input df, matrix 3d has the ranges, 3d_sum = 2d matrix containing sum of proteins with C_F in
-    # the same range, 3d_normalized= 2d matrix with values/max, so value ranges will be 0-1 for the hmap.(as percentage)
-    matrix_2d = (input_df.to_numpy() <= max_range) * input_df.to_numpy()  # <=1 for cont_fract cuz it indicates
-    # disorder percentage(c_f)
-    matrix_3d = np.full((matrix_2d.shape[0], matrix_2d.shape[1], num_3rd_dim + 1), np.nan)
+def matrix_maker_nan(input_df, max_value, thrd_dim_cells, math_oper, get_values_in_range):
+    # gets input_df and gives 2d, 3d arrays, filters based on max_value, the 3rd dim is based on the range of values,
+    # e.g: 0-10 (thrd_dim_cells) math_oper and get_values_in_range are dependant, they should be calculated in order
+    # to give distribute values 0-max based on number of 3d_cells example, for length, max_v = 1000 and we have 11
+    # cell ranges [0:11], so we should divide all by 100 => 1000/100 = 10)
+    matrix_2d = (input_df.to_numpy() <= max_value) * input_df.to_numpy()
+    matrix_3d = np.full((matrix_2d.shape[0], matrix_2d.shape[1], thrd_dim_cells), np.nan)
     for i in range(matrix_2d.shape[0]):
         for j in range(matrix_2d.shape[1]):
             if matrix_2d[i, j] != 0:
-                k = int(round(matrix_2d[i, j] * num_3rd_dim))
-                matrix_3d[i, j, k] = 1
+                if math_oper == '*':
+                    k = int(round(matrix_2d[i, j] * get_values_in_range))
+                    matrix_3d[i, j, k] = 1
+                elif math_oper == '/':
+                    k = int(round(matrix_2d[i, j] / get_values_in_range))
+                    matrix_3d[i, j, k] = 1
 
     #
     # Replace NaN with zeros for rows containing at least one value
@@ -74,7 +78,7 @@ def matrix_maker_nan(input_df, num_3rd_dim, max_range):
     #         if 1.0 in matrix_3d[i][j]:
     #             matrix_3d[i][j][np.isnan(matrix_3d[i][j])] = 0
 
-    # sum of Pr.s with same content_fraction for each feature
+    # sum of Pr.s with same content_fraction or length for each feature
     matrix_3d_sum = np.nansum(matrix_3d, axis=0, dtype=int)
     matrix_3d_sum_normalized = matrix_3d_sum / matrix_3d_sum.max(axis=1)[:, None]
     return matrix_2d, matrix_3d, matrix_3d_sum, matrix_3d_sum_normalized
@@ -156,41 +160,28 @@ ndd_acc_lst = ndd_acc_df['Entry'].to_list()
 ndd_mobidb_df = mobidb_pivot_contf_df[mobidb_pivot_contf_df['acc'].isin(ndd_acc_lst)]
 ## for Length
 mobidb_length_df = mobidb_original_df[['acc', 'length']].drop_duplicates(subset=['acc'])
-mobidb_pivot_length_df =
-
-
+mobidb_pivot_length_df = mobidb_original_df.pivot_table(index=['acc'], columns=['feature'],
+                                                        values='length').fillna(0)
 
 ## Matrix
-# with nan
-_, mobidb_3d_matrix_nan, mobidb_3d_matrix_nan_sum, mobidb_3d_matrix_nan_sum_norm = matrix_maker_nan(
-    mobidb_pivot_contf_df.iloc[:, 1:], 10, 1.)
-_, ndd_3d_matrix_nan, ndd_3d_matrix_nan_sum, ndd_3d_matrix_nan_sum_norm = matrix_maker_nan(ndd_mobidb_df.iloc[:, 1:],
-                                                                                           10, 1.)
+# content fraction with nan
+_, mobi_contf_mat, mobi_contf_mat_sum, mobi_contf_mat_sum_norm = matrix_maker_nan(
+    input_df=mobidb_pivot_contf_df.iloc[:, 1:], max_value=1., thrd_dim_cells=11, math_oper='*', get_values_in_range=10)
+_, ndd_contf_mat, ndd_contf_mat_sum, ndd_contf_mat_sum_norm = matrix_maker_nan(input_df=ndd_mobidb_df.iloc[:, 1:],
+                                                                               max_value=1., thrd_dim_cells=11,
+                                                                               math_oper='*', get_values_in_range=10)
 
-# # Add the length statistics here. Use vstack or hstack
-# # mobidb_3d_matrix_nan_sum
-# # mobidb_3d_matrix_nan_sum_norm
-# # ndd_3d_matrix_nan_sum
-# # ndd_3d_matrix_nan_sum_norm
-#
-# #ax.hist(dataset_len, bins=np.arange(0, 1000, 10))
-#
-# # for length
-# matrix_2d_length = (mobidb_pivot_length_df.to_numpy() <= 1.) * mobidb_pivot_length_df.to_numpy()
-# matrix_3d_length = np.zeros((matrix_2d_length.shape[0], matrix_2d_length.shape[1], 10 + 1))
-# for i in range(matrix_2d_length.shape[0]):
-#     for j in range(matrix_2d_length.shape[1]):
-#         # if matrix_2d[i, j] != 0:
-#         k = int(round(matrix_2d_length[i, j] * 10))
-#         matrix_3d_length[i, j, k] = 1
-# matrix_3d_sum = np.sum(matrix_3d_length, axis=0)
-# matrix_3d_sum_normalized = matrix_3d_sum / matrix_3d_sum.max(axis=1)[:, None]
+# Length (Use vstack or hstack)
+matrix_2d_len, matrix_3d_len, len_sum_mat, len_sum_mat_norm = matrix_maker_nan(input_df=mobidb_pivot_length_df,
+                                                                               max_value=1000, thrd_dim_cells=11,
+                                                                               math_oper='/', get_values_in_range=100)
+# ax.hist(dataset_len, bins=np.arange(0, 1000, 10))
 
 
 ## columns sum of matrix_3d_sum df to get prot count per feature (for histogram based on distribution of heatmap)
-mobidb_columns_sum_df = pd.DataFrame([mobidb_3d_matrix_nan_sum.T.sum(axis=0)], columns=mobidb_features_lst[1:],
+mobidb_columns_sum_df = pd.DataFrame([mobi_contf_mat_sum.T.sum(axis=0)], columns=mobidb_features_lst[1:],
                                      index=['Proteins count'])
-ndd_columns_sum_df = pd.DataFrame([ndd_3d_matrix_nan_sum.T.sum(axis=0)], columns=mobidb_features_lst[1:],
+ndd_columns_sum_df = pd.DataFrame([ndd_contf_mat_sum.T.sum(axis=0)], columns=mobidb_features_lst[1:],
                                   index=['Proteins count'])
 mobidb_columns_sum_df = mobidb_columns_sum_df.T.reset_index()
 ndd_columns_sum_df = ndd_columns_sum_df.T.reset_index()
@@ -211,11 +202,11 @@ ndd_cols_sum_lst = [int(x) for x in ndd_cols_sum_lst]
 # genes4dn_acc_merge_df = pd.merge(genes4dn_orig_df, genes4dn_acc_df, on='geneslist')  # (48060, 19)
 
 ## sum dataframes
-mobidb_cont_fract_sum_norm_df = sum_df_generator(mobidb_3d_matrix_nan_sum_norm)
-ndd_cont_fract_sum_norm_df = sum_df_generator(ndd_3d_matrix_nan_sum_norm)
+mobidb_cont_fract_sum_norm_df = sum_df_generator(mobi_contf_mat_sum_norm)
+ndd_cont_fract_sum_norm_df = sum_df_generator(ndd_contf_mat_sum_norm)
 
 ## Difference of the sum arrays(with nan)
-sum_difference_matrix_nan_norm = mobidb_3d_matrix_nan_sum_norm - ndd_3d_matrix_nan_sum_norm
+sum_difference_matrix_nan_norm = mobi_contf_mat_sum_norm - ndd_contf_mat_sum_norm
 sum_difference_df_nan_norm = sum_df_generator(sum_difference_matrix_nan_norm)
 
 ## heatmaps
