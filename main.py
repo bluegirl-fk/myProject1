@@ -148,8 +148,8 @@ def draw_heatmaps(data, titles, saving_rout):  # www.stackabuse.com/ultimate-gui
 ### Files import and modify
 mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')
 ## for content fraction
-mobidb_pivot_contf_df = mobidb_original_df.pivot_table(index=['acc'], columns=['feature'],
-                                                       values='content_fraction').fillna(0)
+mobidb_pivot_contf_df = mobidb_original_df.pivot_table(
+    index=['acc'], columns=['feature'],  values='content_fraction').fillna(0)
 mobidb_pivot_contf_df = mobidb_pivot_contf_df.reset_index()  # added idx nums manually,ACCs recognized separate column
 mobidb_pivot_contf_df.to_csv(r'data/mobidb_pivot_contf_df.csv', index=True)
 mobidb_features_lst = mobidb_pivot_contf_df.columns.str.split(',').tolist()  # this also contains the 'acc' column
@@ -157,31 +157,34 @@ mobidb_features_lst = list(itertools.chain(*mobidb_features_lst))  # flat list
 
 ndd_acc_df = pd.read_csv('data/allUniqueEntry.tab', sep='\t')
 ndd_acc_lst = ndd_acc_df['Entry'].to_list()
-ndd_mobidb_df = mobidb_pivot_contf_df[mobidb_pivot_contf_df['acc'].isin(ndd_acc_lst)]
+ndd_contf_df = mobidb_pivot_contf_df[mobidb_pivot_contf_df['acc'].isin(ndd_acc_lst)]
 ## for Length
 mobidb_length_df = mobidb_original_df[['acc', 'length']].drop_duplicates(subset=['acc'])
-mobidb_pivot_length_df = mobidb_original_df.pivot_table(index=['acc'], columns=['feature'],
-                                                        values='length').fillna(0)
+mobidb_pivot_length_df = mobidb_original_df.pivot_table(
+    index=['acc'], columns=['feature'], values='length').fillna(0)
+mobidb_pivot_length_df = mobidb_pivot_length_df.reset_index() # reset idx to get acc as dif col to search in it
+ndd_length_df = mobidb_pivot_length_df[mobidb_pivot_length_df['acc'].isin(ndd_acc_lst)]  # len(df) = 1089
+
 
 ## Matrix
 # content fraction with nan
-_, mobi_contf_mat, mobi_contf_mat_sum, mobi_contf_mat_sum_norm = matrix_maker_nan(
+_, mobi_contf_mat, mobi_contf_sum_mat, mobi_contf_sum_norm_mat = matrix_maker_nan(
     input_df=mobidb_pivot_contf_df.iloc[:, 1:], max_value=1., thrd_dim_cells=11, math_oper='*', get_values_in_range=10)
-_, ndd_contf_mat, ndd_contf_mat_sum, ndd_contf_mat_sum_norm = matrix_maker_nan(input_df=ndd_mobidb_df.iloc[:, 1:],
-                                                                               max_value=1., thrd_dim_cells=11,
-                                                                               math_oper='*', get_values_in_range=10)
+_, ndd_contf_mat, ndd_contf_sum_mat, ndd_contf_sum_norm_mat = matrix_maker_nan(
+    input_df=ndd_contf_df.iloc[:, 1:], max_value=1., thrd_dim_cells=11, math_oper='*', get_values_in_range=10)
 
 # Length (Use vstack or hstack)
-matrix_2d_len, matrix_3d_len, len_sum_mat, len_sum_mat_norm = matrix_maker_nan(input_df=mobidb_pivot_length_df,
-                                                                               max_value=1000, thrd_dim_cells=11,
-                                                                               math_oper='/', get_values_in_range=100)
+mobi_len_2d_mat, mobi_len_3d_mat, mobi_len_sum_mat, mobi_len_sum_norm_mat = matrix_maker_nan(
+    input_df=mobidb_pivot_length_df.iloc[:, 1:], max_value=1000, thrd_dim_cells=11, math_oper='/', get_values_in_range=100)
+ndd_len_2d_mat, ndd_len_3d_mat, ndd_len_sum_mat, ndd_len_sum_norm_mat = matrix_maker_nan(
+    input_df=ndd_length_df.iloc[:, 1:], max_value=1000, thrd_dim_cells=11, math_oper='/', get_values_in_range=100)
 # ax.hist(dataset_len, bins=np.arange(0, 1000, 10))
 
 
 ## columns sum of matrix_3d_sum df to get prot count per feature (for histogram based on distribution of heatmap)
-mobidb_columns_sum_df = pd.DataFrame([mobi_contf_mat_sum.T.sum(axis=0)], columns=mobidb_features_lst[1:],
+mobidb_columns_sum_df = pd.DataFrame([mobi_contf_sum_mat.T.sum(axis=0)], columns=mobidb_features_lst[1:],
                                      index=['Proteins count'])
-ndd_columns_sum_df = pd.DataFrame([ndd_contf_mat_sum.T.sum(axis=0)], columns=mobidb_features_lst[1:],
+ndd_columns_sum_df = pd.DataFrame([ndd_contf_sum_mat.T.sum(axis=0)], columns=mobidb_features_lst[1:],
                                   index=['Proteins count'])
 mobidb_columns_sum_df = mobidb_columns_sum_df.T.reset_index()
 ndd_columns_sum_df = ndd_columns_sum_df.T.reset_index()
@@ -202,11 +205,11 @@ ndd_cols_sum_lst = [int(x) for x in ndd_cols_sum_lst]
 # genes4dn_acc_merge_df = pd.merge(genes4dn_orig_df, genes4dn_acc_df, on='geneslist')  # (48060, 19)
 
 ## sum dataframes
-mobidb_cont_fract_sum_norm_df = sum_df_generator(mobi_contf_mat_sum_norm)
-ndd_cont_fract_sum_norm_df = sum_df_generator(ndd_contf_mat_sum_norm)
+mobidb_cont_fract_sum_norm_df = sum_df_generator(mobi_contf_sum_norm_mat)
+ndd_cont_fract_sum_norm_df = sum_df_generator(ndd_contf_sum_norm_mat)
 
 ## Difference of the sum arrays(with nan)
-sum_difference_matrix_nan_norm = mobi_contf_mat_sum_norm - ndd_contf_mat_sum_norm
+sum_difference_matrix_nan_norm = mobi_contf_sum_norm_mat - ndd_contf_sum_norm_mat
 sum_difference_df_nan_norm = sum_df_generator(sum_difference_matrix_nan_norm)
 
 ## heatmaps
@@ -241,7 +244,7 @@ for each_feature in mobidb_features_lst[
 
 ## Dictionary Disease
 for each_feature in mobidb_features_lst:
-    ndd_cont_fra_temp_lst = ndd_mobidb_df[each_feature].tolist()
+    ndd_cont_fra_temp_lst = ndd_contf_df[each_feature].tolist()
     ndd_predictors_cont_fra_dict[each_feature] = ndd_cont_fra_temp_lst
 
 ## plot for ndds
