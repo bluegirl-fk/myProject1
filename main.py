@@ -97,9 +97,9 @@ def matrix_maker_zeros(input_df, num_3rd_dim, max_range):
     return matrix_2d, matrix_3d, matrix_3d_sum  # , matrix_3d_sum_normalized
 
 
-def sum_df_generator(input_sum_matrix):
+def sum_df_generator(input_sum_matrix, columns):
     sum_df = pd.DataFrame(input_sum_matrix,
-                          columns=['0', ' ', '20', ' ', '40', ' ', '60', ' ', '80', ' ', '100'],
+                          columns=columns,
                           index=mobidb_features_lst[1:])
     return sum_df
 
@@ -180,18 +180,27 @@ ndd_len_2d_mat, ndd_len_3d_mat, ndd_len_sum_mat, ndd_len_sum_norm_mat = matrix_m
 # ax.hist(dataset_len, bins=np.arange(0, 1000, 10))
 
 ## sum dataframes
-mobidb_cont_fract_sum_norm_df = sum_df_generator(mobi_contf_sum_norm_mat)
-ndd_cont_fract_sum_norm_df = sum_df_generator(ndd_contf_sum_norm_mat)
+mobi_contf_sum_norm_df = sum_df_generator(mobi_contf_sum_norm_mat,
+                                                 ['0', ' ', '20', ' ', '40', ' ', '60', ' ', '80', ' ', '100'])
+ndd_cont_fract_sum_norm_df = sum_df_generator(ndd_contf_sum_norm_mat,
+                                              ['0', ' ', '20', ' ', '40', ' ', '60', ' ', '80', ' ', '100'])
+mobi_len_sum_norm_df = sum_df_generator(mobi_len_sum_norm_mat, [' ', '100', ' ', '300', ' ', '500', ' ', '700', ' ', '900', ''])
+ndd_len_sum_norm_df = sum_df_generator(ndd_len_sum_norm_mat, [' ', '100', ' ', '300', ' ', '500', ' ', '700', ' ', '900', ''])
 
 ## Difference of the sum arrays(with nan)
-sum_difference_matrix_nan_norm = mobi_contf_sum_norm_mat - ndd_contf_sum_norm_mat
-sum_difference_df_nan_norm = sum_df_generator(sum_difference_matrix_nan_norm)
+difference_contf_sum_norm_mat = mobi_contf_sum_norm_mat - ndd_contf_sum_norm_mat
+difference_len_sum_norm_mat = mobi_len_sum_norm_mat - ndd_len_sum_norm_mat
+difference_contf_sum_norm_df = sum_df_generator(difference_contf_sum_norm_mat,
+                                              ['0', ' ', '20', ' ', '40', ' ', '60', ' ', '80', ' ', '100'])
+difference_len_sum_norm_df = sum_df_generator(difference_len_sum_norm_mat, [' ', '100', ' ', '300', ' ', '500', ' ', '700', ' ', '900', ''])
 
 ## heatmaps
-draw_heatmaps([mobidb_cont_fract_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, sum_difference_df_nan_norm.T],
+draw_heatmaps([mobi_contf_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, difference_contf_sum_norm_df.T],
               ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
               saving_rout='plots/heatmaps/Heatmaps0.png')
-draw_heatmaps()
+draw_heatmaps([mobi_len_sum_norm_df.T, ndd_len_sum_norm_df.T, difference_len_sum_norm_df.T],
+              ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
+              saving_rout='plots/heatmaps/Heatmaps-Length.png')
 
 # TODO: check the hmap with sum as dif color later and get the code back from github if needed
 
