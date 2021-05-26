@@ -205,49 +205,36 @@ draw_heatmaps([mobi_len_sum_norm_df.T, ndd_len_sum_norm_df.T, difference_len_sum
               ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
               saving_rout='plots/heatmaps/Heatmaps-Length.png')
 
+
 # TODO: check the hmap with sum as dif color later and get the code back from github if needed
 # TODO: turn this into a method, shorter way
+def df_lst_maker_for_barplot(input_matrix):
+    cols_sum_df = pd.DataFrame([input_matrix], columns=mobidb_features_lst[1:], index=['Protein count'])
+    cols_sum_df = cols_sum_df.T.reset_index()
+    cols_sum_df.columns = ['Features', 'Protein count']
+    cols_sum_lst = cols_sum_df['Protein count']
+    cols_sum_lst = [int(x) for x in cols_sum_lst]
 
-## columns sum of matrix_3d_sum df to get prot count per feature (for histogram based on distribution of heatmap)
+    return cols_sum_df, cols_sum_lst
+
+
+## columns sum sum_matrix to get protein numbers (for bar plot based on distribution of heatmap)
 # content fraction
-mobi_contf_cols_sum_df = pd.DataFrame(
-    [mobi_contf_sum_mat.T.sum(axis=0)], columns=mobidb_features_lst[1:], index=['Protein count'])
-ndd_contf_cols_sum_df = pd.DataFrame(
-    [ndd_contf_sum_mat.T.sum(axis=0)], columns=mobidb_features_lst[1:], index=['Protein count'])
-mobi_contf_cols_sum_df = mobi_contf_cols_sum_df.T.reset_index()
-ndd_contf_cols_sum_df = ndd_contf_cols_sum_df.T.reset_index()
-mobi_contf_cols_sum_df.columns = ['Features', 'Protein count']
-ndd_contf_cols_sum_df.columns = ['Features', 'Protein count']
-
-mobi_contf_cols_sum_lst = mobi_contf_cols_sum_df['Protein count']
-mobi_contf_cols_sum_lst = [int(x) for x in mobi_contf_cols_sum_lst]
-ndd_contf_cols_sum_lst = ndd_contf_cols_sum_df['Protein count']
-ndd_contf_cols_sum_lst = [int(x) for x in ndd_contf_cols_sum_lst]
-
-
-
+mobi_contf_cols_sum_df, mobi_contf_cols_sum_lst = df_lst_maker_for_barplot(mobi_contf_sum_mat.T.sum(axis=0))
+ndd_contf_cols_sum_df, ndd_contf_cols_sum_lst = df_lst_maker_for_barplot(ndd_contf_sum_mat.T.sum(axis=0))
 # length
-mobi_len_cols_sum_df = pd.DataFrame(
-    [mobi_len_sum_mat.T.sum(axis=0)], columns=mobidb_features_lst[1:], index=['Protein count'])
-ndd_len_cols_sum_df = pd.DataFrame(
-    [ndd_len_sum_mat.T.sum(axis=0)], columns=mobidb_features_lst[1:], index=['Protein count'])
-mobi_len_cols_sum_df = mobi_len_cols_sum_df.T.reset_index()
-ndd_len_cols_sum_df = ndd_len_cols_sum_df.T.reset_index()
-mobi_len_cols_sum_df.columns = ['Features', 'Protein count']
-ndd_len_cols_sum_df.columns = ['Features', 'Protein count']
+mobi_len_cols_sum_df, mobi_len_cols_sum_lst = df_lst_maker_for_barplot(mobi_len_sum_mat.T.sum(axis=0))
+ndd_len_cols_sum_df, ndd_len_cols_sum_lst = df_lst_maker_for_barplot(ndd_len_sum_mat.T.sum(axis=0))
 
-mobi_len_cols_sum_lst = mobi_len_cols_sum_df['Protein count']
-mobi_len_cols_sum_lst = [int(x) for x in mobi_len_cols_sum_lst]
-ndd_len_cols_sum_lst = ndd_len_cols_sum_df['Protein count']
-ndd_len_cols_sum_lst = [int(x) for x in ndd_len_cols_sum_lst]
-
-## distribution heatmap barplot
+## Hmap distribution barplots
+# content fraction
 draw_barplot(figsize_a='24', figsize_b='12', xlabel='Features', ylabel='Protein count', data=mobi_contf_cols_sum_df,
              xticklabel=mobi_contf_cols_sum_lst, yscale='log',
-             save_rout='plots/log/hist-hmaps-distribution/mobidb-log-.png')
+             save_rout='plots/log/hist-hmaps-distribution/mobidb-contf-log-.png')
 draw_barplot(figsize_a='24', figsize_b='12', xlabel='Features', ylabel='Protein count', data=ndd_contf_cols_sum_df,
              xticklabel=ndd_contf_cols_sum_lst, yscale='log',
-             save_rout='plots/log/hist-hmaps-distribution/ndd-log-.png')
+             save_rout='plots/log/hist-hmaps-distribution/ndd-contf-log-.png')
+#Length
 draw_barplot(figsize_a='24', figsize_b='12', xlabel='Features', ylabel='Protein count', data=mobi_len_cols_sum_df,
              xticklabel='', yscale='log',
              save_rout='plots/log/hist-hmaps-distribution/mobi-len-log.png')
