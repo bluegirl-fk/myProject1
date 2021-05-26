@@ -203,28 +203,45 @@ draw_heatmaps([mobi_len_sum_norm_df.T, ndd_len_sum_norm_df.T, difference_len_sum
               saving_rout='plots/heatmaps/Heatmaps-Length.png')
 
 # TODO: check the hmap with sum as dif color later and get the code back from github if needed
-
+# TODO: turn this into a method, think about shorter way maybe
 ## columns sum of matrix_3d_sum df to get prot count per feature (for histogram based on distribution of heatmap)
-mobidb_columns_sum_df = pd.DataFrame([mobi_contf_sum_mat.T.sum(axis=0)], columns=mobidb_features_lst[1:],
-                                     index=['Proteins count'])
-ndd_columns_sum_df = pd.DataFrame([ndd_contf_sum_mat.T.sum(axis=0)], columns=mobidb_features_lst[1:],
-                                  index=['Proteins count'])
-mobidb_columns_sum_df = mobidb_columns_sum_df.T.reset_index()
-ndd_columns_sum_df = ndd_columns_sum_df.T.reset_index()
-mobidb_columns_sum_df.columns = ['Features', 'Protein count']
-ndd_columns_sum_df.columns = ['Features', 'Protein count']
-mobidb_cols_sum_lst = mobidb_columns_sum_df['Protein count']
-mobidb_cols_sum_lst = [int(x) for x in mobidb_cols_sum_lst]
-ndd_cols_sum_lst = ndd_columns_sum_df['Protein count']
-ndd_cols_sum_lst = [int(x) for x in ndd_cols_sum_lst]
-
+mobi_contf_cols_sum_df = pd.DataFrame(
+    [mobi_contf_sum_mat.T.sum(axis=0)], columns=mobidb_features_lst[1:], index=['Proteins count'])
+ndd_contf_cols_sum_df = pd.DataFrame(
+    [ndd_contf_sum_mat.T.sum(axis=0)], columns=mobidb_features_lst[1:], index=['Proteins count'])
+mobi_contf_cols_sum_df = mobi_contf_cols_sum_df.T.reset_index()
+ndd_contf_cols_sum_df = ndd_contf_cols_sum_df.T.reset_index()
+mobi_contf_cols_sum_df.columns = ['Features', 'Protein count']
+ndd_contf_cols_sum_df.columns = ['Features', 'Protein count']
+mobi_contf_cols_sum_lst = mobi_contf_cols_sum_df['Protein count']
+mobi_contf_cols_sum_lst = [int(x) for x in mobi_contf_cols_sum_lst]
+ndd_contf_cols_sum_lst = ndd_contf_cols_sum_df['Protein count']
+ndd_contf_cols_sum_lst = [int(x) for x in ndd_contf_cols_sum_lst]
+#for len
+mobi_len_cols_sum_df = pd.DataFrame(
+    [mobi_len_sum_mat.T.sum(axis=0)], columns=mobidb_features_lst[1:], index=['Proteins count'])
+ndd_len_cols_sum_df = pd.DataFrame(
+    [ndd_len_sum_mat.T.sum(axis=0)], columns=mobidb_features_lst[1:], index=['Proteins count'])
+mobi_len_cols_sum_df = mobi_len_cols_sum_df.reset_index()
+ndd_len_cols_sum_df = ndd_len_cols_sum_df.reset_index()
+mobi_len_cols_sum_df.columns = ['Features', 'Protein count']
+ndd_len_cols_sum_df.columns = ['Features', 'Protein count']
+mobi_len_cols_sum_lst = mobi_len_cols_sum_df['Protein count']
+mobi_len_cols_sum_lst = [int(x) for x in mobi_len_cols_sum_lst]
+ndd_len_cols_sum_lst = ndd_len_cols_sum_df['Protein count']
+ndd_len_cols_sum_lst = [int(x) for x in ndd_len_cols_sum_lst]
 ## distribution heatmap barplot
-draw_barplot(figsize_a='24', figsize_b='12', xlabel='Features', ylabel='Protein count', data=mobidb_columns_sum_df,
-             xticklabel=mobidb_cols_sum_lst, yscale='log',
+draw_barplot(figsize_a='24', figsize_b='12', xlabel='Features', ylabel='Protein count', data=mobi_contf_cols_sum_df,
+             xticklabel=mobi_contf_cols_sum_lst, yscale='log',
              save_rout='plots/log/hist-hmaps-distribution/mobidb-log-.png')
-draw_barplot(figsize_a='24', figsize_b='12', xlabel='Features', ylabel='Protein count', data=ndd_columns_sum_df,
-             xticklabel=ndd_cols_sum_lst, yscale='log', save_rout='plots/log/hist-hmaps-distribution/ndd-log-.png')
-
+draw_barplot(figsize_a='24', figsize_b='12', xlabel='Features', ylabel='Protein count', data=ndd_contf_cols_sum_df,
+             xticklabel=ndd_contf_cols_sum_lst, yscale='log', save_rout='plots/log/hist-hmaps-distribution/ndd-log-.png')
+draw_barplot(figsize_a='24', figsize_b='12', xlabel='Features', ylabel='Protein count', data=mobi_len_cols_sum_df,
+             xticklabel=mobi_len_cols_sum_lst, yscale='log',
+             save_rout='plots/log/hist-hmaps-distribution/mobi-len-log.png')
+draw_barplot(figsize_a='24', figsize_b='12', xlabel='Features', ylabel='Protein count', data=ndd_len_cols_sum_df,
+             xticklabel=ndd_len_cols_sum_lst, yscale='log',
+             save_rout='plots/log/hist-hmaps-distribution/ndd-len-log.png')
 # Protein count
 import sys
 
