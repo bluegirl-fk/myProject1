@@ -141,11 +141,12 @@ def draw_heatmaps(data, titles, saving_rout):  # www.stackabuse.com/ultimate-gui
 gene4dn_all_annotations_df = pd.read_csv('data/gene4denovo/All_De_novo_mutations_and_annotations_1.2.txt',
                                          sep='\t', encoding='cp1252', low_memory=False)  # (670082, 155)
 gene4d_annots_exonic_df = gene4dn_all_annotations_df.loc[gene4dn_all_annotations_df[
-                                                          'Func.ensGene'] == 'exonic',  # (72040, 5)
-                                                      ['Phenotype', 'avsnp150' ,'Gene.ensGene', 'ExonicFunc.ensGene', 'AAChange.ensGene']]
+                                                             'Func.ensGene'] == 'exonic',  # (72040, 5)
+                                                         ['Phenotype', 'avsnp150', 'Gene.ensGene', 'ExonicFunc.ensGene',
+                                                          'AAChange.ensGene']]
 phenotypes = ['EE', 'ID', 'CMS', 'ASD', 'SCZ', 'NDDs']
 gene4d_phenotypes_df = gene4d_annots_exonic_df[gene4d_annots_exonic_df.Phenotype.isin(phenotypes)]  # (17289, 5)
-gene4d_phens_avsnp_df = gene4d_phenotypes_df[gene4d_phenotypes_df.avsnp150 != '-'] # (6367, 5)
+gene4d_phens_avsnp_df = gene4d_phenotypes_df[gene4d_phenotypes_df.avsnp150 != '-']  # (6367, 5)
 
 import sys
 
