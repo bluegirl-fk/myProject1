@@ -279,3 +279,10 @@ for each_feature in mobidb_features_lst[1:]:
                  x_label=each_feature + '_comparison', y_label='proteins count(relative)',
                  first_label='Homo sapiens Pr.s', second_label='NDD Pr.s',
                  png_file_name='plots/log/hist-comparison' '-homoS-NDD/' + each_feature)
+
+# rs_id = file[dbsnp1_merges[i]][merged_rsid]
+# is_protein = file[primary_snapshot_data][placements_with_allele[i]][placement_annot][mol_type]=='protein'
+# positions = file[primary_snapshot_data][placements_with_allele[i]][allelse[i]][allele][spdi][position]
+# # del_seq = file[primary_snapshot_data][placements_with_allele[i]][allelse[i]][allele][spdi][deleted_sequence]
+# positions = file[primary_snapshot_data][placements_with_allele[i]][allelse[i]][allele][spdi][inserted_sequence]
+# if is_protein == True : ...
