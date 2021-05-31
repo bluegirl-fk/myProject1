@@ -147,6 +147,7 @@ gene4d_annots_exonic_df = gene4dn_all_annotations_df.loc[gene4dn_all_annotations
 phenotypes = ['EE', 'ID', 'CMS', 'ASD', 'SCZ', 'NDDs']
 gene4d_phenotypes_df = gene4d_annots_exonic_df[gene4d_annots_exonic_df.Phenotype.isin(phenotypes)]  # (17289, 5)
 gene4d_phens_avsnp_df = gene4d_phenotypes_df[gene4d_phenotypes_df.avsnp150 != '-']  # (6367, 5)
+gene4d_phens_avsnp_df.to_csv(r'data/phens-avsnp-df.csv', index=True)
 
 import sys
 
