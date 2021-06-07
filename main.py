@@ -32,7 +32,7 @@ def draw_barplot(figsize_a, figsize_b, xlabel, ylabel, data, xticklabel, yscale,
     sns.set_style("ticks")
     g = sns.barplot(x=xlabel, y=ylabel, data=data)
     # sns.despine(trim=True, offset=2)
-    g.set_xticklabels(xticklabel)
+    g.set_xticklabels(xticklabel, rotation=45, va="center", position=(0, -0.02))
     sns.color_palette("pastel")
     plt.yscale(yscale)
     plt.tight_layout()
@@ -134,24 +134,22 @@ def draw_heatmaps(data, titles, saving_rout):  # www.stackabuse.com/ultimate-gui
 
 # if __name__ == '__main__':
 
-## Gene4denovo  (delete acc duplicates)
-# genes4dn_orig_df = pd.read_csv('data/gene4denovo/genes4dn.txt', sep='\t')  # (8271, 13)
-# genes4dn_acc_df = pd.read_csv('data/uniprot-gene4dn-acc.tab', sep='\t')  # (8039, 7)
-# genes4dn_acc_merge_df = pd.merge(genes4dn_orig_df, genes4dn_acc_df, on='geneslist')  # (48060, 19)
-gene4dn_all_annotations_df = pd.read_csv('data/gene4denovo/All_De_novo_mutations_and_annotations_1.2.txt',
-                                         sep='\t', encoding='cp1252', low_memory=False)  # (670082, 155)
-gene4d_annots_exonic_df = gene4dn_all_annotations_df.loc[gene4dn_all_annotations_df[
-                                                             'Func.ensGene'] == 'exonic',  # (72040, 5)
-                                                         ['Phenotype', 'avsnp150', 'Gene.ensGene', 'ExonicFunc.ensGene',
-                                                          'AAChange.ensGene']]
-phenotypes = ['EE', 'ID', 'CMS', 'ASD', 'SCZ', 'NDDs']
-gene4d_phenotypes_df = gene4d_annots_exonic_df[gene4d_annots_exonic_df.Phenotype.isin(phenotypes)]  # (17289, 5)
-gene4d_phens_avsnp_df = gene4d_phenotypes_df[gene4d_phenotypes_df.avsnp150 != '-']  # (6367, 5)
-gene4d_phens_avsnp_df.to_csv(r'data/phens-avsnp-df.csv', index=True)
+# ## Gene4denovo  (delete acc duplicates)
+# # genes4dn_orig_df = pd.read_csv('data/gene4denovo/genes4dn.txt', sep='\t')  # (8271, 13)
+# # genes4dn_acc_df = pd.read_csv('data/uniprot-gene4dn-acc.tab', sep='\t')  # (8039, 7)
+# # genes4dn_acc_merge_df = pd.merge(genes4dn_orig_df, genes4dn_acc_df, on='geneslist')  # (48060, 19)
+# gene4dn_all_annotations_df = pd.read_csv('data/gene4denovo/All_De_novo_mutations_and_annotations_1.2.txt',
+#                                          sep='\t', encoding='cp1252', low_memory=False)  # (670082, 155)
+# gene4d_annots_exonic_df = gene4dn_all_annotations_df.loc[gene4dn_all_annotations_df[
+#                                                              'Func.ensGene'] == 'exonic',  # (72040, 5)
+#                                                          ['Phenotype', 'avsnp150', 'Gene.ensGene', 'ExonicFunc.ensGene',
+#                                                           'AAChange.ensGene']]
+# phenotypes = ['EE', 'ID', 'CMS', 'ASD', 'SCZ', 'NDDs']
+# gene4d_phenotypes_df = gene4d_annots_exonic_df[gene4d_annots_exonic_df.Phenotype.isin(phenotypes)]  # (17289, 5)
+# gene4d_phens_avsnp_df = gene4d_phenotypes_df[gene4d_phenotypes_df.avsnp150 != '-']  # (6367, 5)
+# gene4d_phens_avsnp_df.to_csv(r'data/phens-avsnp-df.csv', index=True)
 
-import sys
 
-sys.exit(0)
 ### Files import and modify
 mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')
 ## for content fraction
@@ -205,13 +203,14 @@ difference_contf_sum_norm_df = sum_df_generator(difference_contf_sum_norm_mat,
 difference_len_sum_norm_df = sum_df_generator(difference_len_sum_norm_mat,
                                               [' ', '100', ' ', '300', ' ', '500', ' ', '700', ' ', '900', ''])
 
+
 ## heatmaps
-draw_heatmaps([mobi_contf_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, difference_contf_sum_norm_df.T],
-              ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
-              saving_rout='plots/heatmaps/Heatmaps0.png')
-draw_heatmaps([mobi_len_sum_norm_df.T, ndd_len_sum_norm_df.T, difference_len_sum_norm_df.T],
-              ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
-              saving_rout='plots/heatmaps/Heatmaps-Length.png')
+# draw_heatmaps([mobi_contf_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, difference_contf_sum_norm_df.T],
+#               ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
+#               saving_rout='plots/heatmaps/Heatmaps0.png')
+# draw_heatmaps([mobi_len_sum_norm_df.T, ndd_len_sum_norm_df.T, difference_len_sum_norm_df.T],
+#               ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
+#               saving_rout='plots/heatmaps/Heatmaps-Length.png')
 
 
 # TODO: check the hmap with sum as dif color later and get the code back from github if needed
@@ -236,20 +235,22 @@ ndd_len_cols_sum_df, ndd_len_cols_sum_lst = df_lst_maker_for_barplot(ndd_len_sum
 
 ## Hmap distribution barplots (Protein count)
 # content fraction
-draw_barplot(figsize_a='24', figsize_b='12', xlabel='Features', ylabel='Protein count', data=mobi_contf_cols_sum_df,
+draw_barplot(figsize_a='18', figsize_b='9', xlabel='Features', ylabel='Protein count', data=mobi_contf_cols_sum_df,
              xticklabel=mobi_contf_cols_sum_lst, yscale='log',
-             save_rout='plots/log/hist-hmaps-distribution/mobidb-contf-log-.png')
-draw_barplot(figsize_a='24', figsize_b='12', xlabel='Features', ylabel='Protein count', data=ndd_contf_cols_sum_df,
+             save_rout='plots/log/hist-hmaps-distribution/mobidb-contf-NEW.png')
+draw_barplot(figsize_a='18', figsize_b='9', xlabel='Features', ylabel='Protein count', data=ndd_contf_cols_sum_df,
              xticklabel=ndd_contf_cols_sum_lst, yscale='log',
-             save_rout='plots/log/hist-hmaps-distribution/ndd-contf-log-.png')
+             save_rout='plots/log/hist-hmaps-distribution/ndd-contf-NEW.png')
 # Length
-draw_barplot(figsize_a='24', figsize_b='12', xlabel='Features', ylabel='Protein count', data=mobi_len_cols_sum_df,
-             xticklabel='', yscale='log',
-             save_rout='plots/log/hist-hmaps-distribution/mobi-len-log.png')
-draw_barplot(figsize_a='24', figsize_b='12', xlabel='Features', ylabel='Protein count', data=ndd_len_cols_sum_df,
+draw_barplot(figsize_a='18', figsize_b='9', xlabel='Features', ylabel='Protein count', data=mobi_len_cols_sum_df,
+             xticklabel=mobi_len_cols_sum_lst, yscale='log',
+             save_rout='plots/log/hist-hmaps-distribution/mobi-len-NEW.png')
+draw_barplot(figsize_a='18', figsize_b='9', xlabel='Features', ylabel='Protein count', data=ndd_len_cols_sum_df,
              xticklabel=ndd_len_cols_sum_lst, yscale='log',
-             save_rout='plots/log/hist-hmaps-distribution/ndd-len-log.png')
+             save_rout='plots/log/hist-hmaps-distribution/ndd-len-NEW.png')
+import sys
 
+sys.exit(0)
 ## Dictionary Homo sapiens
 for each_feature in mobidb_features_lst:
     cont_fra_temp_lst = mobidb_pivot_contf_df[each_feature].tolist()
@@ -276,7 +277,7 @@ for each_feature in mobidb_features_lst[1:]:
 for each_feature in mobidb_features_lst[1:]:
     compare_plot(first_lst=mobidb_predictors_cont_fra_dict[each_feature],
                  second_lst=ndd_predictors_cont_fra_dict[each_feature], yscale='log', bins=30, is_dense=False,
-                 x_label=each_feature + '_comparison', y_label='proteins count(relative)',
+                 x_label=each_feature + '_comparison', y_label='proteins count',
                  first_label='Homo sapiens Pr.s', second_label='NDD Pr.s',
                  png_file_name='plots/log/hist-comparison' '-homoS-NDD/' + each_feature)
 

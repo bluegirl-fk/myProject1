@@ -2,7 +2,7 @@ import bz2
 import json
 import os
 
-with open("data/genebank.tsv", "w") as f_gb, open("data/uniprot.tsv", "w") as f_unp:
+with open("data/refsnp/genebank.tsv", "w") as f_gb, open("data/refsnp/uniprot.tsv", "w") as f_unp:
     for name in os.listdir("/home/fatemeh/Desktop/ext-1tb/refsnp/"):
         if (name.startswith("refsnp") and ".json.bz2" in name):
 
