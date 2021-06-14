@@ -148,8 +148,23 @@ def draw_heatmaps(data, titles, saving_rout):  # www.stackabuse.com/ultimate-gui
 # gene4d_phenotypes_df = gene4d_annots_exonic_df[gene4d_annots_exonic_df.Phenotype.isin(phenotypes)]  # (17289, 5)
 # gene4d_phens_avsnp_df = gene4d_phenotypes_df[gene4d_phenotypes_df.avsnp150 != '-']  # (6367, 5)
 # gene4d_phens_avsnp_df.to_csv(r'data/phens-avsnp-df.csv', index=True)
+# TODO: maybve delete synonymous mutations, change names
+dbsnp = pd.read_csv('data/refsnp/genebank.tsv', sep='\t') # (946889, 6)
+dbsnp.columns = ['avsnp150', 'rs_ids', 'seq_id', 'position', 'del_seq', 'in_seq'] # avsnp150 = refsnp_id
+snpacc = pd.read_csv('data/refsnp/uniprot.tsv', sep='\t') # (10219, 3)
+snpacc.columns = ['avsnp150', 'rs_ids', 'uniprot_acc']
+snpacc[['acc', 'variant']] = snpacc.uniprot_acc.str.split('#', expand=True)
+snpacc = snpacc.drop(columns=['rs_ids', 'uniprot_acc'])
+dbsnp_merged = pd.merge(snpacc, dbsnp, on='avsnp150') # (158780,8) # problem?
 
+gene4dn = pd.read_csv('data/phens-avsnp-df.csv')
+gene4dn['avsnp150'] = gene4dn['avsnp150'].str.replace(r'\D', '')
 
+dbsnp_merged['avsnp150'] = dbsnp_merged['avsnp150'].astype(int)
+gene4dn['avsnp150'] = gene4dn['avsnp150'].astype(int)
+
+gene4dn_dbsnp = pd.merge(dbsnp_merged, gene4dn, on='avsnp150') # (571, 13) !!!
+gene4d_dbsnp_mut = gene4dn_dbsnp[gene4dn_dbsnp.del_seq != gene4dn_dbsnp.in_seq] # (404, 13) # 5 ACCs
 ### Files import and modify
 mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')
 ## for content fraction

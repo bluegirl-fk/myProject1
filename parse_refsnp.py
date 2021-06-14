@@ -26,4 +26,5 @@ with open("data/refsnp/genebank.tsv", "w") as f_gb, open("data/refsnp/uniprot.ts
                                     if variant_identifier.get("organization") == "UniProtKB":
                                         f_unp.write("{}\t{}\t{}\n".format(doc["refsnp_id"], rs_ids, variant_identifier["accession"]))
 
+# first two columns of both files are the same
 
