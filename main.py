@@ -148,7 +148,7 @@ def draw_heatmaps(data, titles, saving_rout):  # www.stackabuse.com/ultimate-gui
 # gene4d_phenotypes_df = gene4d_annots_exonic_df[gene4d_annots_exonic_df.Phenotype.isin(phenotypes)]  # (17289, 5)
 # gene4d_phens_avsnp_df = gene4d_phenotypes_df[gene4d_phenotypes_df.avsnp150 != '-']  # (6367, 5)
 # gene4d_phens_avsnp_df.to_csv(r'data/phens-avsnp-df.csv', index=True)
-# TODO: maybve delete synonymous mutations, change names
+# TODO: change names
 dbsnp = pd.read_csv('data/refsnp/genebank.tsv', sep='\t') # (946889, 6)
 dbsnp.columns = ['avsnp150', 'rs_ids', 'seq_id', 'position', 'del_seq', 'in_seq'] # avsnp150 = refsnp_id
 snpacc = pd.read_csv('data/refsnp/uniprot.tsv', sep='\t') # (10219, 3)
