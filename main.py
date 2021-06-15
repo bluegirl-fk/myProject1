@@ -134,10 +134,10 @@ def draw_heatmaps(data, titles, saving_rout):  # www.stackabuse.com/ultimate-gui
 
 # if __name__ == '__main__':
 
-# ## Gene4denovo  (delete acc duplicates)
-# # genes4dn_orig_df = pd.read_csv('data/gene4denovo/genes4dn.txt', sep='\t')  # (8271, 13)
-# # genes4dn_acc_df = pd.read_csv('data/uniprot-gene4dn-acc.tab', sep='\t')  # (8039, 7)
-# # genes4dn_acc_merge_df = pd.merge(genes4dn_orig_df, genes4dn_acc_df, on='geneslist')  # (48060, 19)
+## Gene4denovo  (delete acc duplicates)
+# genes4dn_orig_df = pd.read_csv('data/gene4denovo/genes4dn.txt', sep='\t')  # (8271, 13)
+# genes4dn_acc_df = pd.read_csv('data/uniprot-gene4dn-acc.tab', sep='\t')  # (8039, 7)
+# genes4dn_acc_merge_df = pd.merge(genes4dn_orig_df, genes4dn_acc_df, on='geneslist')  # (48060, 19)
 # gene4dn_all_annotations_df = pd.read_csv('data/gene4denovo/All_De_novo_mutations_and_annotations_1.2.txt',
 #                                          sep='\t', encoding='cp1252', low_memory=False)  # (670082, 155)
 # gene4d_annots_exonic_df = gene4dn_all_annotations_df.loc[gene4dn_all_annotations_df[
@@ -166,21 +166,29 @@ dbsnp_mut['all_rsids'] = dbsnp_mut[['avsnp150', 'rs_ids']].astype(str).agg(','.j
 dbsnp_mut.to_csv(r'data/dbsnp_mut.tsv')
 dbsnp_dict = dict(zip(dbsnp_mut.index, dbsnp_mut.all_rsids))  # 327147
 
-# for each_key in dbsnp_dict:
-#     #dbsnp_dict[each_key].to_string
-#     str(dbsnp_dict[each_key]).split(",")
 keys_values_dbsnp_dict = dbsnp_dict.items()
 dbsnp_str_d = {str(key): list(str(value).split(",")) for key, value in keys_values_dbsnp_dict}
-Key_values_dbsnp_str_d = dbsnp_str_d.items()
-#iterate
-# now you need to convert avsnp150 from gene4dn to list, check the list item in each of this dict keys
+
 gene4dn = pd.read_csv('data/phens-avsnp-df.csv')
 gene4dn['avsnp150'] = gene4dn['avsnp150'].str.replace(r'\D', '')
+gene4dn_dbsnp_lst = gene4dn['avsnp150'].tolist() # len = 6367
 
-dbsnp_mut['avsnp150'] = dbsnp['avsnp150'].astype(int)
-gene4dn['avsnp150'] = gene4dn['avsnp150'].astype(int)
+# print(dbsnp_str_d[1:5])
+# print(gene4dn_dbsnp_lst[1:5])
+dbsnp_idx_true_lst = []
+dbsnp_idx_false_lst = []
+for i in gene4dn_dbsnp_lst:
+    for key, values in dbsnp_str_d.items():
+        if (isinstance(values, list)):
+            if i in values:
+                print(i)
+                dbsnp_idx_true_lst.append(key)  # len : 984
 
-gene4dn_dbsnp = pd.merge(gene4dn, dbsnp_mut, on='avsnp150')  # (998, 11) !!!
+
+
+# dbsnp_mut['avsnp150'] = dbsnp['avsnp150'].astype(int)
+# gene4dn['avsnp150'] = gene4dn['avsnp150'].astype(int)
+# gene4dn_dbsnp = pd.merge(gene4dn, dbsnp_mut, on='avsnp150')  # (998, 11) !!!
 
 import sys
 
