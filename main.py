@@ -161,9 +161,19 @@ def draw_heatmaps(data, titles, saving_rout):  # www.stackabuse.com/ultimate-gui
 dbsnp = pd.read_csv('data/refsnp/genebank.tsv', sep='\t')  # (946889, 6)
 dbsnp.columns = ['avsnp150', 'rs_ids', 'seq_id', 'position', 'del_seq', 'in_seq']  # avsnp150 = refsnp_id
 dbsnp_mut = dbsnp[dbsnp.del_seq != dbsnp.in_seq]  # (338184, 6)
+dbsnp_mut = dbsnp_mut.drop_duplicates(ignore_index=True)  # (327147, 7)
 dbsnp_mut['all_rsids'] = dbsnp_mut[['avsnp150', 'rs_ids']].astype(str).agg(','.join, axis=1)
+dbsnp_mut.to_csv(r'data/dbsnp_mut.tsv')
+dbsnp_dict = dict(zip(dbsnp_mut.index, dbsnp_mut.all_rsids))  # 327147
 
-
+# for each_key in dbsnp_dict:
+#     #dbsnp_dict[each_key].to_string
+#     str(dbsnp_dict[each_key]).split(",")
+keys_values_dbsnp_dict = dbsnp_dict.items()
+dbsnp_str_d = {str(key): list(str(value).split(",")) for key, value in keys_values_dbsnp_dict}
+Key_values_dbsnp_str_d = dbsnp_str_d.items()
+#iterate
+# now you need to convert avsnp150 from gene4dn to list, check the list item in each of this dict keys
 gene4dn = pd.read_csv('data/phens-avsnp-df.csv')
 gene4dn['avsnp150'] = gene4dn['avsnp150'].str.replace(r'\D', '')
 
@@ -172,6 +182,9 @@ gene4dn['avsnp150'] = gene4dn['avsnp150'].astype(int)
 
 gene4dn_dbsnp = pd.merge(gene4dn, dbsnp_mut, on='avsnp150')  # (998, 11) !!!
 
+import sys
+
+sys.exit(0)
 ### Files import and modify
 mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')
 ## for content fraction
@@ -270,9 +283,7 @@ draw_barplot(figsize_a='18', figsize_b='9', xlabel='Features', ylabel='Protein c
 draw_barplot(figsize_a='18', figsize_b='9', xlabel='Features', ylabel='Protein count', data=ndd_len_cols_sum_df,
              xticklabel=ndd_len_cols_sum_lst, yscale='log',
              save_rout='plots/log/hist-hmaps-distribution/ndd-len-NEW.png')
-import sys
 
-sys.exit(0)
 ## Dictionary Homo sapiens
 for each_feature in mobidb_features_lst:
     cont_fra_temp_lst = mobidb_pivot_contf_df[each_feature].tolist()
