@@ -176,14 +176,20 @@ gene4dn_dbsnp_lst = gene4dn['avsnp150'].tolist() # len = 6367
 # print(dbsnp_str_d[1:5])
 # print(gene4dn_dbsnp_lst[1:5])
 dbsnp_idx_true_lst = []
-dbsnp_idx_false_lst = []
-for i in gene4dn_dbsnp_lst:
+dbsnp_idx_false_lst = [] # not using for now
+for i in gene4dn_dbsnp_lst: # is this correct? why less numbers than merging two dfs?
     for key, values in dbsnp_str_d.items():
         if (isinstance(values, list)):
             if i in values:
-                print(i)
                 dbsnp_idx_true_lst.append(key)  # len : 984
 
+dbsnp_idx_true_lst = [ int(x) for x in dbsnp_idx_true_lst ]
+dbsnp_g4dn_df = dbsnp_mut.loc[dbsnp_mut.index[dbsnp_idx_true_lst]]
+textfile = open("data/dbsnp-indexes.txt", "w")
+for element in dbsnp_idx_true_lst:
+    textfile.write(str(element) + "\n")
+textfile.close()
+print(dbsnp_g4dn_df.head())
 
 
 # dbsnp_mut['avsnp150'] = dbsnp['avsnp150'].astype(int)
