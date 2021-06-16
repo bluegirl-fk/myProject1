@@ -155,7 +155,7 @@ snpdb = pd.read_csv('data/refsnp/genebank.tsv', sep='\t')  # (946889, 6)
 # snpdb_mut['all_rsids'] = snpdb_mut[['avsnp150', 'rs_ids']].astype(str).agg(','.join, axis=1)
 # snpdb_mut.to_csv(r'data/snpdb_mut.tsv')
 
-snpdb_mut = pd.read_csv('data/snpdb_mutations.tsv')
+snpdb_mut = pd.read_csv('data/dbsnp_mutations.tsv')
 snpdb_mut_dict = dict(zip(snpdb_mut.index, snpdb_mut.all_rsids))  # 327147
 keys_values_snpdb_mut_dict = snpdb_mut_dict.items()
 snpdb_mut_dict = {str(key): list(str(value).split(",")) for key, value in keys_values_snpdb_mut_dict}  # dict with
@@ -176,8 +176,8 @@ snpdb_idx_false_lst = []  # not used, can come handy for not mapped ones if need
 #     textfile.write(str(element) + "\n")
 # textfile.close()
 
-snpdb_idx_true_df = pd.read_csv('data/snpdb-idxs.txt')
-snpdb_idx_true_lst = snpdb_idx_true_df['index'].tolist()
+true_snpdb_g4dn_idxs = pd.read_csv('data/dbsnp-idxs.txt')
+snpdb_idx_true_lst = true_snpdb_g4dn_idxs['index'].tolist()
 
 snpdb_idx_true_df = snpdb_mut.loc[snpdb_mut.index[snpdb_idx_true_lst]]  # (984, 7), 57 unique rsids
 # uniprot_db_g4dn = pd.merge(snpdb_acc, snpdb_g4dn_df, on='avsnp150')  # only contains 1/2
@@ -188,6 +188,7 @@ snpdb_mut['avsnp150'] = snpdb_mut['avsnp150'].astype(int)
 
 g4dn_mapped_snpdb_df = pd.merge(snpdb_idx_true_df, g4dn_df, on='avsnp150')  # (1000, 13) # trying to get snpdb_idx_true_df + columns
 # of gene4dn e.g: esembel id, etc
+
 snpdb_g4dn_idx_merge_df = pd.merge(g4dn_df, snpdb_mut, on='avsnp150')  # (976, 13)
 # positions in my file should be +1 for the equivalent one in uniprot
 
