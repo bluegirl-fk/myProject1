@@ -151,51 +151,57 @@ def draw_heatmaps(data, titles, saving_rout):  # www.stackabuse.com/ultimate-gui
 # TODO: change names
 
 ## DBsnp
-# snpacc = pd.read_csv('data/refsnp/uniprot.tsv', sep='\t')  # (10219, 3)
-# snpacc.columns = ['avsnp150', 'rs_ids', 'uniprot_acc']
-# snpacc[['acc', 'variant']] = snpacc.uniprot_acc.str.split('#', expand=True)
-# snpacc = snpacc.drop(columns=['rs_ids', 'uniprot_acc'])
-# dbsnp_merged = pd.merge(snpacc, dbsnp, on='avsnp150') # (158780,8) # problem?
+# with uniprot acc
+dbsnp_acc = pd.read_csv('data/refsnp/uniprot.tsv', sep='\t')  # (10219, 3)
+dbsnp_acc.columns = ['avsnp150', 'rs_ids', 'uniprot_acc']
+dbsnp_acc[['acc', 'variant']] = dbsnp_acc.uniprot_acc.str.split('#', expand=True)
+dbsnp_acc = dbsnp_acc.drop(columns=['rs_ids', 'uniprot_acc'])
+# dbsnp_merged = pd.merge(dbsnp_acc, dbsnp, on='avsnp150') # (158780,8) # problem?
 # for now don'tr use the merged df, uniprot not for now, ensembel alternative
 
-dbsnp = pd.read_csv('data/refsnp/genebank.tsv', sep='\t')  # (946889, 6)
-dbsnp.columns = ['avsnp150', 'rs_ids', 'seq_id', 'position', 'del_seq', 'in_seq']  # avsnp150 = refsnp_id
-dbsnp_mut = dbsnp[dbsnp.del_seq != dbsnp.in_seq]  # (338184, 6)
-dbsnp_mut = dbsnp_mut.drop_duplicates(ignore_index=True)  # (327147, 7)
-dbsnp_mut['all_rsids'] = dbsnp_mut[['avsnp150', 'rs_ids']].astype(str).agg(','.join, axis=1)
-dbsnp_mut.to_csv(r'data/dbsnp_mut.tsv')
-dbsnp_dict = dict(zip(dbsnp_mut.index, dbsnp_mut.all_rsids))  # 327147
+# dbsnp = pd.read_csv('data/refsnp/genebank.tsv', sep='\t')  # (946889, 6)
+# dbsnp.columns = ['avsnp150', 'rs_ids', 'seq_id', 'position', 'del_seq', 'in_seq']  # avsnp150 = refsnp_id
+# dbsnp_mut = dbsnp[dbsnp.del_seq != dbsnp.in_seq]  # (338184, 6)
+# dbsnp_mut = dbsnp_mut.drop_duplicates(ignore_index=True)  # (327147, 7)
+# dbsnp_mut['all_rsids'] = dbsnp_mut[['avsnp150', 'rs_ids']].astype(str).agg(','.join, axis=1)
+# dbsnp_mut.to_csv(r'data/dbsnp_mut.tsv')
 
+dbsnp_mut = pd.read_csv('data/dbsnp_mutations.tsv')
+dbsnp_dict = dict(zip(dbsnp_mut.index, dbsnp_mut.all_rsids))  # 327147
 keys_values_dbsnp_dict = dbsnp_dict.items()
 dbsnp_str_d = {str(key): list(str(value).split(",")) for key, value in keys_values_dbsnp_dict}
 
 gene4dn = pd.read_csv('data/phens-avsnp-df.csv')
 gene4dn['avsnp150'] = gene4dn['avsnp150'].str.replace(r'\D', '')
-gene4dn_dbsnp_lst = gene4dn['avsnp150'].tolist() # len = 6367
+gene4dn_dbsnp_lst = gene4dn['avsnp150'].tolist()  # len = 6367
 
-# print(dbsnp_str_d[1:5])
-# print(gene4dn_dbsnp_lst[1:5])
 dbsnp_idx_true_lst = []
-dbsnp_idx_false_lst = [] # not using for now
-for i in gene4dn_dbsnp_lst: # is this correct? why less numbers than merging two dfs?
-    for key, values in dbsnp_str_d.items():
-        if (isinstance(values, list)):
-            if i in values:
-                dbsnp_idx_true_lst.append(key)  # len : 984
+dbsnp_idx_false_lst = []  # not using for now
 
-dbsnp_idx_true_lst = [ int(x) for x in dbsnp_idx_true_lst ]
-dbsnp_g4dn_df = dbsnp_mut.loc[dbsnp_mut.index[dbsnp_idx_true_lst]]
-textfile = open("data/dbsnp-indexes.txt", "w")
-for element in dbsnp_idx_true_lst:
-    textfile.write(str(element) + "\n")
-textfile.close()
-print(dbsnp_g4dn_df.head())
+# this for loop checks if rs_ids of gene4dn are in our filtered dbsnp dataset or not. then idxs are added to .txt file
+
+# for i in gene4dn_dbsnp_lst:  # is this correct? why less numbers than merging two dfs?
+#     for key, values in dbsnp_str_d.items():
+#         if (isinstance(values, list)):
+#             if i in values:
+#                 dbsnp_idx_true_lst.append(key)  # len : 984
+#
+# textfile = open("data/dbsnp-indexes.txt", "w")
+# for element in dbsnp_idx_true_lst:
+#     textfile.write(str(element) + "\n")
+# textfile.close()
+
+dbsnp_idx_true_df = pd.read_csv('data/dbsnp-idxs.txt')
+dbsnp_idx_true_lst = dbsnp_idx_true_df['index'].tolist()
+
+dbsnp_g4dn_filter_df = dbsnp_mut.loc[dbsnp_mut.index[dbsnp_idx_true_lst]]  # (984, 7), 57 unique rsids
+# uniprot_db_g4dn = pd.merge(dbsnp_acc, dbsnp_g4dn_df, on='avsnp150')  # only contains 1/2
 
 
-# dbsnp_mut['avsnp150'] = dbsnp['avsnp150'].astype(int)
-# gene4dn['avsnp150'] = gene4dn['avsnp150'].astype(int)
-# gene4dn_dbsnp = pd.merge(gene4dn, dbsnp_mut, on='avsnp150')  # (998, 11) !!!
-
+dbsnp_g4dn_filter_df['avsnp150'] = dbsnp_g4dn_filter_df['avsnp150'].astype(int)
+gene4dn['avsnp150'] = gene4dn['avsnp150'].astype(int)
+gene4dn_dbsnp_merged = pd.merge(gene4dn, dbsnp_mut, on='avsnp150')  # (976, 12) !!!
+# positions in my file should be +1 for the equivalent one in uniprot
 import sys
 
 sys.exit(0)
