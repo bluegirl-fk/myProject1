@@ -131,6 +131,14 @@ def draw_heatmaps(data, titles, saving_rout):  # www.stackabuse.com/ultimate-gui
     plt.show()
     return
 
+def df_lst_maker_for_barplot(input_matrix):
+    cols_sum_df = pd.DataFrame([input_matrix], columns=mobidb_features_lst[1:], index=['Protein count'])
+    cols_sum_df = cols_sum_df.T.reset_index()
+    cols_sum_df.columns = ['Features', 'Protein count']
+    cols_sum_lst = cols_sum_df['Protein count']
+    cols_sum_lst = [int(x) for x in cols_sum_lst]
+
+    return cols_sum_df, cols_sum_lst
 
 # if __name__ == '__main__':
 ## Gene4denovo
@@ -170,11 +178,6 @@ snpdb_idx_false_lst = []  # not used, can come handy for not mapped ones if need
 #         if (isinstance(values, list)):
 #             if i in values:
 #                 snpdb_idx_true_lst.append(key)  # len : 984
-#
-# textfile = open("data/snpdb-indexes.txt", "w")
-# for element in snpdb_idx_true_lst:
-#     textfile.write(str(element) + "\n")
-# textfile.close()
 
 true_snpdb_g4dn_idxs = pd.read_csv('data/dbsnp-idxs.txt')
 snpdb_idx_true_lst = true_snpdb_g4dn_idxs['index'].tolist()
@@ -188,15 +191,18 @@ snpdb_mut['avsnp150'] = snpdb_mut['avsnp150'].astype(int)
 
 g4dn_mapped_snpdb_df = pd.merge(snpdb_idx_true_df, g4dn_df, on='avsnp150')  # (1000, 13) # trying to get snpdb_idx_true_df + columns
 # of gene4dn e.g: esembel id, etc
+g4dn_snpdb_acc_df = pd.merge(g4dn_mapped_snpdb_df, snpdb_acc, on='avsnp150')  # (410, 15)
+
+snpdb_acc_pos_df = g4dn_snpdb_acc_df.drop_duplicates(['acc', 'position'])  # (26, 15)
 
 snpdb_g4dn_idx_merge_df = pd.merge(g4dn_df, snpdb_mut, on='avsnp150')  # (976, 13)
 # positions in my file should be +1 for the equivalent one in uniprot
 
-import sys
-
-sys.exit(0)
 ### Files import and modify
 mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')
+##TODO: diorder position
+
+
 ## for content fraction
 mobidb_pivot_contf_df = mobidb_original_df.pivot_table(
     index=['acc'], columns=['feature'], values='content_fraction').fillna(0)
@@ -208,13 +214,15 @@ mobidb_features_lst = list(itertools.chain(*mobidb_features_lst))  # flat list
 ndd_acc_df = pd.read_csv('data/allUniqueEntry.tab', sep='\t')
 ndd_acc_lst = ndd_acc_df['Entry'].to_list()
 ndd_contf_df = mobidb_pivot_contf_df[mobidb_pivot_contf_df['acc'].isin(ndd_acc_lst)]
+ndd_contf_df.to_csv(r'data/ndd-contf-dataframe.csv')
 ## for Length
 mobidb_length_df = mobidb_original_df[['acc', 'length']].drop_duplicates(subset=['acc'])
 mobidb_pivot_length_df = mobidb_original_df.pivot_table(
     index=['acc'], columns=['feature'], values='length').fillna(0)
-mobidb_pivot_length_df = mobidb_pivot_length_df.reset_index()  # reset idx to get acc as dif col to search in it
+mobidb_pivot_length_df = mobidb_pivot_length_df.reset_index() # reset idx to get acc as dif col to search in it
+mobidb_pivot_length_df.to_csv(r'data/mobidb-pivot-length-df.csv')
 ndd_length_df = mobidb_pivot_length_df[mobidb_pivot_length_df['acc'].isin(ndd_acc_lst)]  # len(df) = 1089
-
+ndd_length_df.to_csv(r'data/ndd-length-df.csv')
 ## Matrix
 # content fraction with nan
 _, mobi_contf_mat, mobi_contf_sum_mat, mobi_contf_sum_norm_mat = matrix_maker_nan(
@@ -257,26 +265,21 @@ difference_len_sum_norm_df = sum_df_generator(difference_len_sum_norm_mat,
 #               ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
 #               saving_rout='plots/heatmaps/Heatmaps-Length.png')
 
-
-# TODO: check the hmap with sum as dif color later and get the code back from github if needed
-
-def df_lst_maker_for_barplot(input_matrix):
-    cols_sum_df = pd.DataFrame([input_matrix], columns=mobidb_features_lst[1:], index=['Protein count'])
-    cols_sum_df = cols_sum_df.T.reset_index()
-    cols_sum_df.columns = ['Features', 'Protein count']
-    cols_sum_lst = cols_sum_df['Protein count']
-    cols_sum_lst = [int(x) for x in cols_sum_lst]
-
-    return cols_sum_df, cols_sum_lst
-
-
 ## columns sum sum_matrix to get protein numbers (for bar plot based on distribution of heatmap)
 # content fraction
 mobi_contf_cols_sum_df, mobi_contf_cols_sum_lst = df_lst_maker_for_barplot(mobi_contf_sum_mat.T.sum(axis=0))
 ndd_contf_cols_sum_df, ndd_contf_cols_sum_lst = df_lst_maker_for_barplot(ndd_contf_sum_mat.T.sum(axis=0))
+mobi_contf_cols_sum_df.to_csv(r'data/mobidb-contf-distribution.csv')
+ndd_contf_cols_sum_df.to_csv(r'data/ndd-contf-distribution.csv')
 # length
 mobi_len_cols_sum_df, mobi_len_cols_sum_lst = df_lst_maker_for_barplot(mobi_len_sum_mat.T.sum(axis=0))
 ndd_len_cols_sum_df, ndd_len_cols_sum_lst = df_lst_maker_for_barplot(ndd_len_sum_mat.T.sum(axis=0))
+mobi_len_cols_sum_df.to_csv(r'data/mobidb-len-distribution.csv')
+ndd_len_cols_sum_df.to_csv(r'data/ndd-len-distibution.csv')
+
+# import sys
+#
+# sys.exit(0)
 
 ## Hmap distribution barplots (Protein count)
 # content fraction
