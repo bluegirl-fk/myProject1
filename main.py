@@ -277,9 +277,9 @@ ndd_len_cols_sum_df, ndd_len_cols_sum_lst = df_lst_maker_for_barplot(ndd_len_sum
 mobi_len_cols_sum_df.to_csv(r'data/mobidb-len-distribution.csv')
 ndd_len_cols_sum_df.to_csv(r'data/ndd-len-distibution.csv')
 
-# import sys
-#
-# sys.exit(0)
+import sys
+
+sys.exit(0)
 
 ## Hmap distribution barplots (Protein count)
 # content fraction
