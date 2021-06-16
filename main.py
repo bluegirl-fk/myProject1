@@ -133,21 +133,6 @@ def draw_heatmaps(data, titles, saving_rout):  # www.stackabuse.com/ultimate-gui
 
 
 # if __name__ == '__main__':
-
-## Gene4denovo  (delete acc duplicates)
-# genes4dn_orig_df = pd.read_csv('data/gene4denovo/genes4dn.txt', sep='\t')  # (8271, 13)
-# genes4dn_acc_df = pd.read_csv('data/uniprot-gene4dn-acc.tab', sep='\t')  # (8039, 7)
-# genes4dn_acc_merge_df = pd.merge(genes4dn_orig_df, genes4dn_acc_df, on='geneslist')  # (48060, 19)
-# gene4dn_all_annotations_df = pd.read_csv('data/gene4denovo/All_De_novo_mutations_and_annotations_1.2.txt',
-#                                          sep='\t', encoding='cp1252', low_memory=False)  # (670082, 155)
-# gene4d_annots_exonic_df = gene4dn_all_annotations_df.loc[gene4dn_all_annotations_df[
-#                                                              'Func.ensGene'] == 'exonic',  # (72040, 5)
-#                                                          ['Phenotype', 'avsnp150', 'Gene.ensGene', 'ExonicFunc.ensGene',
-#                                                           'AAChange.ensGene']]
-# phenotypes = ['EE', 'ID', 'CMS', 'ASD', 'SCZ', 'NDDs']
-# gene4d_phenotypes_df = gene4d_annots_exonic_df[gene4d_annots_exonic_df.Phenotype.isin(phenotypes)]  # (17289, 5)
-# gene4d_phens_avsnp_df = gene4d_phenotypes_df[gene4d_phenotypes_df.avsnp150 != '-']  # (6367, 5)
-# gene4d_phens_avsnp_df.to_csv(r'data/phens-avsnp-df.csv', index=True)
 # TODO: change names
 
 ## DBsnp
@@ -171,7 +156,7 @@ dbsnp_dict = dict(zip(dbsnp_mut.index, dbsnp_mut.all_rsids))  # 327147
 keys_values_dbsnp_dict = dbsnp_dict.items()
 dbsnp_str_d = {str(key): list(str(value).split(",")) for key, value in keys_values_dbsnp_dict}
 
-gene4dn = pd.read_csv('data/phens-avsnp-df.csv')
+gene4dn = pd.read_csv('data/phens-avsnp-df.csv') # (6367, 5)
 gene4dn['avsnp150'] = gene4dn['avsnp150'].str.replace(r'\D', '')
 gene4dn_dbsnp_lst = gene4dn['avsnp150'].tolist()  # len = 6367
 
