@@ -142,11 +142,15 @@ def df_lst_maker_for_barplot(input_matrix):
 
 # if __name__ == '__main__':
 ## Gene4denovo
+gene4dn_all_annotations_df = pd.read_csv('data/gene4denovo/All_De_novo_mutations_and_annotations_1.2.txt', sep='\t', encoding='cp1252', low_memory=False)  # (670082, 155)
+gene4dn1 = gene4dn_all_annotations_df
 g4dn_df = pd.read_csv('data/phens-avsnp-df.csv') # (6367, 5)
 g4dn_df['avsnp150'] = g4dn_df['avsnp150'].str.replace(r'\D', '')
 g4dn_rsid_lst = g4dn_df['avsnp150'].tolist()  # len = 6367 # should check this lst in merged rsids of each mut
 # position (better with a dictionary)
+import sys
 
+sys.exit(0)
 ## DBsnp
 # with uniprot acc
 snpdb_acc = pd.read_csv('data/refsnp/uniprot.tsv', sep='\t')  # (10219, 3)
@@ -277,9 +281,7 @@ ndd_len_cols_sum_df, ndd_len_cols_sum_lst = df_lst_maker_for_barplot(ndd_len_sum
 mobi_len_cols_sum_df.to_csv(r'data/mobidb-len-distribution.csv')
 ndd_len_cols_sum_df.to_csv(r'data/ndd-len-distibution.csv')
 
-import sys
 
-sys.exit(0)
 
 ## Hmap distribution barplots (Protein count)
 # content fraction
