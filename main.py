@@ -6,6 +6,7 @@ import numpy as np
 import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
+import sys
 
 mobidb_features_lst = []
 mobidb_predictors_cont_fra_dict = {}
@@ -142,210 +143,238 @@ def df_lst_maker_for_barplot(input_matrix):
     return cols_sum_df, cols_sum_lst
 
 
-# if __name__ == '__main__':
-## Gene4denovo
-gene4dn_all_annotations_df = pd.read_csv('data/gene4denovo/All_De_novo_mutations_and_annotations_1.2.txt', sep='\t',
-                                         encoding='cp1252', low_memory=False)  # (670082, 155)
-gene4dn1 = gene4dn_all_annotations_df.loc[gene4dn_all_annotations_df['Func.refGene'] == 'exonic']  # (70879, 155)
 
-gene4dn2 = gene4dn1['AAChange.refGene'].str.split(',', expand=True).stack().to_frame('AAChange.refGene')  # (201372, 155)
-gene4dn3 = gene4dn2['AAChange.refGene'].str.split(pat=':', expand=True)
-gene4dn4 = gene4dn3[gene4dn3.columns[:10]]
-gene4dn4.columns = ['Gene.refGene', 'refSeq', 'exon#', 'mutNA', 'mutPrInfo', 'aa1', 'aa2', 'position', 'frameshift', 'mutPr']
-gene4dn4['mutPr'] = gene4dn4.mutPrInfo.str.split(pat='fs*', expand=True,)  # first separate the
-# frameshift info
-gene4dn4['aa1'] = gene4dn4['mutPr'].str[2]
-gene4dn4['aa2'] = gene4dn4['mutPr'].str[-1]
-gene4dn4['position'] = gene4dn4['mutPr'].str.replace(r'\D', '')
+if __name__ == '__main__':
+    # This is the main!
 
+    ## Gene4denovo
+    gene4dn_all_annotations_df = pd.read_csv('data/gene4denovo/All_De_novo_mutations_and_annotations_1.2.txt', sep='\t',
+                                             encoding='cp1252', low_memory=False)  # (670082, 155)
+    gene4dn1 = gene4dn_all_annotations_df.loc[gene4dn_all_annotations_df['Func.refGene'] == 'exonic']  # (70879, 155)
 
+    gene4dn2 = gene4dn1['AAChange.refGene'].str.split(',', expand=True).stack().to_frame('AAChange.refGene')  # (201372, 155)
+    gene4dn3 = gene4dn2['AAChange.refGene'].str.split(pat=':', expand=True)
+    gene4dn_newdb = gene4dn3[gene4dn3.columns[:10]]
+    gene4dn_newdb.columns = ['Gene.refGene', 'refSeq', 'exon#', 'mutNA', 'mutPrInfo', 'aa1', 'aa2', 'position', 'frameshift', 'mutPr']
+    gene4dn_newdb['mutPr'] = gene4dn_newdb.mutPrInfo.str.split(pat='fs*', expand=True,)  # first separate the
+    # frameshift info
+    gene4dn_newdb['aa1'] = gene4dn_newdb['mutPr'].str[2]
+    gene4dn_newdb['aa2'] = gene4dn_newdb['mutPr'].str[-1]
+    gene4dn_newdb['position'] = gene4dn_newdb['mutPr'].str.replace(r'\D', '')  # (201372, 10)
+    refseq_lst = gene4dn_newdb['refSeq'].tolist()  # len=201372
 
-g4dn_df = pd.read_csv('data/phens-avsnp-df.csv')  # (6367, 5)
-g4dn_df['avsnp150'] = g4dn_df['avsnp150'].str.replace(r'\D', '')
-g4dn_rsid_lst = g4dn_df['avsnp150'].tolist()  # len = 6367 # should check this lst in merged rsids of each mut
-# position (better with a dictionary)
-import sys
+    # Define batch size
+    BATCH_SIZE = 70000
+    # Define path to output file
+    out_pattern = 'data/refseq-gene4d.%d.txt'
+    # Define current batch
+    curr_batch = list()
+    # Loop through all entries
+    for i, element in enumerate(refseq_lst):
+        # Update current batch
+        curr_batch.append(element)
+        # Check batch size
+        if (len(curr_batch) >= BATCH_SIZE) or (i == len(refseq_lst) - 1):
+            # Define output file path
+            out_path = out_pattern % (i // BATCH_SIZE)
+            # Open file in write mode
+            with open(out_path, 'w') as out_file:
+                # Write out current batch
+                out_file.write('\n'.join(str(curr_batch)))
+            # Empty current batch
+            curr_batch = list()
 
-sys.exit(0)
-## DBsnp
-# with uniprot acc
-snpdb_acc = pd.read_csv('data/refsnp/uniprot.tsv', sep='\t')  # (10219, 3)
-snpdb_acc.columns = ['avsnp150', 'rs_ids', 'uniprot_acc']
-snpdb_acc[['acc', 'variant']] = snpdb_acc.uniprot_acc.str.split('#', expand=True)
-snpdb_acc = snpdb_acc.drop(columns=['rs_ids', 'uniprot_acc'])
-# snpdb_merged = pd.merge(snpdb_acc, snpdb, on='avsnp150') # (158780,8) # problem?
-# for now don't use the merged df, uniprot not for now, ensembel alternative
+    # # textfile = open("data/refseq-gene4dn.txt", "w")
+    # for element in refseq_lst:
+    #     textfile. write(str(element) + "\n")
+    # textfile. close()
 
-snpdb = pd.read_csv('data/refsnp/genebank.tsv', sep='\t')  # (946889, 6)
-# snpdb.columns = ['avsnp150', 'rs_ids', 'seq_id', 'position', 'del_seq', 'in_seq']  # avsnp150 = refsnp_id
-# snpdb_mut = snpdb[snpdb.del_seq != snpdb.in_seq]  # (338184, 6)
-# snpdb_mut = snpdb_mut.drop_duplicates(ignore_index=True)  # (327147, 7)
-# snpdb_mut['all_rsids'] = snpdb_mut[['avsnp150', 'rs_ids']].astype(str).agg(','.join, axis=1)
-# snpdb_mut.to_csv(r'data/snpdb_mut.tsv')
-
-snpdb_mut = pd.read_csv('data/dbsnp_mutations.tsv')
-snpdb_mut_dict = dict(zip(snpdb_mut.index, snpdb_mut.all_rsids))  # 327147
-keys_values_snpdb_mut_dict = snpdb_mut_dict.items()
-snpdb_mut_dict = {str(key): list(str(value).split(",")) for key, value in keys_values_snpdb_mut_dict}  # dict with
-# idx of snpdb_mut df as key and lst of all merged rsids of each position as values
-
-snpdb_idx_true_lst = []
-snpdb_idx_false_lst = []  # not used, can come handy for not mapped ones if needed
-
-# this for loop checks if rs_ids of g4dn are in our filtered snpdb dataset or not. then idxs are added to .txt file
-# for i in g4dn_rsid_lst:  # is this correct? why less numbers than merging two dfs?
-#     for key, values in snpdb_mut_dict.items():
-#         if (isinstance(values, list)):
-#             if i in values:
-#                 snpdb_idx_true_lst.append(key)  # len : 984
-
-true_snpdb_g4dn_idxs = pd.read_csv('data/dbsnp-idxs.txt')
-snpdb_idx_true_lst = true_snpdb_g4dn_idxs['index'].tolist()
-
-snpdb_idx_true_df = snpdb_mut.loc[snpdb_mut.index[snpdb_idx_true_lst]]  # (984, 7), 57 unique rsids
-# uniprot_db_g4dn = pd.merge(snpdb_acc, snpdb_g4dn_df, on='avsnp150')  # only contains 1/2
-
-snpdb_idx_true_df['avsnp150'] = snpdb_idx_true_df['avsnp150'].astype(int)
-g4dn_df['avsnp150'] = g4dn_df['avsnp150'].astype(int)
-snpdb_mut['avsnp150'] = snpdb_mut['avsnp150'].astype(int)
-
-g4dn_mapped_snpdb_df = pd.merge(snpdb_idx_true_df, g4dn_df,
-                                on='avsnp150')  # (1000, 13) # trying to get snpdb_idx_true_df + columns
-# of gene4dn e.g: esembel id, etc
-g4dn_snpdb_acc_df = pd.merge(g4dn_mapped_snpdb_df, snpdb_acc, on='avsnp150')  # (410, 15)
-
-snpdb_acc_pos_df = g4dn_snpdb_acc_df.drop_duplicates(['acc', 'position'])  # (26, 15)
-
-snpdb_g4dn_idx_merge_df = pd.merge(g4dn_df, snpdb_mut, on='avsnp150')  # (976, 13)
-# positions in my file should be +1 for the equivalent one in uniprot
-
-### Files import and modify
-mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')
-##TODO: diorder position
+    g4dn_df = pd.read_csv('data/phens-avsnp-df.csv')  # (6367, 5)
+    g4dn_df['avsnp150'] = g4dn_df['avsnp150'].str.replace(r'\D', '')
+    g4dn_rsid_lst = g4dn_df['avsnp150'].tolist()  # len = 6367 # should check this lst in merged rsids of each mut
+    # position (better with a dictionary)
 
 
-## for content fraction
-mobidb_pivot_contf_df = mobidb_original_df.pivot_table(
-    index=['acc'], columns=['feature'], values='content_fraction').fillna(0)
-mobidb_pivot_contf_df = mobidb_pivot_contf_df.reset_index()  # added idx nums manually,ACCs recognized separate column
-mobidb_pivot_contf_df.to_csv(r'data/mobidb_pivot_contf_df.csv', index=True)
-mobidb_features_lst = mobidb_pivot_contf_df.columns.str.split(',').tolist()  # this also contains the 'acc' column
-mobidb_features_lst = list(itertools.chain(*mobidb_features_lst))  # flat list
+    sys.exit(0)
+    ## DBsnp
+    # with uniprot acc
+    snpdb_acc = pd.read_csv('data/refsnp/uniprot.tsv', sep='\t')  # (10219, 3)
+    snpdb_acc.columns = ['avsnp150', 'rs_ids', 'uniprot_acc']
+    snpdb_acc[['acc', 'variant']] = snpdb_acc.uniprot_acc.str.split('#', expand=True)
+    snpdb_acc = snpdb_acc.drop(columns=['rs_ids', 'uniprot_acc'])
+    # snpdb_merged = pd.merge(snpdb_acc, snpdb, on='avsnp150') # (158780,8) # problem?
+    # for now don't use the merged df, uniprot not for now, ensembel alternative
 
-ndd_acc_df = pd.read_csv('data/allUniqueEntry.tab', sep='\t')
-ndd_acc_lst = ndd_acc_df['Entry'].to_list()
-ndd_contf_df = mobidb_pivot_contf_df[mobidb_pivot_contf_df['acc'].isin(ndd_acc_lst)]
-ndd_contf_df.to_csv(r'data/ndd-contf-dataframe.csv')
-## for Length
-mobidb_length_df = mobidb_original_df[['acc', 'length']].drop_duplicates(subset=['acc'])
-mobidb_pivot_length_df = mobidb_original_df.pivot_table(
-    index=['acc'], columns=['feature'], values='length').fillna(0)
-mobidb_pivot_length_df = mobidb_pivot_length_df.reset_index()  # reset idx to get acc as dif col to search in it
-mobidb_pivot_length_df.to_csv(r'data/mobidb-pivot-length-df.csv')
-ndd_length_df = mobidb_pivot_length_df[mobidb_pivot_length_df['acc'].isin(ndd_acc_lst)]  # len(df) = 1089
-ndd_length_df.to_csv(r'data/ndd-length-df.csv')
-## Matrix
-# content fraction with nan
-_, mobi_contf_mat, mobi_contf_sum_mat, mobi_contf_sum_norm_mat = matrix_maker_nan(
-    input_df=mobidb_pivot_contf_df.iloc[:, 1:], max_value=1., thrd_dim_cells=11, math_oper='*', get_values_in_range=10)
-_, ndd_contf_mat, ndd_contf_sum_mat, ndd_contf_sum_norm_mat = matrix_maker_nan(
-    input_df=ndd_contf_df.iloc[:, 1:], max_value=1., thrd_dim_cells=11, math_oper='*', get_values_in_range=10)
+    snpdb = pd.read_csv('data/refsnp/genebank.tsv', sep='\t')  # (946889, 6)
+    # snpdb.columns = ['avsnp150', 'rs_ids', 'seq_id', 'position', 'del_seq', 'in_seq']  # avsnp150 = refsnp_id
+    # snpdb_mut = snpdb[snpdb.del_seq != snpdb.in_seq]  # (338184, 6)
+    # snpdb_mut = snpdb_mut.drop_duplicates(ignore_index=True)  # (327147, 7)
+    # snpdb_mut['all_rsids'] = snpdb_mut[['avsnp150', 'rs_ids']].astype(str).agg(','.join, axis=1)
+    # snpdb_mut.to_csv(r'data/snpdb_mut.tsv')
 
-# Length (Use vstack or hstack ?)
-mobi_len_2d_mat, mobi_len_3d_mat, mobi_len_sum_mat, mobi_len_sum_norm_mat = matrix_maker_nan(
-    input_df=mobidb_pivot_length_df.iloc[:, 1:], max_value=1000, thrd_dim_cells=11, math_oper='/',
-    get_values_in_range=100)
-ndd_len_2d_mat, ndd_len_3d_mat, ndd_len_sum_mat, ndd_len_sum_norm_mat = matrix_maker_nan(
-    input_df=ndd_length_df.iloc[:, 1:], max_value=1000, thrd_dim_cells=11, math_oper='/', get_values_in_range=100)
-# ax.hist(dataset_len, bins=np.arange(0, 1000, 10))
+    snpdb_mut = pd.read_csv('data/dbsnp_mutations.tsv')
+    snpdb_mut_dict = dict(zip(snpdb_mut.index, snpdb_mut.all_rsids))  # 327147
+    keys_values_snpdb_mut_dict = snpdb_mut_dict.items()
+    snpdb_mut_dict = {str(key): list(str(value).split(",")) for key, value in keys_values_snpdb_mut_dict}  # dict with
+    # idx of snpdb_mut df as key and lst of all merged rsids of each position as values
 
-## sum dataframes
-mobi_contf_sum_norm_df = sum_df_generator(mobi_contf_sum_norm_mat,
-                                          ['0', ' ', '20', ' ', '40', ' ', '60', ' ', '80', ' ', '100'])
-ndd_cont_fract_sum_norm_df = sum_df_generator(ndd_contf_sum_norm_mat,
+    snpdb_idx_true_lst = []
+    snpdb_idx_false_lst = []  # not used, can come handy for not mapped ones if needed
+
+    # this for loop checks if rs_ids of g4dn are in our filtered snpdb dataset or not. then idxs are added to .txt file
+    # for i in g4dn_rsid_lst:  # is this correct? why less numbers than merging two dfs?
+    #     for key, values in snpdb_mut_dict.items():
+    #         if (isinstance(values, list)):
+    #             if i in values:
+    #                 snpdb_idx_true_lst.append(key)  # len : 984
+
+    true_snpdb_g4dn_idxs = pd.read_csv('data/dbsnp-idxs.txt')
+    snpdb_idx_true_lst = true_snpdb_g4dn_idxs['index'].tolist()
+
+    snpdb_idx_true_df = snpdb_mut.loc[snpdb_mut.index[snpdb_idx_true_lst]]  # (984, 7), 57 unique rsids
+    # uniprot_db_g4dn = pd.merge(snpdb_acc, snpdb_g4dn_df, on='avsnp150')  # only contains 1/2
+
+    snpdb_idx_true_df['avsnp150'] = snpdb_idx_true_df['avsnp150'].astype(int)
+    g4dn_df['avsnp150'] = g4dn_df['avsnp150'].astype(int)
+    snpdb_mut['avsnp150'] = snpdb_mut['avsnp150'].astype(int)
+
+    g4dn_mapped_snpdb_df = pd.merge(snpdb_idx_true_df, g4dn_df,
+                                    on='avsnp150')  # (1000, 13) # trying to get snpdb_idx_true_df + columns
+    # of gene4dn e.g: esembel id, etc
+    g4dn_snpdb_acc_df = pd.merge(g4dn_mapped_snpdb_df, snpdb_acc, on='avsnp150')  # (410, 15)
+
+    snpdb_acc_pos_df = g4dn_snpdb_acc_df.drop_duplicates(['acc', 'position'])  # (26, 15)
+
+    snpdb_g4dn_idx_merge_df = pd.merge(g4dn_df, snpdb_mut, on='avsnp150')  # (976, 13)
+    # positions in my file should be +1 for the equivalent one in uniprot
+
+    ### Files import and modify
+    mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')
+    ##TODO: diorder position
+
+
+    ## for content fraction
+    mobidb_pivot_contf_df = mobidb_original_df.pivot_table(
+        index=['acc'], columns=['feature'], values='content_fraction').fillna(0)
+    mobidb_pivot_contf_df = mobidb_pivot_contf_df.reset_index()  # added idx nums manually,ACCs recognized separate column
+    mobidb_pivot_contf_df.to_csv(r'data/mobidb_pivot_contf_df.csv', index=True)
+    mobidb_features_lst = mobidb_pivot_contf_df.columns.str.split(',').tolist()  # this also contains the 'acc' column
+    mobidb_features_lst = list(itertools.chain(*mobidb_features_lst))  # flat list
+
+    ndd_acc_df = pd.read_csv('data/allUniqueEntry.tab', sep='\t')
+    ndd_acc_lst = ndd_acc_df['Entry'].to_list()
+    ndd_contf_df = mobidb_pivot_contf_df[mobidb_pivot_contf_df['acc'].isin(ndd_acc_lst)]
+    ndd_contf_df.to_csv(r'data/ndd-contf-dataframe.csv')
+    ## for Length
+    mobidb_length_df = mobidb_original_df[['acc', 'length']].drop_duplicates(subset=['acc'])
+    mobidb_pivot_length_df = mobidb_original_df.pivot_table(
+        index=['acc'], columns=['feature'], values='length').fillna(0)
+    mobidb_pivot_length_df = mobidb_pivot_length_df.reset_index()  # reset idx to get acc as dif col to search in it
+    mobidb_pivot_length_df.to_csv(r'data/mobidb-pivot-length-df.csv')
+    ndd_length_df = mobidb_pivot_length_df[mobidb_pivot_length_df['acc'].isin(ndd_acc_lst)]  # len(df) = 1089
+    ndd_length_df.to_csv(r'data/ndd-length-df.csv')
+    ## Matrix
+    # content fraction with nan
+    _, mobi_contf_mat, mobi_contf_sum_mat, mobi_contf_sum_norm_mat = matrix_maker_nan(
+        input_df=mobidb_pivot_contf_df.iloc[:, 1:], max_value=1., thrd_dim_cells=11, math_oper='*', get_values_in_range=10)
+    _, ndd_contf_mat, ndd_contf_sum_mat, ndd_contf_sum_norm_mat = matrix_maker_nan(
+        input_df=ndd_contf_df.iloc[:, 1:], max_value=1., thrd_dim_cells=11, math_oper='*', get_values_in_range=10)
+
+    # Length (Use vstack or hstack ?)
+    mobi_len_2d_mat, mobi_len_3d_mat, mobi_len_sum_mat, mobi_len_sum_norm_mat = matrix_maker_nan(
+        input_df=mobidb_pivot_length_df.iloc[:, 1:], max_value=1000, thrd_dim_cells=11, math_oper='/',
+        get_values_in_range=100)
+    ndd_len_2d_mat, ndd_len_3d_mat, ndd_len_sum_mat, ndd_len_sum_norm_mat = matrix_maker_nan(
+        input_df=ndd_length_df.iloc[:, 1:], max_value=1000, thrd_dim_cells=11, math_oper='/', get_values_in_range=100)
+    # ax.hist(dataset_len, bins=np.arange(0, 1000, 10))
+
+    ## sum dataframes
+    mobi_contf_sum_norm_df = sum_df_generator(mobi_contf_sum_norm_mat,
                                               ['0', ' ', '20', ' ', '40', ' ', '60', ' ', '80', ' ', '100'])
-mobi_len_sum_norm_df = sum_df_generator(mobi_len_sum_norm_mat,
-                                        [' ', '100', ' ', '300', ' ', '500', ' ', '700', ' ', '900', ''])
-ndd_len_sum_norm_df = sum_df_generator(ndd_len_sum_norm_mat,
-                                       [' ', '100', ' ', '300', ' ', '500', ' ', '700', ' ', '900', ''])
+    ndd_cont_fract_sum_norm_df = sum_df_generator(ndd_contf_sum_norm_mat,
+                                                  ['0', ' ', '20', ' ', '40', ' ', '60', ' ', '80', ' ', '100'])
+    mobi_len_sum_norm_df = sum_df_generator(mobi_len_sum_norm_mat,
+                                            [' ', '100', ' ', '300', ' ', '500', ' ', '700', ' ', '900', ''])
+    ndd_len_sum_norm_df = sum_df_generator(ndd_len_sum_norm_mat,
+                                           [' ', '100', ' ', '300', ' ', '500', ' ', '700', ' ', '900', ''])
 
-## Difference of the sum arrays(with nan)
-difference_contf_sum_norm_mat = mobi_contf_sum_norm_mat - ndd_contf_sum_norm_mat
-difference_len_sum_norm_mat = mobi_len_sum_norm_mat - ndd_len_sum_norm_mat
-difference_contf_sum_norm_df = sum_df_generator(difference_contf_sum_norm_mat,
-                                                ['0', ' ', '20', ' ', '40', ' ', '60', ' ', '80', ' ', '100'])
-difference_len_sum_norm_df = sum_df_generator(difference_len_sum_norm_mat,
-                                              [' ', '100', ' ', '300', ' ', '500', ' ', '700', ' ', '900', ''])
+    ## Difference of the sum arrays(with nan)
+    difference_contf_sum_norm_mat = mobi_contf_sum_norm_mat - ndd_contf_sum_norm_mat
+    difference_len_sum_norm_mat = mobi_len_sum_norm_mat - ndd_len_sum_norm_mat
+    difference_contf_sum_norm_df = sum_df_generator(difference_contf_sum_norm_mat,
+                                                    ['0', ' ', '20', ' ', '40', ' ', '60', ' ', '80', ' ', '100'])
+    difference_len_sum_norm_df = sum_df_generator(difference_len_sum_norm_mat,
+                                                  [' ', '100', ' ', '300', ' ', '500', ' ', '700', ' ', '900', ''])
 
-## heatmaps
-# draw_heatmaps([mobi_contf_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, difference_contf_sum_norm_df.T],
-#               ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
-#               saving_rout='plots/heatmaps/Heatmaps0.png')
-# draw_heatmaps([mobi_len_sum_norm_df.T, ndd_len_sum_norm_df.T, difference_len_sum_norm_df.T],
-#               ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
-#               saving_rout='plots/heatmaps/Heatmaps-Length.png')
+    ## heatmaps
+    # draw_heatmaps([mobi_contf_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, difference_contf_sum_norm_df.T],
+    #               ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
+    #               saving_rout='plots/heatmaps/Heatmaps0.png')
+    # draw_heatmaps([mobi_len_sum_norm_df.T, ndd_len_sum_norm_df.T, difference_len_sum_norm_df.T],
+    #               ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
+    #               saving_rout='plots/heatmaps/Heatmaps-Length.png')
 
-## columns sum sum_matrix to get protein numbers (for bar plot based on distribution of heatmap)
-# content fraction
-mobi_contf_cols_sum_df, mobi_contf_cols_sum_lst = df_lst_maker_for_barplot(mobi_contf_sum_mat.T.sum(axis=0))
-ndd_contf_cols_sum_df, ndd_contf_cols_sum_lst = df_lst_maker_for_barplot(ndd_contf_sum_mat.T.sum(axis=0))
-mobi_contf_cols_sum_df.to_csv(r'data/mobidb-contf-distribution.csv')
-ndd_contf_cols_sum_df.to_csv(r'data/ndd-contf-distribution.csv')
-# length
-mobi_len_cols_sum_df, mobi_len_cols_sum_lst = df_lst_maker_for_barplot(mobi_len_sum_mat.T.sum(axis=0))
-ndd_len_cols_sum_df, ndd_len_cols_sum_lst = df_lst_maker_for_barplot(ndd_len_sum_mat.T.sum(axis=0))
-mobi_len_cols_sum_df.to_csv(r'data/mobidb-len-distribution.csv')
-ndd_len_cols_sum_df.to_csv(r'data/ndd-len-distibution.csv')
+    ## columns sum sum_matrix to get protein numbers (for bar plot based on distribution of heatmap)
+    # content fraction
+    mobi_contf_cols_sum_df, mobi_contf_cols_sum_lst = df_lst_maker_for_barplot(mobi_contf_sum_mat.T.sum(axis=0))
+    ndd_contf_cols_sum_df, ndd_contf_cols_sum_lst = df_lst_maker_for_barplot(ndd_contf_sum_mat.T.sum(axis=0))
+    mobi_contf_cols_sum_df.to_csv(r'data/mobidb-contf-distribution.csv')
+    ndd_contf_cols_sum_df.to_csv(r'data/ndd-contf-distribution.csv')
+    # length
+    mobi_len_cols_sum_df, mobi_len_cols_sum_lst = df_lst_maker_for_barplot(mobi_len_sum_mat.T.sum(axis=0))
+    ndd_len_cols_sum_df, ndd_len_cols_sum_lst = df_lst_maker_for_barplot(ndd_len_sum_mat.T.sum(axis=0))
+    mobi_len_cols_sum_df.to_csv(r'data/mobidb-len-distribution.csv')
+    ndd_len_cols_sum_df.to_csv(r'data/ndd-len-distibution.csv')
 
-## Hmap distribution barplots (Protein count)
-# content fraction
-draw_barplot(figsize_a='18', figsize_b='9', xlabel='Features', ylabel='Protein count', data=mobi_contf_cols_sum_df,
-             xticklabel=mobi_contf_cols_sum_lst, yscale='log',
-             save_rout='plots/log/hist-hmaps-distribution/mobidb-contf-NEW.png')
-draw_barplot(figsize_a='18', figsize_b='9', xlabel='Features', ylabel='Protein count', data=ndd_contf_cols_sum_df,
-             xticklabel=ndd_contf_cols_sum_lst, yscale='log',
-             save_rout='plots/log/hist-hmaps-distribution/ndd-contf-NEW.png')
-# Length
-draw_barplot(figsize_a='18', figsize_b='9', xlabel='Features', ylabel='Protein count', data=mobi_len_cols_sum_df,
-             xticklabel=mobi_len_cols_sum_lst, yscale='log',
-             save_rout='plots/log/hist-hmaps-distribution/mobi-len-NEW.png')
-draw_barplot(figsize_a='18', figsize_b='9', xlabel='Features', ylabel='Protein count', data=ndd_len_cols_sum_df,
-             xticklabel=ndd_len_cols_sum_lst, yscale='log',
-             save_rout='plots/log/hist-hmaps-distribution/ndd-len-NEW.png')
+    ## Hmap distribution barplots (Protein count)
+    # content fraction
+    draw_barplot(figsize_a='18', figsize_b='9', xlabel='Features', ylabel='Protein count', data=mobi_contf_cols_sum_df,
+                 xticklabel=mobi_contf_cols_sum_lst, yscale='log',
+                 save_rout='plots/log/hist-hmaps-distribution/mobidb-contf-NEW.png')
+    draw_barplot(figsize_a='18', figsize_b='9', xlabel='Features', ylabel='Protein count', data=ndd_contf_cols_sum_df,
+                 xticklabel=ndd_contf_cols_sum_lst, yscale='log',
+                 save_rout='plots/log/hist-hmaps-distribution/ndd-contf-NEW.png')
+    # Length
+    draw_barplot(figsize_a='18', figsize_b='9', xlabel='Features', ylabel='Protein count', data=mobi_len_cols_sum_df,
+                 xticklabel=mobi_len_cols_sum_lst, yscale='log',
+                 save_rout='plots/log/hist-hmaps-distribution/mobi-len-NEW.png')
+    draw_barplot(figsize_a='18', figsize_b='9', xlabel='Features', ylabel='Protein count', data=ndd_len_cols_sum_df,
+                 xticklabel=ndd_len_cols_sum_lst, yscale='log',
+                 save_rout='plots/log/hist-hmaps-distribution/ndd-len-NEW.png')
 
-## Dictionary Homo sapiens
-for each_feature in mobidb_features_lst:
-    cont_fra_temp_lst = mobidb_pivot_contf_df[each_feature].tolist()
-    mobidb_predictors_cont_fra_dict[each_feature] = cont_fra_temp_lst
+    ## Dictionary Homo sapiens
+    for each_feature in mobidb_features_lst:
+        cont_fra_temp_lst = mobidb_pivot_contf_df[each_feature].tolist()
+        mobidb_predictors_cont_fra_dict[each_feature] = cont_fra_temp_lst
 
-## Plot for homosapiens
-for each_feature in mobidb_features_lst[
-                    1:]:
-    drawplot(mobidb_predictors_cont_fra_dict[each_feature], 'log', 30, True, each_feature + '_homosapiens',
-             "Protein Count(relative)",
-             'plots/log/hist-all-homo sapiens/' + each_feature)
+    ## Plot for homosapiens
+    for each_feature in mobidb_features_lst[
+                        1:]:
+        drawplot(mobidb_predictors_cont_fra_dict[each_feature], 'log', 30, True, each_feature + '_homosapiens',
+                 "Protein Count(relative)",
+                 'plots/log/hist-all-homo sapiens/' + each_feature)
 
-## Dictionary Disease
-for each_feature in mobidb_features_lst:
-    ndd_cont_fra_temp_lst = ndd_contf_df[each_feature].tolist()
-    ndd_predictors_cont_fra_dict[each_feature] = ndd_cont_fra_temp_lst
+    ## Dictionary Disease
+    for each_feature in mobidb_features_lst:
+        ndd_cont_fra_temp_lst = ndd_contf_df[each_feature].tolist()
+        ndd_predictors_cont_fra_dict[each_feature] = ndd_cont_fra_temp_lst
 
-## plot for ndds
-for each_feature in mobidb_features_lst[1:]:
-    drawplot(ndd_predictors_cont_fra_dict[each_feature], 'log', 30, False, each_feature + '_NDD', 'Protein count',
-             'plots/log/hist-all-NDD/SCZ/' + each_feature + '_SCZ')
+    ## plot for ndds
+    for each_feature in mobidb_features_lst[1:]:
+        drawplot(ndd_predictors_cont_fra_dict[each_feature], 'log', 30, False, each_feature + '_NDD', 'Protein count',
+                 'plots/log/hist-all-NDD/SCZ/' + each_feature + '_SCZ')
 
-# comparative histogram (homosapiens Vs. ndd)
-for each_feature in mobidb_features_lst[1:]:
-    compare_plot(first_lst=mobidb_predictors_cont_fra_dict[each_feature],
-                 second_lst=ndd_predictors_cont_fra_dict[each_feature], yscale='log', bins=30, is_dense=False,
-                 x_label=each_feature + '_comparison', y_label='proteins count',
-                 first_label='Homo sapiens Pr.s', second_label='NDD Pr.s',
-                 png_file_name='plots/log/hist-comparison' '-homoS-NDD/' + each_feature)
+    # comparative histogram (homosapiens Vs. ndd)
+    for each_feature in mobidb_features_lst[1:]:
+        compare_plot(first_lst=mobidb_predictors_cont_fra_dict[each_feature],
+                     second_lst=ndd_predictors_cont_fra_dict[each_feature], yscale='log', bins=30, is_dense=False,
+                     x_label=each_feature + '_comparison', y_label='proteins count',
+                     first_label='Homo sapiens Pr.s', second_label='NDD Pr.s',
+                     png_file_name='plots/log/hist-comparison' '-homoS-NDD/' + each_feature)
 
-# rs_id = file[snpdb1_merges[i]][merged_rsid]
-# is_protein = file[primary_snapshot_data][placements_with_allele[i]][placement_annot][mol_type]=='protein'
-# positions = file[primary_snapshot_data][placements_with_allele[i]][allelse[i]][allele][spdi][position]
-# # del_seq = file[primary_snapshot_data][placements_with_allele[i]][allelse[i]][allele][spdi][deleted_sequence]
-# positions = file[primary_snapshot_data][placements_with_allele[i]][allelse[i]][allele][spdi][inserted_sequence]
-# if is_protein == True : ...
+    # rs_id = file[snpdb1_merges[i]][merged_rsid]
+    # is_protein = file[primary_snapshot_data][placements_with_allele[i]][placement_annot][mol_type]=='protein'
+    # positions = file[primary_snapshot_data][placements_with_allele[i]][allelse[i]][allele][spdi][position]
+    # # del_seq = file[primary_snapshot_data][placements_with_allele[i]][allelse[i]][allele][spdi][deleted_sequence]
+    # positions = file[primary_snapshot_data][placements_with_allele[i]][allelse[i]][allele][spdi][inserted_sequence]
+    # if is_protein == True : ...
