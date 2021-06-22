@@ -131,6 +131,7 @@ def draw_heatmaps(data, titles, saving_rout):  # www.stackabuse.com/ultimate-gui
     plt.show()
     return
 
+
 def df_lst_maker_for_barplot(input_matrix):
     cols_sum_df = pd.DataFrame([input_matrix], columns=mobidb_features_lst[1:], index=['Protein count'])
     cols_sum_df = cols_sum_df.T.reset_index()
@@ -140,11 +141,26 @@ def df_lst_maker_for_barplot(input_matrix):
 
     return cols_sum_df, cols_sum_lst
 
+
 # if __name__ == '__main__':
 ## Gene4denovo
-gene4dn_all_annotations_df = pd.read_csv('data/gene4denovo/All_De_novo_mutations_and_annotations_1.2.txt', sep='\t', encoding='cp1252', low_memory=False)  # (670082, 155)
-gene4dn1 = gene4dn_all_annotations_df
-g4dn_df = pd.read_csv('data/phens-avsnp-df.csv') # (6367, 5)
+gene4dn_all_annotations_df = pd.read_csv('data/gene4denovo/All_De_novo_mutations_and_annotations_1.2.txt', sep='\t',
+                                         encoding='cp1252', low_memory=False)  # (670082, 155)
+gene4dn1 = gene4dn_all_annotations_df.loc[gene4dn_all_annotations_df['Func.refGene'] == 'exonic']  # (70879, 155)
+
+gene4dn2 = gene4dn1['AAChange.refGene'].str.split(',', expand=True).stack().to_frame('AAChange.refGene')  # (201372, 155)
+gene4dn3 = gene4dn2['AAChange.refGene'].str.split(pat=':', expand=True)
+gene4dn4 = gene4dn3[gene4dn3.columns[:10]]
+gene4dn4.columns = ['Gene.refGene', 'refSeq', 'exon#', 'mutNA', 'mutPrInfo', 'aa1', 'aa2', 'position', 'frameshift', 'mutPr']
+gene4dn4['mutPr'] = gene4dn4.mutPrInfo.str.split(pat='fs*', expand=True,)  # first separate the
+# frameshift info
+gene4dn4['aa1'] = gene4dn4['mutPr'].str[2]
+gene4dn4['aa2'] = gene4dn4['mutPr'].str[-1]
+gene4dn4['position'] = gene4dn4['mutPr'].str.replace(r'\D', '')
+
+
+
+g4dn_df = pd.read_csv('data/phens-avsnp-df.csv')  # (6367, 5)
 g4dn_df['avsnp150'] = g4dn_df['avsnp150'].str.replace(r'\D', '')
 g4dn_rsid_lst = g4dn_df['avsnp150'].tolist()  # len = 6367 # should check this lst in merged rsids of each mut
 # position (better with a dictionary)
@@ -193,7 +209,8 @@ snpdb_idx_true_df['avsnp150'] = snpdb_idx_true_df['avsnp150'].astype(int)
 g4dn_df['avsnp150'] = g4dn_df['avsnp150'].astype(int)
 snpdb_mut['avsnp150'] = snpdb_mut['avsnp150'].astype(int)
 
-g4dn_mapped_snpdb_df = pd.merge(snpdb_idx_true_df, g4dn_df, on='avsnp150')  # (1000, 13) # trying to get snpdb_idx_true_df + columns
+g4dn_mapped_snpdb_df = pd.merge(snpdb_idx_true_df, g4dn_df,
+                                on='avsnp150')  # (1000, 13) # trying to get snpdb_idx_true_df + columns
 # of gene4dn e.g: esembel id, etc
 g4dn_snpdb_acc_df = pd.merge(g4dn_mapped_snpdb_df, snpdb_acc, on='avsnp150')  # (410, 15)
 
@@ -223,7 +240,7 @@ ndd_contf_df.to_csv(r'data/ndd-contf-dataframe.csv')
 mobidb_length_df = mobidb_original_df[['acc', 'length']].drop_duplicates(subset=['acc'])
 mobidb_pivot_length_df = mobidb_original_df.pivot_table(
     index=['acc'], columns=['feature'], values='length').fillna(0)
-mobidb_pivot_length_df = mobidb_pivot_length_df.reset_index() # reset idx to get acc as dif col to search in it
+mobidb_pivot_length_df = mobidb_pivot_length_df.reset_index()  # reset idx to get acc as dif col to search in it
 mobidb_pivot_length_df.to_csv(r'data/mobidb-pivot-length-df.csv')
 ndd_length_df = mobidb_pivot_length_df[mobidb_pivot_length_df['acc'].isin(ndd_acc_lst)]  # len(df) = 1089
 ndd_length_df.to_csv(r'data/ndd-length-df.csv')
@@ -260,7 +277,6 @@ difference_contf_sum_norm_df = sum_df_generator(difference_contf_sum_norm_mat,
 difference_len_sum_norm_df = sum_df_generator(difference_len_sum_norm_mat,
                                               [' ', '100', ' ', '300', ' ', '500', ' ', '700', ' ', '900', ''])
 
-
 ## heatmaps
 # draw_heatmaps([mobi_contf_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, difference_contf_sum_norm_df.T],
 #               ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
@@ -280,8 +296,6 @@ mobi_len_cols_sum_df, mobi_len_cols_sum_lst = df_lst_maker_for_barplot(mobi_len_
 ndd_len_cols_sum_df, ndd_len_cols_sum_lst = df_lst_maker_for_barplot(ndd_len_sum_mat.T.sum(axis=0))
 mobi_len_cols_sum_df.to_csv(r'data/mobidb-len-distribution.csv')
 ndd_len_cols_sum_df.to_csv(r'data/ndd-len-distibution.csv')
-
-
 
 ## Hmap distribution barplots (Protein count)
 # content fraction
