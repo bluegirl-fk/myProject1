@@ -143,7 +143,6 @@ def df_lst_maker_for_barplot(input_matrix):
     return cols_sum_df, cols_sum_lst
 
 
-
 if __name__ == '__main__':
     # This is the main!
 
@@ -152,48 +151,31 @@ if __name__ == '__main__':
                                              encoding='cp1252', low_memory=False)  # (670082, 155)
     gene4dn1 = gene4dn_all_annotations_df.loc[gene4dn_all_annotations_df['Func.refGene'] == 'exonic']  # (70879, 155)
 
-    gene4dn2 = gene4dn1['AAChange.refGene'].str.split(',', expand=True).stack().to_frame('AAChange.refGene')  # (201372, 155)
+    gene4dn2 = gene4dn1['AAChange.refGene'].str.split(',', expand=True).stack().to_frame(
+        'AAChange.refGene')  # (201372, 155)
     gene4dn3 = gene4dn2['AAChange.refGene'].str.split(pat=':', expand=True)
     gene4dn_newdb = gene4dn3[gene4dn3.columns[:10]]
-    gene4dn_newdb.columns = ['Gene.refGene', 'refSeq', 'exon#', 'mutNA', 'mutPrInfo', 'aa1', 'aa2', 'position', 'frameshift', 'mutPr']
-    gene4dn_newdb['mutPr'] = gene4dn_newdb.mutPrInfo.str.split(pat='fs*', expand=True,)  # first separate the
+    gene4dn_newdb.columns = ['Gene.refGene', 'refSeq', 'exon#', 'mutNA', 'mutPrInfo', 'aa1', 'aa2', 'position',
+                             'frameshift', 'mutPr']
+    gene4dn_newdb['mutPr'] = gene4dn_newdb.mutPrInfo.str.split(pat='fs*', expand=True, )  # first separate the
     # frameshift info
     gene4dn_newdb['aa1'] = gene4dn_newdb['mutPr'].str[2]
     gene4dn_newdb['aa2'] = gene4dn_newdb['mutPr'].str[-1]
     gene4dn_newdb['position'] = gene4dn_newdb['mutPr'].str.replace(r'\D', '')  # (201372, 10)
     refseq_lst = gene4dn_newdb['refSeq'].tolist()  # len=201372
-
-    # Define batch size
-    BATCH_SIZE = 70000
-    # Define path to output file
-    out_pattern = 'data/refseq-gene4d.%d.txt'
-    # Define current batch
-    curr_batch = list()
-    # Loop through all entries
-    for i, element in enumerate(refseq_lst):
-        # Update current batch
-        curr_batch.append(element)
-        # Check batch size
-        if (len(curr_batch) >= BATCH_SIZE) or (i == len(refseq_lst) - 1):
-            # Define output file path
-            out_path = out_pattern % (i // BATCH_SIZE)
-            # Open file in write mode
-            with open(out_path, 'w') as out_file:
-                # Write out current batch
-                out_file.write('\n'.join(str(curr_batch)))
-            # Empty current batch
-            curr_batch = list()
+    #TODO: edit the frameshift info into separate column
+    #TODO: filter the diseases from gene 4 dn later, not all the DB
 
     # # textfile = open("data/refseq-gene4dn.txt", "w")
     # for element in refseq_lst:
     #     textfile. write(str(element) + "\n")
     # textfile. close()
+    # splited my text file using bash : split -l 70000 refseq-gene4dn.txt, the 7000 is number of the lines
 
     g4dn_df = pd.read_csv('data/phens-avsnp-df.csv')  # (6367, 5)
     g4dn_df['avsnp150'] = g4dn_df['avsnp150'].str.replace(r'\D', '')
     g4dn_rsid_lst = g4dn_df['avsnp150'].tolist()  # len = 6367 # should check this lst in merged rsids of each mut
     # position (better with a dictionary)
-
 
     sys.exit(0)
     ## DBsnp
@@ -252,7 +234,6 @@ if __name__ == '__main__':
     mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')
     ##TODO: diorder position
 
-
     ## for content fraction
     mobidb_pivot_contf_df = mobidb_original_df.pivot_table(
         index=['acc'], columns=['feature'], values='content_fraction').fillna(0)
@@ -276,7 +257,8 @@ if __name__ == '__main__':
     ## Matrix
     # content fraction with nan
     _, mobi_contf_mat, mobi_contf_sum_mat, mobi_contf_sum_norm_mat = matrix_maker_nan(
-        input_df=mobidb_pivot_contf_df.iloc[:, 1:], max_value=1., thrd_dim_cells=11, math_oper='*', get_values_in_range=10)
+        input_df=mobidb_pivot_contf_df.iloc[:, 1:], max_value=1., thrd_dim_cells=11, math_oper='*',
+        get_values_in_range=10)
     _, ndd_contf_mat, ndd_contf_sum_mat, ndd_contf_sum_norm_mat = matrix_maker_nan(
         input_df=ndd_contf_df.iloc[:, 1:], max_value=1., thrd_dim_cells=11, math_oper='*', get_values_in_range=10)
 
