@@ -175,6 +175,7 @@ if __name__ == '__main__':
     # splited my text file using bash : split -l 70000 refseq-gene4dn.txt, the 7000 is number of the lines
 
     # import the resfeq file with corresponding uniprot ACCs
+
     g4dn_rseq_df = pd.read_csv('data/refseq/refseq-acc.tab', sep='\t')
     g4dn_rseq_df.columns = ['refseq_id', 'isofroms', 'acc', 'organism', 'Length', 'Gene names']
     del g4dn_rseq_df['organism']  # (50930, 5)
@@ -183,8 +184,8 @@ if __name__ == '__main__':
     g4dn_rseq0_df = g4dn_rseq_df.iloc[idx_tmp].copy()
     g4dn_rseq0_df['rseq_id'] = temp_df.values
     del g4dn_rseq0_df['refseq_id']
-
     # TODO: filter the diseases from gene 4 dn later, not all the DB, like the phens file
+    #just a change for the com,mit
 
     g4dn_df = pd.read_csv('data/phens-avsnp-df.csv')  # (6367, 5)
     g4dn_df['avsnp150'] = g4dn_df['avsnp150'].str.replace(r'\D', '')
