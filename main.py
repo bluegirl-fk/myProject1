@@ -177,15 +177,35 @@ if __name__ == '__main__':
     # import the resfeq file with corresponding uniprot ACCs
 
     g4dn_rseq_df = pd.read_csv('data/refseq/refseq-acc.tab', sep='\t')
-    g4dn_rseq_df.columns = ['refseq_id', 'isofroms', 'acc', 'organism', 'Length', 'Gene names']
+    g4dn_rseq_df.columns = ['refseq_id', 'isoforms', 'acc', 'organism', 'Length', 'Gene names']
     del g4dn_rseq_df['organism']  # (50930, 5)
+    # split columns solution from : https://www.reddit.com/r/Python/comments/c8oi7h/pandas_splitting_comma_separated_column/
     temp_df = g4dn_rseq_df['refseq_id'].str.split(',', expand=True).stack()
     idx_tmp = temp_df.index._get_level_values(0)
     g4dn_rseq0_df = g4dn_rseq_df.iloc[idx_tmp].copy()
-    g4dn_rseq0_df['rseq_id'] = temp_df.values
+    g4dn_rseq0_df['refSeq'] = temp_df.values  # (93949, 5)
     del g4dn_rseq0_df['refseq_id']
-    # TODO: filter the diseases from gene 4 dn later, not all the DB, like the phens file
-    #just a change for the com,mit
+
+    # merge with gene4dn_newdb to get positions
+    refseq_position = pd.read_csv('data/refseq/newdb-before-refseq-acc.csv')  # (201372, 11)
+    mut_positions_df = pd.merge(g4dn_rseq0_df, refseq_position, on='refSeq')
+    del mut_positions_df['Gene names']
+    mut_positions_df = mut_positions_df.loc[:, ~mut_positions_df.columns.str.contains('^Unnamed')]
+    mut_positions_df = mut_positions_df[['acc', 'position', 'aa1', 'aa2', 'Gene.refGene', 'refSeq', 'Length', 'isoforms', 'exon#', 'mutNA', 'mutPrInfo', 'frameshift']]
+    mut_positions_df['position'] = mut_positions_df['position'].fillna(0).astype(int)  # (551773, 12)
+    mut_positions_df = mut_positions_df.drop_duplicates(ignore_index=True)  # (224021, 12)
+
+    ## mobidb
+    mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')
+    mobidb_original_df.columns = ['acc', 'feature', 'startend', 'content_fraction', 'content_count', 'length']
+
+    # mobidb_startend_df = mobidb_original_df.pivot_table(
+    #     index=['acc'], columns=['feature'], values='startend').fillna(0)
+    # mobidb_startend_df = mobidb_startend_df.reset_index()
+    # mobidb_startend_df.to_csv(r'data/mobidb-disorder-range-table.csv', index=True)
+
+
+    # TODO: filter the phenotypes from gene4dn, like the phens file
 
     g4dn_df = pd.read_csv('data/phens-avsnp-df.csv')  # (6367, 5)
     g4dn_df['avsnp150'] = g4dn_df['avsnp150'].str.replace(r'\D', '')
@@ -247,8 +267,7 @@ if __name__ == '__main__':
     # positions in my file should be +1 for the equivalent one in uniprot
 
     ### Files import and modify
-    mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')
-    ##TODO: diorder position
+
 
     ## for content fraction
     mobidb_pivot_contf_df = mobidb_original_df.pivot_table(
