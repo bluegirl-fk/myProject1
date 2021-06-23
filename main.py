@@ -147,35 +147,50 @@ if __name__ == '__main__':
     # This is the main!
 
     ## Gene4denovo
-    gene4dn_all_annotations_df = pd.read_csv('data/gene4denovo/All_De_novo_mutations_and_annotations_1.2.txt', sep='\t',
-                                             encoding='cp1252', low_memory=False)  # (670082, 155)
-    gene4dn1 = gene4dn_all_annotations_df.loc[gene4dn_all_annotations_df['Func.refGene'] == 'exonic']  # (70879, 155)
-
-    gene4dn2 = gene4dn1['AAChange.refGene'].str.split(',', expand=True).stack().to_frame(
-        'AAChange.refGene')  # (201372, 155)
-    gene4dn3 = gene4dn2['AAChange.refGene'].str.split(pat=':', expand=True)
-    gene4dn_newdb = gene4dn3[gene4dn3.columns[:10]]
-    gene4dn_newdb.columns = ['Gene.refGene', 'refSeq', 'exon#', 'mutNA', 'mutPrInfo', 'aa1', 'aa2', 'position',
-                             'frameshift', 'mutPr']
-    gene4dn_newdb['mutPr'] = gene4dn_newdb.mutPrInfo.str.split(pat='fs*', expand=True, )  # first separate the
-    # frameshift info
-    gene4dn_newdb['aa1'] = gene4dn_newdb['mutPr'].str[2]
-    gene4dn_newdb['aa2'] = gene4dn_newdb['mutPr'].str[-1]
-    gene4dn_newdb['position'] = gene4dn_newdb['mutPr'].str.replace(r'\D', '')  # (201372, 10)
-    refseq_lst = gene4dn_newdb['refSeq'].tolist()  # len=201372
-    #TODO: edit the frameshift info into separate column
-    #TODO: filter the diseases from gene 4 dn later, not all the DB
-
+    # gene4dn_all_annotations_df = pd.read_csv('data/gene4denovo/All_De_novo_mutations_and_annotations_1.2.txt', sep='\t',
+    #                                          encoding='cp1252', low_memory=False)  # (670082, 155)
+    # # TODO: keep idxs from original df
+    # gene4dn1 = gene4dn_all_annotations_df.loc[gene4dn_all_annotations_df['Func.refGene'] == 'exonic']  # (70879, 155)
+    #
+    # gene4dn2 = gene4dn1['AAChange.refGene'].str.split(',', expand=True).stack().to_frame(
+    #     'AAChange.refGene')  # (201372, 155)
+    # gene4dn3 = gene4dn2['AAChange.refGene'].str.split(pat=':', expand=True)
+    # gene4dn_newdb = gene4dn3[gene4dn3.columns[:10]]
+    # gene4dn_newdb.columns = ['Gene.refGene', 'refSeq', 'exon#', 'mutNA', 'mutPrInfo', 'aa1', 'aa2', 'position',
+    #                          'frameshift', 'mutPr']
+    # gene4dn_newdb['mutPr'] = gene4dn_newdb.mutPrInfo.str.split(pat='fs*', expand=True, )  # first separate the
+    # # frameshift info
+    # gene4dn_newdb['aa1'] = gene4dn_newdb['mutPr'].str[2]
+    # gene4dn_newdb['aa2'] = gene4dn_newdb['mutPr'].str[-1]
+    # gene4dn_newdb['position'] = gene4dn_newdb['mutPr'].str.replace(r'\D', '')  # (201372, 10)
+    # del gene4dn_newdb['mutPr']
+    # gene4dn_newdb.to_csv(r'data/refseq/newdb-before-refseq-acc.csv')  # (201372, 9)
+    # refseq_lst = gene4dn_newdb['refSeq'].tolist()  # len=201372
+    # TODO: edit the frameshift info into separate column
+    # delete duplicates in gene4dn_newdb
     # # textfile = open("data/refseq-gene4dn.txt", "w")
     # for element in refseq_lst:
     #     textfile. write(str(element) + "\n")
     # textfile. close()
     # splited my text file using bash : split -l 70000 refseq-gene4dn.txt, the 7000 is number of the lines
 
+    # import the resfeq file with corresponding uniprot ACCs
+    g4dn_rseq_df = pd.read_csv('data/refseq/refseq-acc.tab', sep='\t')
+    g4dn_rseq_df.columns = ['refseq_id', 'isofroms', 'acc', 'organism', 'Length', 'Gene names']
+    del g4dn_rseq_df['organism']  # (50930, 5)
+    temp_df = g4dn_rseq_df['refseq_id'].str.split(',', expand=True).stack()
+    idx_tmp = temp_df.index._get_level_values(0)
+    g4dn_rseq0_df = g4dn_rseq_df.iloc[idx_tmp].copy()
+    g4dn_rseq0_df['rseq_id'] = temp_df.values
+    del g4dn_rseq0_df['refseq_id']
+
+    # TODO: filter the diseases from gene 4 dn later, not all the DB, like the phens file
+
     g4dn_df = pd.read_csv('data/phens-avsnp-df.csv')  # (6367, 5)
     g4dn_df['avsnp150'] = g4dn_df['avsnp150'].str.replace(r'\D', '')
     g4dn_rsid_lst = g4dn_df['avsnp150'].tolist()  # len = 6367 # should check this lst in merged rsids of each mut
     # position (better with a dictionary)
+
 
     sys.exit(0)
     ## DBsnp
