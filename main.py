@@ -194,11 +194,17 @@ if __name__ == '__main__':
     mut_positions_df = mut_positions_df[['acc', 'position', 'aa1', 'aa2', 'Gene.refGene', 'refSeq', 'Length', 'isoforms', 'exon#', 'mutNA', 'mutPrInfo', 'frameshift']]
     mut_positions_df['position'] = mut_positions_df['position'].fillna(0).astype(int)  # (551773, 12)
     mut_positions_df = mut_positions_df.drop_duplicates(ignore_index=True)  # (224021, 12)
+    mut_positions_df.reset_index(level=0, inplace=True)
+
 
     ## mobidb
     mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')
     mobidb_original_df.columns = ['acc', 'feature', 'startend', 'content_fraction', 'content_count', 'length']
+    # converting disorder content ranges in each cell to a list
+    mobidb_original_df['startend'] = mobidb_original_df['startend'].str.split(',')
+    mut_pos_subdf = mut_positions_df['acc', 'index', 'position']
 
+    ### after finding the ACCs which were in disordered range, could turn it to a pivot table if needed
     # mobidb_startend_df = mobidb_original_df.pivot_table(
     #     index=['acc'], columns=['feature'], values='startend').fillna(0)
     # mobidb_startend_df = mobidb_startend_df.reset_index()
