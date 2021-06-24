@@ -205,6 +205,29 @@ if __name__ == '__main__':
     mut_pos_subdf = mut_positions_df[['index', 'acc', 'position']]
 
 
+    def expand_regions(region_ranges_lst):
+        transformed_regions = []
+        for reg in region_ranges_lst:
+            start = int(reg.split('..')[0])
+            end = int(reg.split('..')[1])
+            while start <= end:
+                transformed_regions.append(start)
+                start += 1
+        return set(transformed_regions)
+
+    # set_disorder_region = expand_regions(mobidb_original_df['startend'])
+
+
+
+
+    # Merge the dataframes
+    mobidb_mutpos_df = pd.merge(mobidb_original_df, mut_pos_subdf, on='acc')  # (4013158, 8)
+
+    for index, row in mobidb_mutpos_df.iterrows():
+        set_disorder_region = expand_regions(row['startend'])
+        print(set_disorder_region)
+        if row['position'] in set_disorder_region:
+            print(mobidb_mutpos_df.loc[mobidb_mutpos_df['position'], 'index'])
 
     # TODO: filter the phenotypes from gene4dn, like the phens file
 
