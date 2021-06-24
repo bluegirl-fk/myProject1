@@ -191,11 +191,12 @@ if __name__ == '__main__':
     mut_positions_df = pd.merge(g4dn_rseq0_df, refseq_position, on='refSeq')
     del mut_positions_df['Gene names']
     mut_positions_df = mut_positions_df.loc[:, ~mut_positions_df.columns.str.contains('^Unnamed')]
-    mut_positions_df = mut_positions_df[['acc', 'position', 'aa1', 'aa2', 'Gene.refGene', 'refSeq', 'Length', 'isoforms', 'exon#', 'mutNA', 'mutPrInfo', 'frameshift']]
+    mut_positions_df = mut_positions_df[
+        ['acc', 'position', 'aa1', 'aa2', 'Gene.refGene', 'refSeq', 'Length', 'isoforms', 'exon#', 'mutNA', 'mutPrInfo',
+         'frameshift']]
     mut_positions_df['position'] = mut_positions_df['position'].fillna(0).astype(int)  # (551773, 12)
     mut_positions_df = mut_positions_df.drop_duplicates(ignore_index=True)  # (224021, 12)
     mut_positions_df.reset_index(level=0, inplace=True)
-
 
     ## mobidb
     mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')
@@ -215,27 +216,31 @@ if __name__ == '__main__':
                 start += 1
         return set(transformed_regions)
 
+
     # set_disorder_region = expand_regions(mobidb_original_df['startend'])
-
-
-
 
     # Merge the dataframes
     mobidb_mutpos_df = pd.merge(mobidb_original_df, mut_pos_subdf, on='acc')  # (4013158, 8)
-
+    array_is_in = []
     for index, row in mobidb_mutpos_df.iterrows():
-        set_disorder_region = expand_regions(row['startend'])
+        set_disorder_region = expand_regions(row.startend)
         print(set_disorder_region)
-        if row['position'] in set_disorder_region:
-            print(mobidb_mutpos_df.loc[mobidb_mutpos_df['position'], 'index'])
+        if row.position in set_disorder_region:
+            # print(mobidb_mutpos_df.loc[mobidb_mutpos_df['position'], 'index'])
+            print('yes')
+            array_is_in.append('1')
+        else:
+            print('no')
+            array_is_in.append('0')
 
+    mobidb_mutpos_df['is_in_startend'] = array_is_in
+    mobidb_mutpos_df.to_csv(r'data/mutations-position-mobidb.csv')
     # TODO: filter the phenotypes from gene4dn, like the phens file
 
     g4dn_df = pd.read_csv('data/phens-avsnp-df.csv')  # (6367, 5)
     g4dn_df['avsnp150'] = g4dn_df['avsnp150'].str.replace(r'\D', '')
     g4dn_rsid_lst = g4dn_df['avsnp150'].tolist()  # len = 6367 # should check this lst in merged rsids of each mut
     # position (better with a dictionary)
-
 
     sys.exit(0)
     ## DBsnp
@@ -291,7 +296,6 @@ if __name__ == '__main__':
     # positions in my file should be +1 for the equivalent one in uniprot
 
     ### Files import and modify
-
 
     ## for content fraction
     mobidb_pivot_contf_df = mobidb_original_df.pivot_table(
