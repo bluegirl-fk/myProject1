@@ -217,7 +217,8 @@ if __name__ == '__main__':
         return set(transformed_regions)
 
 
-    # set_disorder_region = expand_regions(mobidb_original_df['startend'])
+    final_mut_check_df = pd.read_csv('data/mutations-position-mobidb.csv')
+    filtered_mut_pos_df = final_mut_check_df[final_mut_check_df['is_in_startend']==1]  # (941013, 10)
 
     # Merge the dataframes
     mobidb_mutpos_df = pd.merge(mobidb_original_df, mut_pos_subdf, on='acc')  # (4013158, 8)
