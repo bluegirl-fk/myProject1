@@ -202,13 +202,8 @@ if __name__ == '__main__':
     mobidb_original_df.columns = ['acc', 'feature', 'startend', 'content_fraction', 'content_count', 'length']
     # converting disorder content ranges in each cell to a list
     mobidb_original_df['startend'] = mobidb_original_df['startend'].str.split(',')
-    mut_pos_subdf = mut_positions_df['acc', 'index', 'position']
+    mut_pos_subdf = mut_positions_df[['index', 'acc', 'position']]
 
-    ### after finding the ACCs which were in disordered range, could turn it to a pivot table if needed
-    # mobidb_startend_df = mobidb_original_df.pivot_table(
-    #     index=['acc'], columns=['feature'], values='startend').fillna(0)
-    # mobidb_startend_df = mobidb_startend_df.reset_index()
-    # mobidb_startend_df.to_csv(r'data/mobidb-disorder-range-table.csv', index=True)
 
 
     # TODO: filter the phenotypes from gene4dn, like the phens file
