@@ -219,7 +219,7 @@ if __name__ == '__main__':
 
     final_mut_check_df = pd.read_csv('data/mutations-position-mobidb.csv')
     filtered_mut_pos_df = final_mut_check_df[final_mut_check_df['is_in_startend']==1]  # (941013, 10)
-
+    unique_mut_pos_df = filtered_mut_pos_df.drop_duplicates(['acc', 'startend', 'position', 'length'])
     # Merge the dataframes
     mobidb_mutpos_df = pd.merge(mobidb_original_df, mut_pos_subdf, on='acc')  # (4013158, 8)
     array_is_in = []
