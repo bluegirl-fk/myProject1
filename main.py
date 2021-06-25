@@ -143,6 +143,17 @@ def df_lst_maker_for_barplot(input_matrix):
     return cols_sum_df, cols_sum_lst
 
 
+def expand_regions(region_ranges_lst):
+    transformed_regions = []
+    for reg in region_ranges_lst:
+        start = int(reg.split('..')[0])
+        end = int(reg.split('..')[1])
+        while start <= end:
+            transformed_regions.append(start)
+            start += 1
+    return set(transformed_regions)
+
+
 if __name__ == '__main__':
     # This is the main!
 
@@ -179,7 +190,8 @@ if __name__ == '__main__':
     g4dn_rseq_df = pd.read_csv('data/refseq/refseq-acc.tab', sep='\t')
     g4dn_rseq_df.columns = ['refseq_id', 'isoforms', 'acc', 'organism', 'Length', 'Gene names']
     del g4dn_rseq_df['organism']  # (50930, 5)
-    # split columns solution from : https://www.reddit.com/r/Python/comments/c8oi7h/pandas_splitting_comma_separated_column/
+    # split columns solution from :
+    # https://www.reddit.com/r/Python/comments/c8oi7h/pandas_splitting_comma_separated_column/
     temp_df = g4dn_rseq_df['refseq_id'].str.split(',', expand=True).stack()
     idx_tmp = temp_df.index._get_level_values(0)
     g4dn_rseq0_df = g4dn_rseq_df.iloc[idx_tmp].copy()
@@ -205,20 +217,8 @@ if __name__ == '__main__':
     mobidb_original_df['startend'] = mobidb_original_df['startend'].str.split(',')
     mut_pos_subdf = mut_positions_df[['index', 'acc', 'position']]
 
-
-    def expand_regions(region_ranges_lst):
-        transformed_regions = []
-        for reg in region_ranges_lst:
-            start = int(reg.split('..')[0])
-            end = int(reg.split('..')[1])
-            while start <= end:
-                transformed_regions.append(start)
-                start += 1
-        return set(transformed_regions)
-
-
     final_mut_check_df = pd.read_csv('data/mutations-position-mobidb.csv')
-    filtered_mut_pos_df = final_mut_check_df[final_mut_check_df['is_in_startend']==1]  # (941013, 10)
+    filtered_mut_pos_df = final_mut_check_df[final_mut_check_df['is_in_startend'] == 1]  # (941013, 10)
     unique_mut_pos_df = filtered_mut_pos_df.drop_duplicates(['acc', 'startend', 'position', 'length'])
     # Merge the dataframes
     mobidb_mutpos_df = pd.merge(mobidb_original_df, mut_pos_subdf, on='acc')  # (4013158, 8)
@@ -353,12 +353,12 @@ if __name__ == '__main__':
                                                   [' ', '100', ' ', '300', ' ', '500', ' ', '700', ' ', '900', ''])
 
     ## heatmaps
-    # draw_heatmaps([mobi_contf_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, difference_contf_sum_norm_df.T],
-    #               ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
-    #               saving_rout='plots/heatmaps/Heatmaps0.png')
-    # draw_heatmaps([mobi_len_sum_norm_df.T, ndd_len_sum_norm_df.T, difference_len_sum_norm_df.T],
-    #               ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
-    #               saving_rout='plots/heatmaps/Heatmaps-Length.png')
+    draw_heatmaps([mobi_contf_sum_norm_df.T, ndd_cont_fract_sum_norm_df.T, difference_contf_sum_norm_df.T],
+                  ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
+                  saving_rout='plots/heatmaps/Heatmaps0.png')
+    draw_heatmaps([mobi_len_sum_norm_df.T, ndd_len_sum_norm_df.T, difference_len_sum_norm_df.T],
+                  ['Homo sapiens', 'NDDs', 'Difference (Homo sapiens - NDDs)'],
+                  saving_rout='plots/heatmaps/Heatmaps-Length.png')
 
     ## columns sum sum_matrix to get protein numbers (for bar plot based on distribution of heatmap)
     # content fraction
@@ -418,9 +418,3 @@ if __name__ == '__main__':
                      first_label='Homo sapiens Pr.s', second_label='NDD Pr.s',
                      png_file_name='plots/log/hist-comparison' '-homoS-NDD/' + each_feature)
 
-    # rs_id = file[snpdb1_merges[i]][merged_rsid]
-    # is_protein = file[primary_snapshot_data][placements_with_allele[i]][placement_annot][mol_type]=='protein'
-    # positions = file[primary_snapshot_data][placements_with_allele[i]][allelse[i]][allele][spdi][position]
-    # # del_seq = file[primary_snapshot_data][placements_with_allele[i]][allelse[i]][allele][spdi][deleted_sequence]
-    # positions = file[primary_snapshot_data][placements_with_allele[i]][allelse[i]][allele][spdi][inserted_sequence]
-    # if is_protein == True : ...
