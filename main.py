@@ -219,13 +219,12 @@ if __name__ == '__main__':
     # converting disorder content ranges in each cell to a list
     mobidb_original_df['startend'] = mobidb_original_df['startend'].str.split(',')
     # subdf of mut pos to be merged with mobidb
-    mut_pos_subdf = mut_acc_mrg_df[['index', 'acc', 'position']]
+    mut_pos_subdf = mut_acc_mrg_df[['index', 'acc', 'position']]  # (236699, 3)
+    # merge mobidb and subdf, later with the index we can reach useful data in dene5dn exoinic mutinfo acc merged db
+    ## TODO: read from here
 
-    final_mut_check_df = pd.read_csv('data/mutations-position-mobidb.csv')
-    filtered_mut_pos_df = final_mut_check_df[final_mut_check_df['is_in_startend'] == 1]  # (941013, 10)
-    unique_mut_pos_df = filtered_mut_pos_df.drop_duplicates(['acc', 'startend', 'position', 'length'])
-    # Merge the dataframes
     mobidb_mutpos_df = pd.merge(mobidb_original_df, mut_pos_subdf, on='acc')  # (4013158, 8)
+
     array_is_in = []
     for index, row in mobidb_mutpos_df.iterrows():
         set_disorder_region = expand_regions(row.startend)
@@ -240,6 +239,13 @@ if __name__ == '__main__':
 
     mobidb_mutpos_df['is_in_startend'] = array_is_in
     mobidb_mutpos_df.to_csv(r'data/mutations-position-mobidb.csv')
+
+    final_mut_check_df = pd.read_csv('data/mutations-position-mobidb.csv')
+    filtered_mut_pos_df = final_mut_check_df[final_mut_check_df['is_in_startend'] == 1]  # (941013, 10)
+    unique_mut_pos_df = filtered_mut_pos_df.drop_duplicates(['acc', 'startend', 'position', 'length'])
+
+
+
 
     ### Files import and modify
 
