@@ -158,29 +158,29 @@ if __name__ == '__main__':
     # This is the main!
 
     ## Gene4denovo
-    # gene4dn_all_annotations_df = pd.read_csv(
-    #     'data/gene4denovo/All_De_novo_mutations_and_annotations_1.2.txt', sep='\t', encoding='cp1252',
-    #     low_memory=False)  # (670082, 155) # TODO: keep idxs from original df
-    # exonic_g4dn_df = gene4dn_all_annotations_df.loc[
-    #     gene4dn_all_annotations_df['Func.refGene'] == 'exonic']  # (70879, 155)
-    # exonic_g4dn_df.to_csv(r'data/gene4denovo/exonic-df.csv')
-    sys.exit(0)
-    gene4dn2 = exonic_g4dn_df['AAChange.refGene'].str.split(',', expand=True).stack().to_frame(
+    # g4dn with only exonic mutations
+    exonic_g4dn_df = pd.read_csv('data/gene4denovo/exonic-df.csv')  # (70879, 156)
+    exonic_g4dn_df = exonic_g4dn_df.loc[:, ~exonic_g4dn_df.columns.str.contains('^Unnamed')]
+    exonic_g4dn_df = exonic_g4dn_df.reset_index()
+
+    aachange_g4dn_subdf1 = exonic_g4dn_df['AAChange.refGene'].str.split(',', expand=True).stack().to_frame(
         'AAChange.refGene')  # (201372, 155)
-    gene4dn3 = gene4dn2['AAChange.refGene'].str.split(pat=':', expand=True)
-    gene4dn_newdb = gene4dn3[gene4dn3.columns[:10]]
-    gene4dn_newdb.columns = ['Gene.refGene', 'refSeq', 'exon#', 'mutNA', 'mutPrInfo', 'aa1', 'aa2', 'position',
+    aachange_g4dn_subdf2 = aachange_g4dn_subdf1['AAChange.refGene'].str.split(pat=':', expand=True)
+    aachange_g4dn_subdf3 = aachange_g4dn_subdf2[aachange_g4dn_subdf2.columns[:10]]
+    aachange_g4dn_subdf3.columns = ['Gene.refGene', 'refSeq', 'exon#', 'mutNA', 'AAChange_refGene', 'aa1', 'aa2', 'position',
                              'frameshift', 'mutPr']
-    gene4dn_newdb['mutPr'] = gene4dn_newdb.mutPrInfo.str.split(pat='fs*', expand=True, )  # first separate the
+    aachange_g4dn_subdf3['mutPr'] = aachange_g4dn_subdf3.AAChange_refGene.str.split(pat='fs*', expand=True, )  # first separate the
     # frameshift info
-    gene4dn_newdb['aa1'] = gene4dn_newdb['mutPr'].str[2]
-    gene4dn_newdb['aa2'] = gene4dn_newdb['mutPr'].str[-1]
-    gene4dn_newdb['position'] = gene4dn_newdb['mutPr'].str.replace(r'\D', '')  # (201372, 10)
-    del gene4dn_newdb['mutPr']
-    gene4dn_newdb.to_csv(r'data/refseq/newdb-before-refseq-acc.csv')  # (201372, 9)
-    refseq_lst = gene4dn_newdb['refSeq'].tolist()  # len=201372
-    # TODO: edit the frameshift info into separate column
-    # delete duplicates in gene4dn_newdb
+    # sys.exit()
+    aachange_g4dn_subdf3['aa1'] = aachange_g4dn_subdf3['mutPr'].str[2]
+    aachange_g4dn_subdf3['aa2'] = aachange_g4dn_subdf3['mutPr'].str[-1]
+    aachange_g4dn_subdf3['position'] = aachange_g4dn_subdf3['mutPr'].str.replace(r'\D', '')  # (201372, 10)
+    aachange_g4dn_subdf3['frameshift'] = aachange_g4dn_subdf3['AAChange_refGene'].str.split('fs', 1).str[1]  # find out
+    # scientific meaning
+    del aachange_g4dn_subdf3['mutPr']
+    aachange_g4dn_subdf3.to_csv(r'data/refseq/newdb-before-refseq-acc.csv')  # (201372, 9)
+    refseq_lst = aachange_g4dn_subdf3['refSeq'].tolist()  # len=201372
+    # delete duplicates in aachange_g4dn_subdf3
     # # textfile = open("data/refseq-gene4dn.txt", "w")
     # for element in refseq_lst:
     #     textfile. write(str(element) + "\n")
@@ -200,13 +200,13 @@ if __name__ == '__main__':
     g4dn_rseq0_df['refSeq'] = temp_df.values  # (93949, 5)
     del g4dn_rseq0_df['refseq_id']
 
-    # merge with gene4dn_newdb to get positions
+    # merge with aachange_g4dn_subdf3 to get positions
     refseq_position = pd.read_csv('data/refseq/newdb-before-refseq-acc.csv')  # (201372, 11)
     mut_positions_df = pd.merge(g4dn_rseq0_df, refseq_position, on='refSeq')
     del mut_positions_df['Gene names']
     mut_positions_df = mut_positions_df.loc[:, ~mut_positions_df.columns.str.contains('^Unnamed')]
     mut_positions_df = mut_positions_df[
-        ['acc', 'position', 'aa1', 'aa2', 'Gene.refGene', 'refSeq', 'Length', 'isoforms', 'exon#', 'mutNA', 'mutPrInfo',
+        ['acc', 'position', 'aa1', 'aa2', 'Gene.refGene', 'refSeq', 'Length', 'isoforms', 'exon#', 'mutNA', 'AAChange_refGene',
          'frameshift']]
     mut_positions_df['position'] = mut_positions_df['position'].fillna(0).astype(int)  # (551773, 12)
     mut_positions_df = mut_positions_df.drop_duplicates(ignore_index=True)  # (224021, 12)
