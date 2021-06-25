@@ -157,13 +157,13 @@ def expand_regions(region_ranges_lst):
 if __name__ == '__main__':
     # This is the main!
 
-    ## Gene4denovo
-    # g4dn with only exonic mutations
-    exonic_g4dn_df = pd.read_csv('data/gene4denovo/exonic-df.csv')  # (70879, 156)
-    del exonic_g4dn_df['Unnamed: 0']
-    # set its own index to idx, npot the original df , then m,erge with subdf
-    exonic_g4dn_df = exonic_g4dn_df.reset_index()
-    exonic_g4dn_df = exonic_g4dn_df.rename(columns={'index': 'idx', 'AAChange.refGene': 'AAChange_refGene'})
+    # ## Gene4denovo
+    # # g4dn with only exonic mutations
+    # exonic_g4dn_df = pd.read_csv('data/gene4denovo/exonic-df.csv')  # (70879, 156)
+    # del exonic_g4dn_df['Unnamed: 0']
+    # # set its own index to idx, npot the original df , then m,erge with subdf
+    # exonic_g4dn_df = exonic_g4dn_df.reset_index()
+    # exonic_g4dn_df = exonic_g4dn_df.rename(columns={'index': 'idx', 'AAChange.refGene': 'AAChange_refGene'})
 
     # aachange_g4dn_subdf1 = exonic_g4dn_df[['AAChange_refGene']]
     # aachange_g4dn_subdf1 = aachange_g4dn_subdf1['AAChange_refGene'].str.split(',', expand=True).stack().to_frame(
@@ -185,13 +185,17 @@ if __name__ == '__main__':
     # # splited my text file using bash : split -l 70000 refseq-gene4dn.txt, the 7000 is number of the lines
     # TODO: filter phens
 
-    ## mut positionb df import
-    rseq_mutinfo_df = pd.read_csv('data/gene4denovo/subdf-mut-beforeACC.csv')  # (201372, 11)
-    rseq_mutinfo_df = rseq_mutinfo_df.rename(columns={'Unnamed: 0': 'idx', 'Unnamed: 1': 'sub-idx'})
-    # merge with gene4dn exonic, now original exonic g4dn file + mutInfo e.g position
-    g4dn_exonic_mutinfo_df = pd.merge(rseq_mutinfo_df, exonic_g4dn_df, on='idx')  # (201372, 166)
+    # ## mut positionb df import
+    # rseq_mutinfo_df = pd.read_csv('data/gene4denovo/subdf-mut-beforeACC.csv')  # (201372, 11)
+    # rseq_mutinfo_df = rseq_mutinfo_df.rename(columns={'Unnamed: 0': 'idx', 'Unnamed: 1': 'sub-idx'})
+    # # merge with gene4dn exonic, now original exonic g4dn file + mutInfo e.g position
+    # g4dn_exonic_mutinfo_df = pd.merge(rseq_mutinfo_df, exonic_g4dn_df, on='idx')  # (201372, 166)
+    # g4dn_exonic_mutinfo_df.to_csv(r'data/gene4denovo/exonic-mutinfo.csv')
+
     ## g4dn mutInfo + uniprot ACCs file
+    g4dn_exonic_mutinfo_df = pd.read_csv('data/gene4denovo/exonic-mutinfo.csv')  # (201372, 166)
     refseq_acc_df1 = pd.read_csv('data/refseq/refseq-acc.tab', sep='\t')  # from Uniprot
+
     refseq_acc_df1.columns = ['refseq_id', 'isoforms', 'acc', 'organism', 'Length', 'Gene names']
     del refseq_acc_df1['organism']  # (50930, 5)
     refseq_acc_df2 = refseq_acc_df1['refseq_id'].str.split(',', expand=True).stack()
@@ -200,25 +204,22 @@ if __name__ == '__main__':
     refseq_acc_df3['refSeq'] = refseq_acc_df2.values
     del refseq_acc_df3['refseq_id']  # (93949, 5)
 
-    # merge with aachange_g4dn_subdf3 to get positions
-    # rseq_mutinfo_df = pd.read_csv('data/gene4denovo/subdf-mut-beforeACC.csv')  # (201372, 11)
-    # rseq_mutinfo_df = rseq_mutinfo_df.rename(columns={'Unnamed: 0': 'idx', 'Unnamed: 1': 'sub-idx'})
-    mut_positions_df = pd.merge(refseq_acc_df3, rseq_mutinfo_df, on='refSeq')
-    del mut_positions_df['Gene names']
-    mut_positions_df = mut_positions_df.loc[:, ~mut_positions_df.columns.str.contains('^Unnamed')]
-    mut_positions_df = mut_positions_df[
-        ['acc', 'position', 'aa1', 'aa2', 'Gene.refGene', 'refSeq', 'Length', 'isoforms', 'exon#', 'mutNA', 'AAChange_refGene',
-         'frameshift']]
-    mut_positions_df['position'] = mut_positions_df['position'].fillna(0).astype(int)  # (551773, 12)
-    mut_positions_df = mut_positions_df.drop_duplicates(ignore_index=True)  # (224021, 12)
-    mut_positions_df.reset_index(level=0, inplace=True)
+    # merge g4dn exonic mutInfo with Uniprot ACC
+    mut_acc_mrg_df = pd.merge(refseq_acc_df3, g4dn_exonic_mutinfo_df, on='refSeq')
+    del mut_acc_mrg_df['Gene names']
+    del mut_acc_mrg_df['idx']
+    del mut_acc_mrg_df['sub-idx']
+    mut_acc_mrg_df['position'] = mut_acc_mrg_df['position'].fillna(0).astype(int)  # (551773, 169)
+    mut_acc_mrg_df = mut_acc_mrg_df.drop_duplicates(ignore_index=True)
+    mut_acc_mrg_df.reset_index(level=0, inplace=True)  # (236699, 169)
 
     ## mobidb
     mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')
     mobidb_original_df.columns = ['acc', 'feature', 'startend', 'content_fraction', 'content_count', 'length']
     # converting disorder content ranges in each cell to a list
     mobidb_original_df['startend'] = mobidb_original_df['startend'].str.split(',')
-    mut_pos_subdf = mut_positions_df[['index', 'acc', 'position']]
+    # subdf of mut pos to be merged with mobidb
+    mut_pos_subdf = mut_acc_mrg_df[['index', 'acc', 'position']]
 
     final_mut_check_df = pd.read_csv('data/mutations-position-mobidb.csv')
     filtered_mut_pos_df = final_mut_check_df[final_mut_check_df['is_in_startend'] == 1]  # (941013, 10)
@@ -239,8 +240,6 @@ if __name__ == '__main__':
 
     mobidb_mutpos_df['is_in_startend'] = array_is_in
     mobidb_mutpos_df.to_csv(r'data/mutations-position-mobidb.csv')
-    # TODO: filter the phenotypes from gene4dn, like the phens file
-
 
     ## DBsnp
     # with uniprot acc
