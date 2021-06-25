@@ -192,63 +192,67 @@ if __name__ == '__main__':
     # g4dn_exonic_mutinfo_df = pd.merge(rseq_mutinfo_df, exonic_g4dn_df, on='idx')  # (201372, 166)
     # g4dn_exonic_mutinfo_df.to_csv(r'data/gene4denovo/exonic-mutinfo.csv')
 
-    ## g4dn mutInfo + uniprot ACCs file
-    g4dn_exonic_mutinfo_df = pd.read_csv('data/gene4denovo/exonic-mutinfo.csv')  # (201372, 166)
-    refseq_acc_df1 = pd.read_csv('data/refseq/refseq-acc.tab', sep='\t')  # from Uniprot
+    # ## g4dn mutInfo + uniprot ACCs file
+    # g4dn_exonic_mutinfo_df = pd.read_csv('data/gene4denovo/exonic-mutinfo.csv')  # (201372, 166)
+    # refseq_acc_df1 = pd.read_csv('data/refseq/refseq-acc.tab', sep='\t')  # from Uniprot
+    #
+    # refseq_acc_df1.columns = ['refseq_id', 'isoforms', 'acc', 'organism', 'Length', 'Gene names']
+    # del refseq_acc_df1['organism']  # (50930, 5)
+    # refseq_acc_df2 = refseq_acc_df1['refseq_id'].str.split(',', expand=True).stack()
+    # idx_tmp = refseq_acc_df2.index._get_level_values(0)
+    # refseq_acc_df3 = refseq_acc_df1.iloc[idx_tmp].copy()
+    # refseq_acc_df3['refSeq'] = refseq_acc_df2.values
+    # del refseq_acc_df3['refseq_id']  # (93949, 5)
+    #
+    # # merge g4dn exonic mutInfo with Uniprot ACC
+    # mut_acc_mrg_df = pd.merge(refseq_acc_df3, g4dn_exonic_mutinfo_df, on='refSeq')
+    # del mut_acc_mrg_df['Gene names']
+    # del mut_acc_mrg_df['idx']
+    # del mut_acc_mrg_df['sub-idx']
+    # mut_acc_mrg_df['position'] = mut_acc_mrg_df['position'].fillna(0).astype(int)  # (551773, 169)
+    # mut_acc_mrg_df = mut_acc_mrg_df.drop_duplicates(ignore_index=True)
+    # mut_acc_mrg_df.reset_index(level=0, inplace=True)  # (236699, 169)
+    #
+    # ## mobidb
+    # mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')  # (1212280, 6)
+    # mobidb_original_df.columns = ['acc', 'feature', 'startend', 'content_fraction', 'content_count', 'length']
+    # # converting disorder content ranges in each cell to a list
+    # mobidb_original_df['startend'] = mobidb_original_df['startend'].str.split(',')
+    # # subdf of mut pos to be merged with mobidb
+    # mutinfo_subdf = mut_acc_mrg_df[['index', 'acc', 'position']]  # (236699, 3)
+    # # merge mobidb and subdf, later with the index we can reach useful data in dene5dn exoinic mutinfo acc merged dF
+    # mobidb_mutpos_df = pd.merge(mobidb_original_df, mutinfo_subdf, on='acc')  # (4258689, 8) # lots of rows cuz accs are repeated in both databases with dif features or mutation per each ACC
 
-    refseq_acc_df1.columns = ['refseq_id', 'isoforms', 'acc', 'organism', 'Length', 'Gene names']
-    del refseq_acc_df1['organism']  # (50930, 5)
-    refseq_acc_df2 = refseq_acc_df1['refseq_id'].str.split(',', expand=True).stack()
-    idx_tmp = refseq_acc_df2.index._get_level_values(0)
-    refseq_acc_df3 = refseq_acc_df1.iloc[idx_tmp].copy()
-    refseq_acc_df3['refSeq'] = refseq_acc_df2.values
-    del refseq_acc_df3['refseq_id']  # (93949, 5)
+    # check if mutation position is in startend disorder region of mobidb or not
+    # array_is_in = []  # will be filled with boolean of 0,1 for pos in startend or not
+    # for index, row in mobidb_mutpos_df.iterrows():
+    #     set_disorder_region = expand_regions(row.startend)  # temp set of data, convert each startend lst to a set,
+    #     # write in report
+    #     if row.position in set_disorder_region:
+    #         print('yes')
+    #         array_is_in.append('1')
+    #     else:
+    #         print('no')
+    #         array_is_in.append('0')
 
-    # merge g4dn exonic mutInfo with Uniprot ACC
-    mut_acc_mrg_df = pd.merge(refseq_acc_df3, g4dn_exonic_mutinfo_df, on='refSeq')
-    del mut_acc_mrg_df['Gene names']
-    del mut_acc_mrg_df['idx']
-    del mut_acc_mrg_df['sub-idx']
-    mut_acc_mrg_df['position'] = mut_acc_mrg_df['position'].fillna(0).astype(int)  # (551773, 169)
-    mut_acc_mrg_df = mut_acc_mrg_df.drop_duplicates(ignore_index=True)
-    mut_acc_mrg_df.reset_index(level=0, inplace=True)  # (236699, 169)
+    # # add bool array to the df
+    # mobidb_mutpos_df['is_in_startend'] = array_is_in
+    # mobidb_mutpos_df.to_csv(r'data/mutations-position-mobidb-all.csv')
 
-    ## mobidb
-    mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')
-    mobidb_original_df.columns = ['acc', 'feature', 'startend', 'content_fraction', 'content_count', 'length']
-    # converting disorder content ranges in each cell to a list
-    mobidb_original_df['startend'] = mobidb_original_df['startend'].str.split(',')
-    # subdf of mut pos to be merged with mobidb
-    mut_pos_subdf = mut_acc_mrg_df[['index', 'acc', 'position']]  # (236699, 3)
-    # merge mobidb and subdf, later with the index we can reach useful data in dene5dn exoinic mutinfo acc merged db
-    ## TODO: read from here
+    final_mut_check_df = pd.read_csv('data/mutations-position-mobidb-all.csv')  # (4258689, 10)
+    filtered_mut_pos_df = final_mut_check_df[final_mut_check_df['is_in_startend'] == 1]  # (1003250, 10)
+    filtered_mut_pos_df.to_csv(r'data/gene4denovo/mobidb-mut-pos-true.csv')
+    unique_acc_mut_pos_df = filtered_mut_pos_df.drop_duplicates(['acc', 'position'], keep='last')  # TODO: later also
+    # drop duplicates for the ones with same acc, position and aa1 and aa2, meaning the point mutation lead to the
+    # same aa change
 
-    mobidb_mutpos_df = pd.merge(mobidb_original_df, mut_pos_subdf, on='acc')  # (4013158, 8)
-
-    array_is_in = []
-    for index, row in mobidb_mutpos_df.iterrows():
-        set_disorder_region = expand_regions(row.startend)
-        print(set_disorder_region)
-        if row.position in set_disorder_region:
-            # print(mobidb_mutpos_df.loc[mobidb_mutpos_df['position'], 'index'])
-            print('yes')
-            array_is_in.append('1')
-        else:
-            print('no')
-            array_is_in.append('0')
-
-    mobidb_mutpos_df['is_in_startend'] = array_is_in
-    mobidb_mutpos_df.to_csv(r'data/mutations-position-mobidb.csv')
-
-    final_mut_check_df = pd.read_csv('data/mutations-position-mobidb.csv')
-    filtered_mut_pos_df = final_mut_check_df[final_mut_check_df['is_in_startend'] == 1]  # (941013, 10)
-    unique_mut_pos_df = filtered_mut_pos_df.drop_duplicates(['acc', 'startend', 'position', 'length'])
-
-
-
+    # here should get the indexes of mut_acc_merge_df and merge this mobidb with that one, filter phens,
+    # drop duplicates, see what percentage is disordered, how many proteins(disordered muts of refseq of gene4dn db/
+    # all proteins of g4dn exonic refseq) unique_mut_pos_df = filtered_mut_pos_df.drop_duplicates(['acc', 'startend',
+    # 'position', 'length'])
+    sys.exit(0)
 
     ### Files import and modify
-
     ## for content fraction
     mobidb_pivot_contf_df = mobidb_original_df.pivot_table(
         index=['acc'], columns=['feature'], values='content_fraction').fillna(0)
