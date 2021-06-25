@@ -183,7 +183,7 @@ if __name__ == '__main__':
     # aachange_g4dn_subdf3.to_csv(r'data/gene4denovo/subdf-mut-beforeACC.csv')  # (201372, 9)
     # # Then made a list of refSeq ids from this df, wrote to .txt, retrived ACCs from uniprot
     # # splited my text file using bash : split -l 70000 refseq-gene4dn.txt, the 7000 is number of the lines
-    # TODO: merge g4dn and subdf, decide to filter phens before or after
+    # TODO: filter phens
 
     ## mut positionb df import
     rseq_mutinfo_df = pd.read_csv('data/gene4denovo/subdf-mut-beforeACC.csv')  # (201372, 11)
