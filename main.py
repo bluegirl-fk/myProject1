@@ -160,20 +160,16 @@ if __name__ == '__main__':
     ## Gene4denovo
     # g4dn with only exonic mutations
     exonic_g4dn_df = pd.read_csv('data/gene4denovo/exonic-df.csv')  # (70879, 156)
-    # exonic_g4dn_df = exonic_g4dn_df.loc[:, ~exonic_g4dn_df.columns.str.contains('^Unnamed')]
-    # exonic_g4dn_df = exonic_g4dn_df.reset_index().rename(columns={exonic_g4dn_df.index.name:'idx'})
-
-    exonic_g4dn_df = exonic_g4dn_df.rename(columns={'Unnamed: 0':'idx', 'AAChange.refGene': 'AAChange_refGene'})
+    exonic_g4dn_df = exonic_g4dn_df.rename(columns={'Unnamed: 0': 'idx', 'AAChange.refGene': 'AAChange_refGene'})
 
     aachange_g4dn_subdf1 = exonic_g4dn_df[['AAChange_refGene']]
     aachange_g4dn_subdf1 = aachange_g4dn_subdf1['AAChange_refGene'].str.split(',', expand=True).stack().to_frame(
         'AAChange_refGene')
     aachange_g4dn_subdf2 = aachange_g4dn_subdf1['AAChange_refGene'].str.split(pat=':', expand=True)
-    aachange_g4dn_subdf3 = aachange_g4dn_subdf2[aachange_g4dn_subdf2.columns[:11]]
+    aachange_g4dn_subdf3 = aachange_g4dn_subdf2[aachange_g4dn_subdf2.columns[:10]]  # del rest of None columns
     aachange_g4dn_subdf3.columns = ['Gene_refGene', 'refSeq', 'exon#', 'mutNA', 'AAChange_refGene', 'aa1', 'aa2', 'position',
-                             'frameshift', 'mutPr']
-    aachange_g4dn_subdf3['mutPr'] = aachange_g4dn_subdf3.AAChange_refGene.str.split(pat='fs*', expand=True, )  # first separate the
-    # frameshift info
+                             'frameshift', 'mutPr']  # rename cuz .stack() made Series and deleted original column names
+    aachange_g4dn_subdf3['mutPr'] = aachange_g4dn_subdf3.AAChange_refGene.str.split(pat='fs*', expand=True, )
     # sys.exit()
     aachange_g4dn_subdf3['aa1'] = aachange_g4dn_subdf3['mutPr'].str[2]
     aachange_g4dn_subdf3['aa2'] = aachange_g4dn_subdf3['mutPr'].str[-1]
