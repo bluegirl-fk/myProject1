@@ -159,9 +159,12 @@ if __name__ == '__main__':
 
     ## Gene4denovo
     # g4dn with only exonic mutations
-    # exonic_g4dn_df = pd.read_csv('data/gene4denovo/exonic-df.csv')  # (70879, 156)
-    # exonic_g4dn_df = exonic_g4dn_df.rename(columns={'Unnamed: 0': 'idx', 'AAChange.refGene': 'AAChange_refGene'})
-    #
+    exonic_g4dn_df = pd.read_csv('data/gene4denovo/exonic-df.csv')  # (70879, 156)
+    del exonic_g4dn_df['Unnamed: 0']
+    # set its own index to idx, npot the original df , then m,erge with subdf
+    exonic_g4dn_df = exonic_g4dn_df.reset_index()
+    exonic_g4dn_df = exonic_g4dn_df.rename(columns={'index': 'idx', 'AAChange.refGene': 'AAChange_refGene'})
+
     # aachange_g4dn_subdf1 = exonic_g4dn_df[['AAChange_refGene']]
     # aachange_g4dn_subdf1 = aachange_g4dn_subdf1['AAChange_refGene'].str.split(',', expand=True).stack().to_frame(
     #     'AAChange_refGene')
@@ -182,21 +185,25 @@ if __name__ == '__main__':
     # # splited my text file using bash : split -l 70000 refseq-gene4dn.txt, the 7000 is number of the lines
     # TODO: merge g4dn and subdf, decide to filter phens before or after
 
-    ## refseq + uniprot ACCs file
-    rseq_acc_df = pd.read_csv('data/refseq/refseq-acc.tab', sep='\t')
-    rseq_acc_df.columns = ['refseq_id', 'isoforms', 'acc', 'organism', 'Length', 'Gene names']
-    del rseq_acc_df['organism']  # (50930, 5)
-    # split columns solution from :
-    # https://www.reddit.com/r/Python/comments/c8oi7h/pandas_splitting_comma_separated_column/
-    temp_df = rseq_acc_df['refseq_id'].str.split(',', expand=True).stack()
-    idx_tmp = temp_df.index._get_level_values(0)
-    g4dn_rseq0_df = rseq_acc_df.iloc[idx_tmp].copy()
-    g4dn_rseq0_df['refSeq'] = temp_df.values  # (93949, 5)
-    del g4dn_rseq0_df['refseq_id']
+    ## mut positionb df import
+    rseq_mutinfo_df = pd.read_csv('data/gene4denovo/subdf-mut-beforeACC.csv')  # (201372, 11)
+    rseq_mutinfo_df = rseq_mutinfo_df.rename(columns={'Unnamed: 0': 'idx', 'Unnamed: 1': 'sub-idx'})
+    # merge with gene4dn exonic, now original exonic g4dn file + mutInfo e.g position
+    g4dn_exonic_mutinfo_df = pd.merge(rseq_mutinfo_df, exonic_g4dn_df, on='idx')  # (201372, 166)
+    ## g4dn mutInfo + uniprot ACCs file
+    refseq_acc_df1 = pd.read_csv('data/refseq/refseq-acc.tab', sep='\t')  # from Uniprot
+    refseq_acc_df1.columns = ['refseq_id', 'isoforms', 'acc', 'organism', 'Length', 'Gene names']
+    del refseq_acc_df1['organism']  # (50930, 5)
+    refseq_acc_df2 = refseq_acc_df1['refseq_id'].str.split(',', expand=True).stack()
+    idx_tmp = refseq_acc_df2.index._get_level_values(0)
+    refseq_acc_df3 = refseq_acc_df1.iloc[idx_tmp].copy()
+    refseq_acc_df3['refSeq'] = refseq_acc_df2.values
+    del refseq_acc_df3['refseq_id']  # (93949, 5)
 
     # merge with aachange_g4dn_subdf3 to get positions
-    refseq_position = pd.read_csv('data/refseq/newdb-before-refseq-acc.csv')  # (201372, 11)
-    mut_positions_df = pd.merge(g4dn_rseq0_df, refseq_position, on='refSeq')
+    # rseq_mutinfo_df = pd.read_csv('data/gene4denovo/subdf-mut-beforeACC.csv')  # (201372, 11)
+    # rseq_mutinfo_df = rseq_mutinfo_df.rename(columns={'Unnamed: 0': 'idx', 'Unnamed: 1': 'sub-idx'})
+    mut_positions_df = pd.merge(refseq_acc_df3, rseq_mutinfo_df, on='refSeq')
     del mut_positions_df['Gene names']
     mut_positions_df = mut_positions_df.loc[:, ~mut_positions_df.columns.str.contains('^Unnamed')]
     mut_positions_df = mut_positions_df[
