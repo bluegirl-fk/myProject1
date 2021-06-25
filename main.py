@@ -241,58 +241,6 @@ if __name__ == '__main__':
     mobidb_mutpos_df['is_in_startend'] = array_is_in
     mobidb_mutpos_df.to_csv(r'data/mutations-position-mobidb.csv')
 
-    ## DBsnp
-    # with uniprot acc
-    snpdb_acc = pd.read_csv('data/refsnp/uniprot.tsv', sep='\t')  # (10219, 3)
-    snpdb_acc.columns = ['avsnp150', 'rs_ids', 'uniprot_acc']
-    snpdb_acc[['acc', 'variant']] = snpdb_acc.uniprot_acc.str.split('#', expand=True)
-    snpdb_acc = snpdb_acc.drop(columns=['rs_ids', 'uniprot_acc'])
-    # snpdb_merged = pd.merge(snpdb_acc, snpdb, on='avsnp150') # (158780,8) # problem?
-    # for now don't use the merged df, uniprot not for now, ensembel alternative
-
-    snpdb = pd.read_csv('data/refsnp/genebank.tsv', sep='\t')  # (946889, 6)
-    # snpdb.columns = ['avsnp150', 'rs_ids', 'seq_id', 'position', 'del_seq', 'in_seq']  # avsnp150 = refsnp_id
-    # snpdb_mut = snpdb[snpdb.del_seq != snpdb.in_seq]  # (338184, 6)
-    # snpdb_mut = snpdb_mut.drop_duplicates(ignore_index=True)  # (327147, 7)
-    # snpdb_mut['all_rsids'] = snpdb_mut[['avsnp150', 'rs_ids']].astype(str).agg(','.join, axis=1)
-    # snpdb_mut.to_csv(r'data/snpdb_mut.tsv')
-
-    snpdb_mut = pd.read_csv('data/dbsnp_mutations.tsv')
-    snpdb_mut_dict = dict(zip(snpdb_mut.index, snpdb_mut.all_rsids))  # 327147
-    keys_values_snpdb_mut_dict = snpdb_mut_dict.items()
-    snpdb_mut_dict = {str(key): list(str(value).split(",")) for key, value in keys_values_snpdb_mut_dict}  # dict with
-    # idx of snpdb_mut df as key and lst of all merged rsids of each position as values
-
-    snpdb_idx_true_lst = []
-    snpdb_idx_false_lst = []  # not used, can come handy for not mapped ones if needed
-
-    # this for loop checks if rs_ids of g4dn are in our filtered snpdb dataset or not. then idxs are added to .txt file
-    # for i in g4dn_rsid_lst:  # is this correct? why less numbers than merging two dfs?
-    #     for key, values in snpdb_mut_dict.items():
-    #         if (isinstance(values, list)):
-    #             if i in values:
-    #                 snpdb_idx_true_lst.append(key)  # len : 984
-
-    true_snpdb_g4dn_idxs = pd.read_csv('data/dbsnp-idxs.txt')
-    snpdb_idx_true_lst = true_snpdb_g4dn_idxs['index'].tolist()
-
-    snpdb_idx_true_df = snpdb_mut.loc[snpdb_mut.index[snpdb_idx_true_lst]]  # (984, 7), 57 unique rsids
-    # uniprot_db_g4dn = pd.merge(snpdb_acc, snpdb_g4dn_df, on='avsnp150')  # only contains 1/2
-
-    snpdb_idx_true_df['avsnp150'] = snpdb_idx_true_df['avsnp150'].astype(int)
-    g4dn_df['avsnp150'] = g4dn_df['avsnp150'].astype(int)
-    snpdb_mut['avsnp150'] = snpdb_mut['avsnp150'].astype(int)
-
-    g4dn_mapped_snpdb_df = pd.merge(snpdb_idx_true_df, g4dn_df,
-                                    on='avsnp150')  # (1000, 13) # trying to get snpdb_idx_true_df + columns
-    # of gene4dn e.g: esembel id, etc
-    g4dn_snpdb_acc_df = pd.merge(g4dn_mapped_snpdb_df, snpdb_acc, on='avsnp150')  # (410, 15)
-
-    snpdb_acc_pos_df = g4dn_snpdb_acc_df.drop_duplicates(['acc', 'position'])  # (26, 15)
-
-    snpdb_g4dn_idx_merge_df = pd.merge(g4dn_df, snpdb_mut, on='avsnp150')  # (976, 13)
-    # positions in my file should be +1 for the equivalent one in uniprot
-
     ### Files import and modify
 
     ## for content fraction
