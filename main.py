@@ -175,12 +175,12 @@ if __name__ == '__main__':
     aachange_g4dn_subdf3['aa2'] = aachange_g4dn_subdf3['mutPr'].str[-1]
     aachange_g4dn_subdf3['position'] = aachange_g4dn_subdf3['mutPr'].str.replace(r'\D', '')  # (201372, 10)
     aachange_g4dn_subdf3['frameshift'] = aachange_g4dn_subdf3['AAChange_refGene'].str.split('fs', 1).str[1]  # find out
-    # scientific meaning
-    del aachange_g4dn_subdf3['mutPr']   #TODO: merge g4dn and subdf, decide to filter phens before or after
+    # scientific meaning of fs*35 for example
+    del aachange_g4dn_subdf3['mutPr']   # TODO: merge g4dn and subdf, decide to filter phens before or after
     aachange_g4dn_subdf3.to_csv(r'data/gene4denovo/subdf-mut-beforeACC.csv')  # (201372, 9)
+    # Then made a list of refSeq ids from this df, wrote to .txt, retrived ACCs from uniprot
 
-    sys.exit(0)
-    refseq_lst = aachange_g4dn_subdf3['refSeq'].tolist()  # len=201372
+    # refseq_lst = aachange_g4dn_subdf3['refSeq'].tolist()  # len=201372
     # delete duplicates in aachange_g4dn_subdf3
     # # textfile = open("data/refseq-gene4dn.txt", "w")
     # for element in refseq_lst:
