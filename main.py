@@ -159,45 +159,38 @@ if __name__ == '__main__':
 
     ## Gene4denovo
     # g4dn with only exonic mutations
-    exonic_g4dn_df = pd.read_csv('data/gene4denovo/exonic-df.csv')  # (70879, 156)
-    exonic_g4dn_df = exonic_g4dn_df.rename(columns={'Unnamed: 0': 'idx', 'AAChange.refGene': 'AAChange_refGene'})
+    # exonic_g4dn_df = pd.read_csv('data/gene4denovo/exonic-df.csv')  # (70879, 156)
+    # exonic_g4dn_df = exonic_g4dn_df.rename(columns={'Unnamed: 0': 'idx', 'AAChange.refGene': 'AAChange_refGene'})
+    #
+    # aachange_g4dn_subdf1 = exonic_g4dn_df[['AAChange_refGene']]
+    # aachange_g4dn_subdf1 = aachange_g4dn_subdf1['AAChange_refGene'].str.split(',', expand=True).stack().to_frame(
+    #     'AAChange_refGene')
+    # aachange_g4dn_subdf2 = aachange_g4dn_subdf1['AAChange_refGene'].str.split(pat=':', expand=True)
+    # aachange_g4dn_subdf3 = aachange_g4dn_subdf2[aachange_g4dn_subdf2.columns[:10]]  # del rest of None columns
+    # aachange_g4dn_subdf3.columns = ['Gene_refGene', 'refSeq', 'exon#', 'mutNA', 'AAChange_refGene', 'aa1', 'aa2', 'position',
+    #                          'frameshift', 'mutPr']  # rename cuz .stack() made Series and deleted original column names
+    # aachange_g4dn_subdf3['mutPr'] = aachange_g4dn_subdf3.AAChange_refGene.str.split(pat='fs*', expand=True, )
+    # # sys.exit()
+    # aachange_g4dn_subdf3['aa1'] = aachange_g4dn_subdf3['mutPr'].str[2]
+    # aachange_g4dn_subdf3['aa2'] = aachange_g4dn_subdf3['mutPr'].str[-1]
+    # aachange_g4dn_subdf3['position'] = aachange_g4dn_subdf3['mutPr'].str.replace(r'\D', '')  # (201372, 10)
+    # aachange_g4dn_subdf3['frameshift'] = aachange_g4dn_subdf3['AAChange_refGene'].str.split('fs', 1).str[1]  # find out
+    # # scientific meaning of fs*35 for example
+    # del aachange_g4dn_subdf3['mutPr']
+    # aachange_g4dn_subdf3.to_csv(r'data/gene4denovo/subdf-mut-beforeACC.csv')  # (201372, 9)
+    # # Then made a list of refSeq ids from this df, wrote to .txt, retrived ACCs from uniprot
+    # # splited my text file using bash : split -l 70000 refseq-gene4dn.txt, the 7000 is number of the lines
+    # TODO: merge g4dn and subdf, decide to filter phens before or after
 
-    aachange_g4dn_subdf1 = exonic_g4dn_df[['AAChange_refGene']]
-    aachange_g4dn_subdf1 = aachange_g4dn_subdf1['AAChange_refGene'].str.split(',', expand=True).stack().to_frame(
-        'AAChange_refGene')
-    aachange_g4dn_subdf2 = aachange_g4dn_subdf1['AAChange_refGene'].str.split(pat=':', expand=True)
-    aachange_g4dn_subdf3 = aachange_g4dn_subdf2[aachange_g4dn_subdf2.columns[:10]]  # del rest of None columns
-    aachange_g4dn_subdf3.columns = ['Gene_refGene', 'refSeq', 'exon#', 'mutNA', 'AAChange_refGene', 'aa1', 'aa2', 'position',
-                             'frameshift', 'mutPr']  # rename cuz .stack() made Series and deleted original column names
-    aachange_g4dn_subdf3['mutPr'] = aachange_g4dn_subdf3.AAChange_refGene.str.split(pat='fs*', expand=True, )
-    # sys.exit()
-    aachange_g4dn_subdf3['aa1'] = aachange_g4dn_subdf3['mutPr'].str[2]
-    aachange_g4dn_subdf3['aa2'] = aachange_g4dn_subdf3['mutPr'].str[-1]
-    aachange_g4dn_subdf3['position'] = aachange_g4dn_subdf3['mutPr'].str.replace(r'\D', '')  # (201372, 10)
-    aachange_g4dn_subdf3['frameshift'] = aachange_g4dn_subdf3['AAChange_refGene'].str.split('fs', 1).str[1]  # find out
-    # scientific meaning of fs*35 for example
-    del aachange_g4dn_subdf3['mutPr']   # TODO: merge g4dn and subdf, decide to filter phens before or after
-    aachange_g4dn_subdf3.to_csv(r'data/gene4denovo/subdf-mut-beforeACC.csv')  # (201372, 9)
-    # Then made a list of refSeq ids from this df, wrote to .txt, retrived ACCs from uniprot
-
-    # refseq_lst = aachange_g4dn_subdf3['refSeq'].tolist()  # len=201372
-    # delete duplicates in aachange_g4dn_subdf3
-    # # textfile = open("data/refseq-gene4dn.txt", "w")
-    # for element in refseq_lst:
-    #     textfile. write(str(element) + "\n")
-    # textfile. close()
-    # splited my text file using bash : split -l 70000 refseq-gene4dn.txt, the 7000 is number of the lines
-
-    # import the resfeq file with corresponding ACCs retrieved from the uniprot
-
-    g4dn_rseq_df = pd.read_csv('data/refseq/refseq-acc.tab', sep='\t')
-    g4dn_rseq_df.columns = ['refseq_id', 'isoforms', 'acc', 'organism', 'Length', 'Gene names']
-    del g4dn_rseq_df['organism']  # (50930, 5)
+    ## refseq + uniprot ACCs file
+    rseq_acc_df = pd.read_csv('data/refseq/refseq-acc.tab', sep='\t')
+    rseq_acc_df.columns = ['refseq_id', 'isoforms', 'acc', 'organism', 'Length', 'Gene names']
+    del rseq_acc_df['organism']  # (50930, 5)
     # split columns solution from :
     # https://www.reddit.com/r/Python/comments/c8oi7h/pandas_splitting_comma_separated_column/
-    temp_df = g4dn_rseq_df['refseq_id'].str.split(',', expand=True).stack()
+    temp_df = rseq_acc_df['refseq_id'].str.split(',', expand=True).stack()
     idx_tmp = temp_df.index._get_level_values(0)
-    g4dn_rseq0_df = g4dn_rseq_df.iloc[idx_tmp].copy()
+    g4dn_rseq0_df = rseq_acc_df.iloc[idx_tmp].copy()
     g4dn_rseq0_df['refSeq'] = temp_df.values  # (93949, 5)
     del g4dn_rseq0_df['refseq_id']
 
