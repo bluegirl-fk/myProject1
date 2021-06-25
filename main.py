@@ -160,14 +160,17 @@ if __name__ == '__main__':
     ## Gene4denovo
     # g4dn with only exonic mutations
     exonic_g4dn_df = pd.read_csv('data/gene4denovo/exonic-df.csv')  # (70879, 156)
-    exonic_g4dn_df = exonic_g4dn_df.loc[:, ~exonic_g4dn_df.columns.str.contains('^Unnamed')]
-    exonic_g4dn_df = exonic_g4dn_df.reset_index()
+    # exonic_g4dn_df = exonic_g4dn_df.loc[:, ~exonic_g4dn_df.columns.str.contains('^Unnamed')]
+    # exonic_g4dn_df = exonic_g4dn_df.reset_index().rename(columns={exonic_g4dn_df.index.name:'idx'})
 
-    aachange_g4dn_subdf1 = exonic_g4dn_df['AAChange.refGene'].str.split(',', expand=True).stack().to_frame(
-        'AAChange.refGene')  # (201372, 155)
-    aachange_g4dn_subdf2 = aachange_g4dn_subdf1['AAChange.refGene'].str.split(pat=':', expand=True)
-    aachange_g4dn_subdf3 = aachange_g4dn_subdf2[aachange_g4dn_subdf2.columns[:10]]
-    aachange_g4dn_subdf3.columns = ['Gene.refGene', 'refSeq', 'exon#', 'mutNA', 'AAChange_refGene', 'aa1', 'aa2', 'position',
+    exonic_g4dn_df = exonic_g4dn_df.rename(columns={'Unnamed: 0':'idx', 'AAChange.refGene': 'AAChange_refGene'})
+
+    aachange_g4dn_subdf1 = exonic_g4dn_df[['AAChange_refGene']]
+    aachange_g4dn_subdf1 = aachange_g4dn_subdf1['AAChange_refGene'].str.split(',', expand=True).stack().to_frame(
+        'AAChange_refGene')
+    aachange_g4dn_subdf2 = aachange_g4dn_subdf1['AAChange_refGene'].str.split(pat=':', expand=True)
+    aachange_g4dn_subdf3 = aachange_g4dn_subdf2[aachange_g4dn_subdf2.columns[:11]]
+    aachange_g4dn_subdf3.columns = ['Gene_refGene', 'refSeq', 'exon#', 'mutNA', 'AAChange_refGene', 'aa1', 'aa2', 'position',
                              'frameshift', 'mutPr']
     aachange_g4dn_subdf3['mutPr'] = aachange_g4dn_subdf3.AAChange_refGene.str.split(pat='fs*', expand=True, )  # first separate the
     # frameshift info
@@ -177,8 +180,10 @@ if __name__ == '__main__':
     aachange_g4dn_subdf3['position'] = aachange_g4dn_subdf3['mutPr'].str.replace(r'\D', '')  # (201372, 10)
     aachange_g4dn_subdf3['frameshift'] = aachange_g4dn_subdf3['AAChange_refGene'].str.split('fs', 1).str[1]  # find out
     # scientific meaning
-    del aachange_g4dn_subdf3['mutPr']
-    aachange_g4dn_subdf3.to_csv(r'data/refseq/newdb-before-refseq-acc.csv')  # (201372, 9)
+    del aachange_g4dn_subdf3['mutPr']   #TODO: merge g4dn and subdf, decide to filter phens before or after
+    aachange_g4dn_subdf3.to_csv(r'data/gene4denovo/subdf-mut-beforeACC.csv')  # (201372, 9)
+
+    sys.exit(0)
     refseq_lst = aachange_g4dn_subdf3['refSeq'].tolist()  # len=201372
     # delete duplicates in aachange_g4dn_subdf3
     # # textfile = open("data/refseq-gene4dn.txt", "w")
@@ -240,7 +245,7 @@ if __name__ == '__main__':
     mobidb_mutpos_df.to_csv(r'data/mutations-position-mobidb.csv')
     # TODO: filter the phenotypes from gene4dn, like the phens file
 
-    sys.exit(0)
+
     ## DBsnp
     # with uniprot acc
     snpdb_acc = pd.read_csv('data/refsnp/uniprot.tsv', sep='\t')  # (10219, 3)
