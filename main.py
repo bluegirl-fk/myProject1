@@ -246,15 +246,13 @@ if __name__ == '__main__':
     filtered_mut_pos_df.to_csv(r'data/gene4denovo/mobidb-mut-pos-true.csv')
     merged_filtered_mobidb_d4dn_df = pd.merge(filtered_mut_pos_df, mut_acc_mrg_df, on='index')
     merged_filtered_mobidb_d4dn_df.to_csv(r'data/gene4denovo/final-merged-mobi-g4dn-true.csv')
-    # this does not work cuz there will be several acc cuz several mobidb features for each acc:
-    # unique_acc_mut_pos_df = filtered_mut_pos_df.drop_duplicates(['acc', 'position'], keep='last')   # (97897,
-    # 10)  # TODO: later also drop duplicates for the ones with same acc, position and aa1 and aa2, meaning the point
-    #  mutation lead to the same aa change
 
+    # TODO: later also drop duplicates for the ones with same acc, position and aa1 and aa2, meaning the point
+    #  mutation lead to the same aa change
     # here should get the indexes of mut_acc_merge_df and merge this mobidb with that one, filter phens,
     # drop duplicates, see what percentage is disordered, how many proteins(disordered muts of refseq of gene4dn db/
     # all proteins of g4dn exonic refseq)
-    # unique_mut_pos_df = filtered_mut_pos_df.drop_duplicates(['acc', 'startend','position', 'length'])
+
     sys.exit(0)
 
     ### Files import and modify
