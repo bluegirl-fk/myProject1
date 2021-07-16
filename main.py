@@ -157,127 +157,88 @@ def expand_regions(region_ranges_lst):
 if __name__ == '__main__':
     # This is the main!
 
-    # ## Gene4denovo
-    # # g4dn with only exonic mutations
+    ## Gene4denovo
+    ## only exonic mutations
     # exonic_g4dn_df = pd.read_csv('data/gene4denovo/exonic-df.csv')  # (70879, 156)
-    # del exonic_g4dn_df['Unnamed: 0']
-    # # set its own index to idx, npot the original df , then m,erge with subdf
-    # exonic_g4dn_df = exonic_g4dn_df.reset_index()
-    # exonic_g4dn_df = exonic_g4dn_df.rename(columns={'index': 'idx', 'AAChange.refGene': 'AAChange_refGene'})
-    #
-    # aachange_g4dn_subdf1 = exonic_g4dn_df[['AAChange_refGene']]
-    # aachange_g4dn_subdf1 = aachange_g4dn_subdf1['AAChange_refGene'].str.split(',', expand=True).stack().to_frame(
-    #     'AAChange_refGene')
-    # aachange_g4dn_subdf2 = aachange_g4dn_subdf1['AAChange_refGene'].str.split(pat=':', expand=True)
-    # aachange_g4dn_subdf3 = aachange_g4dn_subdf2[aachange_g4dn_subdf2.columns[:10]]  # del rest of None columns
-    # aachange_g4dn_subdf3.columns = ['Gene_refGene', 'refSeq', 'exon#', 'mutNA', 'AAChange_refGene', 'aa1', 'aa2', 'position',
-    #                          'frameshift', 'mutPr']  # rename cuz .stack() made Series and deleted original column names
-    # aachange_g4dn_subdf3['mutPr'] = aachange_g4dn_subdf3.AAChange_refGene.str.split(pat='fs*', expand=True, )
-    # # sys.exit()
-    # aachange_g4dn_subdf3['aa1'] = aachange_g4dn_subdf3['mutPr'].str[2]
-    # aachange_g4dn_subdf3['aa2'] = aachange_g4dn_subdf3['mutPr'].str[-1]
-    # aachange_g4dn_subdf3['position'] = aachange_g4dn_subdf3['mutPr'].str.replace(r'\D', '')  # (201372, 10)
-    # aachange_g4dn_subdf3['frameshift'] = aachange_g4dn_subdf3['AAChange_refGene'].str.split('fs', 1).str[1]  # find out
-    # # scientific meaning of fs*35 for example
-    # del aachange_g4dn_subdf3['mutPr']
+    # stacked the refseq mut positions, now have repeated proteins but with possible dif mut positions per each protein
+    # (several possible rows per protein)
     # aachange_g4dn_subdf3.to_csv(r'data/gene4denovo/subdf-mut-beforeACC.csv')  # (201372, 9)
-    # # Then made a list of refSeq ids from this df, wrote to .txt, retrived ACCs from uniprot
-    # # splited my text file using bash : split -l 70000 refseq-gene4dn.txt, the 7000 is number of the lines
-    #
-    #
-    # ## mut positionb df import
+    # Then made a list of refSeq ids from this df, wrote to .txt, retrived ACCs from uniprot
+    # splited my text file using bash : split -l 70000 refseq-gene4dn.txt, the 7000 is number of the lines
+
+    ## mut position df import
     # rseq_mutinfo_df = pd.read_csv('data/gene4denovo/subdf-mut-beforeACC.csv')  # (201372, 11)
-    # rseq_mutinfo_df = rseq_mutinfo_df.rename(columns={'Unnamed: 0': 'idx', 'Unnamed: 1': 'sub-idx'})
     # # merge with gene4dn exonic, now original exonic g4dn file + mutInfo e.g position
     # g4dn_exonic_mutinfo_df = pd.merge(rseq_mutinfo_df, exonic_g4dn_df, on='idx')  # (201372, 166)
     # g4dn_exonic_mutinfo_df.to_csv(r'data/gene4denovo/exonic-mutinfo.csv')
-    #
+
     # ## g4dn mutInfo + uniprot ACCs file
     # g4dn_exonic_mutinfo_df = pd.read_csv('data/gene4denovo/exonic-mutinfo.csv')  # (201372, 166)
     # refseq_acc_df1 = pd.read_csv('data/refseq/refseq-acc.tab', sep='\t')  # from Uniprot
-    #
-    # refseq_acc_df1.columns = ['refseq_id', 'isoforms', 'acc', 'organism', 'Length', 'Gene names']
-    # del refseq_acc_df1['organism']  # (50930, 5)
-    # refseq_acc_df2 = refseq_acc_df1['refseq_id'].str.split(',', expand=True).stack()
-    # idx_tmp = refseq_acc_df2.index._get_level_values(0)
-    # refseq_acc_df3 = refseq_acc_df1.iloc[idx_tmp].copy()
-    # refseq_acc_df3['refSeq'] = refseq_acc_df2.values
-    # del refseq_acc_df3['refseq_id']  # (93949, 5)
-    # #
-    # # merge g4dn exonic mutInfo with Uniprot ACC
+
+    # * merge g4dn exonic mutInfo with Uniprot ACC
     # mut_acc_mrg_df = pd.merge(refseq_acc_df3, g4dn_exonic_mutinfo_df, on='refSeq')
-    # del mut_acc_mrg_df['Gene names']
-    # del mut_acc_mrg_df['idx']
-    # del mut_acc_mrg_df['sub-idx']
-    # mut_acc_mrg_df['position'] = mut_acc_mrg_df['position'].fillna(0).astype(int)  # (551773, 169)
-    # mut_acc_mrg_df = mut_acc_mrg_df.drop_duplicates(ignore_index=True)
+    # TODO: if filter this db based on my phenotypes, then I get the number of all mutations (inside and outside IDRs)
     # mut_acc_mrg_df.reset_index(level=0, inplace=True)  # (236699, 169)
-    # #
-    # # ## mobidb
-    # # mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')  # (1212280,6)
-    # # mobidb_original_df.columns = ['acc', 'feature', 'startend', 'content_fraction', 'content_count', 'length']
-    # # # converting disorder content ranges in each cell to a list
-    # # mobidb_original_df['startend'] = mobidb_original_df['startend'].str.split(',') # subdf of mut pos to be merged with mobidb
-    # # mutinfo_subdf = mut_acc_mrg_df[['index', 'acc', 'position']]  # (236699, 3) # merge mobidb and subdf, later with
-    # # # the index we can reach useful data in
-    # # # dene5dn exoinic mutinfo acc merged dF
-    # # mobidb_mutpos_df = pd.merge(mobidb_original_df, mutinfo_subdf,
-    # # on='acc')  # (4258689, 8) # lots of rows cuz accs are repeated in both databases with dif features or mutation
-    # # # per each ACC
-    # #
-    # # # check if mutation position is in startend disorder region of mobidb or not
-    # # # array_is_in = []  # will be filled with boolean of 0,1 for pos in startend or not
-    # # # for index, row in mobidb_mutpos_df.iterrows():
-    # # #     set_disorder_region = expand_regions(row.startend)  # temp set of data, convert each startend lst to a set,
-    # # #     # write in report
-    # # #     if row.position in set_disorder_region:
-    # # #         print('yes')
-    # # #         array_is_in.append('1')
-    # # #     else:
-    # # #         print('no')
-    # # #         array_is_in.append('0')
-    # #
-    # # # # add bool array to the df
-    # # # mobidb_mutpos_df['is_in_startend'] = array_is_in
-    # # # mobidb_mutpos_df.to_csv(r'data/mutations-position-mobidb-all.csv')
-    # #
-    # # final_mut_check_df = pd.read_csv('data/mutations-position-mobidb-all.csv')  # (4258689, 10)
-    # # filtered_mut_pos_df = final_mut_check_df[final_mut_check_df['is_in_startend'] == 1]  # (1003250, 10)
-    # # filtered_mut_pos_df.to_csv(r'data/gene4denovo/mobidb-mut-pos-true.csv')
+
+    ## mobidb
+    # mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')  # (1212280,6)
+    # mobidb_original_df.columns = ['acc', 'feature', 'startend', 'content_fraction', 'content_count', 'length']
+    # # converting disorder content ranges in each cell to a list
+    # mobidb_original_df['startend'] = mobidb_original_df['startend'].str.split(',')
+    ## subdf of mut pos to be merged with mobidb
+    # mutinfo_subdf = mut_acc_mrg_df[['index', 'acc', 'position']]  # (236699, 3)
+
+    ##  lots of rows cuz accs are repeated in both databases with dif features or mutation per each ACC,
+    # (this can be merged with d4dn based on idx)
+    # mobidb_mutpos_df = pd.merge(mobidb_original_df, mutinfo_subdf, on='acc')  # (4258689, 8)
+
+    ## check if mutation position is in startend disorder region of mobidb or not
+    # array_is_in = []  # will be filled with boolean of 0,1 for pos in startend or not
+    # for index, row in mobidb_mutpos_df.iterrows():
+    #     set_disorder_region = expand_regions(row.startend)  # temp set of data, convert each startend lst to a set,
+    #     # write in report
+    #     if row.position in set_disorder_region:
+    #         print('yes')
+    #         array_is_in.append('1')
+    #     else:
+    #         print('no')
+    #         array_is_in.append('0')
+
+    ## add bool array to the df
+    # mobidb_mutpos_df['is_in_startend'] = array_is_in
+    # mobidb_mutpos_df.to_csv(r'data/mutations-position-mobidb-all.csv')
+    # final_mut_check_df = pd.read_csv('data/mutations-position-mobidb-all.csv')  # (4258689, 10)
+
+    # filtered with only mutations in IDRs
+    # filtered_mut_pos_df = final_mut_check_df[final_mut_check_df['is_in_startend'] == 1]  # (1003250, 10)
+    # filtered_mut_pos_df.to_csv(r'data/gene4denovo/mobidb-mut-pos-true.csv')
     # mobidb_mutpos_true_df = pd.read_csv('data/gene4denovo/mobidb-mut-pos-true.csv')
+
     # mobidb_muttrue_pivot_df = mobidb_mutpos_true_df.pivot_table(
     #     index=['acc'], columns=['feature'], values='content_fraction').fillna(0)  # also content_count could be used
-    # # this df could be used to assess which disorder features (type) get more mutated, later could make array
-    #
+    ## merged mobidb_muttrue(normal df) with (g4dn+acc)
     # # merged_filtered_mobidb_d4dn_df = pd.merge(filtered_mut_pos_df, mut_acc_mrg_df, on='index')
     # # merged_filtered_mobidb_d4dn_df.to_csv(r'data/gene4denovo/final-merged-mobi-g4dn-true.csv')
-    # ## read the to_csv() files
+
+    ## merged mobidb_muttrue(pivot df) with (g4dn+acc)
     # merged_mobidbp_g4dn_df = pd.merge(mobidb_muttrue_pivot_df, mut_acc_mrg_df, on='acc')
     # merged_mobidbp_g4dn_df.to_csv(r'data/gene4denovo/final-merged-with-mobidb-pivot.csv')
     merged_mobidbp_g4dn_df = pd.read_csv('data/gene4denovo/final-merged-with-mobidb-pivot.csv',
                                          low_memory=False)  # (180315, 245)
-    phenotypes = ['EE', 'ID', 'CMS', 'ASD', 'SCZ', 'NDDs']
-    phens_mrg_pivot_df = merged_mobidbp_g4dn_df[merged_mobidbp_g4dn_df.Phenotype.isin(phenotypes)]  # (41081, 245)
-    phens_limited_df = phens_mrg_pivot_df.drop(
+    phenotypes_lst = ['ASD', 'EE', 'ID', 'CMS', 'SCZ', 'NDDs']
+    # (41081, 245)
+    phens_mobip_g4dn_muttrue_df = merged_mobidbp_g4dn_df[merged_mobidbp_g4dn_df.Phenotype.isin(phenotypes_lst)]
+    phens_mobip_g4dn_limited_df = phens_mobip_g4dn_muttrue_df.drop(
         columns=['Unnamed: 0', 'index', 'Unnamed: 0.1', 'mutNA', 'AAChange_refGene_x', 'Rare_or_Common',
                  'Func.refGene', 'Gene.refGene', 'GeneDetail.refGene', 'AAChange_refGene_y', 'GeneFullName.refGene',
                  'GeneFullName.ensGene', 'GeneFunction.ensGene', 'GeneExpressionTissue.ensGene',
                  'GeneDisease.ensGene', 'OMIM.ensGene', 'MGI.ensGene', 'RVIS.ensGene', 'LoFtool.ensGene', 'GDI.ensGene',
                  'Episcore.ensGene', 'Aggarwala.ensGene', 'pLi_EXAC.ensGene', 'HIPred.ensGene'])  # (41081, 221)
-    ## unnamed :0 = idx from merged_mobidbp_g4dn_df
-    ## index =
-    # # final_mut_pos_true_df = (1003250, 179)
-    # # final_mut_pos_true_df = pd.read_csv('data/gene4denovo/final-merged-mobi-g4dn-true.csv', low_memory=False)
-    # # phenotypes = ['EE', 'ID', 'CMS', 'ASD', 'SCZ', 'NDDs']
-    # # phens_mut_pos_true_df = final_mut_pos_true_df[final_mut_pos_true_df.Phenotype.isin(phenotypes)]  # (223524, 179)
-    # # asd_input_lst = ['ASD']
-    # # asd_mut_pos_true_df = final_mut_pos_true_df[final_mut_pos_true_df.Phenotype.isin(asd_input_lst)]
+    ASD_mobip_g4dn_limited_df = phens_mobip_g4dn_limited_df[
+        phens_mobip_g4dn_limited_df.Phenotype.isin(phenotypes_lst[0])]
 
-    # # TODO: later also drop duplicates for the ones with same acc, position and aa1 and aa2, meaning the point
-    # #  mutation lead to the same aa change
-    # # here should get the indexes of mut_acc_merge_df and merge this mobidb with that one, filter phens,
-    # # drop duplicates, see what percentage is disordered, how many proteins(disordered muts of refseq of gene4dn db/
-    # # all proteins of g4dn exonic refseq)
+    # percentage of IDR mutations (merged_mobidbp_g4dn_df/all(mut_acc_mrg_df) )=> 180315/236699 = 76.17 % in IDRs
 
     sys.exit(0)
 
