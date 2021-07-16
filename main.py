@@ -254,9 +254,18 @@ if __name__ == '__main__':
     # ## read the to_csv() files
     # merged_mobidbp_g4dn_df = pd.merge(mobidb_muttrue_pivot_df, mut_acc_mrg_df, on='acc')
     # merged_mobidbp_g4dn_df.to_csv(r'data/gene4denovo/final-merged-with-mobidb-pivot.csv')
-    merged_mobidbp_g4dn_df = pd.read_csv('data/gene4denovo/final-merged-with-mobidb-pivot.csv')  # (180315, 245)
+    merged_mobidbp_g4dn_df = pd.read_csv('data/gene4denovo/final-merged-with-mobidb-pivot.csv',
+                                         low_memory=False)  # (180315, 245)
     phenotypes = ['EE', 'ID', 'CMS', 'ASD', 'SCZ', 'NDDs']
     phens_mrg_pivot_df = merged_mobidbp_g4dn_df[merged_mobidbp_g4dn_df.Phenotype.isin(phenotypes)]  # (41081, 245)
+    phens_limited_df = phens_mrg_pivot_df.drop(
+        columns=['Unnamed: 0', 'index', 'Unnamed: 0.1', 'mutNA', 'AAChange_refGene_x', 'Rare_or_Common',
+                 'Func.refGene', 'Gene.refGene', 'GeneDetail.refGene', 'AAChange_refGene_y', 'GeneFullName.refGene',
+                 'GeneFullName.ensGene', 'GeneFunction.ensGene', 'GeneExpressionTissue.ensGene',
+                 'GeneDisease.ensGene', 'OMIM.ensGene', 'MGI.ensGene', 'RVIS.ensGene', 'LoFtool.ensGene', 'GDI.ensGene',
+                 'Episcore.ensGene', 'Aggarwala.ensGene', 'pLi_EXAC.ensGene', 'HIPred.ensGene'])  # (41081, 221)
+    ## unnamed :0 = idx from merged_mobidbp_g4dn_df
+    ## index =
     # # final_mut_pos_true_df = (1003250, 179)
     # # final_mut_pos_true_df = pd.read_csv('data/gene4denovo/final-merged-mobi-g4dn-true.csv', low_memory=False)
     # # phenotypes = ['EE', 'ID', 'CMS', 'ASD', 'SCZ', 'NDDs']
