@@ -235,8 +235,9 @@ if __name__ == '__main__':
                  'GeneFullName.ensGene', 'GeneFunction.ensGene', 'GeneExpressionTissue.ensGene',
                  'GeneDisease.ensGene', 'OMIM.ensGene', 'MGI.ensGene', 'RVIS.ensGene', 'LoFtool.ensGene', 'GDI.ensGene',
                  'Episcore.ensGene', 'Aggarwala.ensGene', 'pLi_EXAC.ensGene', 'HIPred.ensGene'])  # (41081, 221)
+    phen_asd = ['ASD']
     ASD_mobip_g4dn_limited_df = phens_mobip_g4dn_limited_df[
-        phens_mobip_g4dn_limited_df.Phenotype.isin(phenotypes_lst[0])]
+        phens_mobip_g4dn_limited_df.Phenotype.isin(phen_asd)]
 
     # percentage of IDR mutations (merged_mobidbp_g4dn_df/all(mut_acc_mrg_df) )=> 180315/236699 = 76.17 % in IDRs
 
