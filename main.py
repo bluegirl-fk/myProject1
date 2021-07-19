@@ -242,6 +242,28 @@ if __name__ == '__main__':
     ## lst of column names
     mrg_mobip_d4dn_cols_lst = list(merged_mobidbp_g4dn_df.columns)
     # percentage of IDR mutations (merged_mobidbp_g4dn_df/all(mut_acc_mrg_df) )=> 180315/236699 = 76.17 % in IDRs
+    # print(ASD_mobip_g4dn_limited_df['ExonicFunc.refGene'].value_counts().keys()[0:1])  # => ['nonsynonymous SNV']
+    # print(ASD_mobip_g4dn_limited_df['Chr'].value_counts().keys()[0:5])  # => ['2', '1', '3', '19', '12']
+    # print(ASD_mobip_g4dn_limited_df['GeneFunction.refGene'].value_counts().keys()[0:4])   # =>
+    # [1- May be involved in transcriptional regulation., 2- Key component in the assembly and functioning of vertebrate
+    # striated muscles. By providing connections at the level of individual microfilaments, it contributes to the fine
+    # balance of forces between the two halves of the sarcomere. The size and extensibility of the cross-links are the
+    # main determinants of sarcomere extensibility properties of muscle. In non-muscle cells, seems to play a role in
+    # chromosome condensation and chromosome segregation during mitosis. Might link the lamina network to chromatin or
+    # nuclear actin, or both during interphase. {ECO:0000269|PubMed:9804419}.
+    # 3- Voltage-sensitive calcium channels (VSCC) mediate the entry of calcium ions into excitable cells and are also
+    # involved in a variety of calcium-dependent processes, including muscle contraction, hormone or neurotransmitter
+    # release, gene expression, cell motility, cell division and cell death. The isoform alpha-1C gives rise to L-type
+    # calcium currents. Long-lasting (L-type) calcium channels belong to the ' high - voltage activated ' (HVA) group.
+    # They are blocked by dihydropyridines (DHP), phenylalkylamines, benzothiazepines, and by omega-agatoxin-IIIA
+    # (omega-Aga-IIIA). They are however insensitive to omega-conotoxin- GVIA (omega-CTx-GVIA) and omega-agatoxin-IVA
+    # (omega-Aga-IVA). Calcium channels containing the alpha-1C subunit play an important role in excitation-contraction
+    # coupling in the heart. The various isoforms display marked differences in the sensitivity to DHP compounds.
+    # Binding of calmodulin or CABP1 at the same regulatory sites results in an opposit effects on the channel function.
+    # {ECO:0000269|PubMed:12176756, ECO:0000269|PubMed:17071743, ECO:0000269|PubMed:7737988,
+    # ECO:0000269|PubMed:8392192, ECO:0000269|PubMed:9013606, ECO:0000269|PubMed:9607315}., '], dtype = 'object')
+    print(ASD_mobip_g4dn_limited_df['ExonicFunc.refGene'].value_counts(dropna=False))
+
 
     sys.exit(0)
 
