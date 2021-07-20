@@ -204,6 +204,9 @@ if __name__ == '__main__':
     #     else:
     #         print('no')
     #         array_is_in.append('0')
+    # TODO: within this for loop you can also include the length of each set (only mobidb-lite)
+    # as the sum of disorder regions residue numbers, for each protein
+    # also find the average number of disorder length for the whole disorder region
 
     ## add bool array to the df
     # mobidb_mutpos_df['is_in_startend'] = array_is_in
@@ -239,6 +242,13 @@ if __name__ == '__main__':
     ASD_mobip_g4dn_limited_df = phens_mobip_g4dn_limited_df[
         phens_mobip_g4dn_limited_df.Phenotype.isin(phen_asd)]  # (28486, 221)
 
+    g4dn_llps_subdf = phens_mobip_g4dn_limited_df.loc[phens_mobip_g4dn_limited_df['curated-phase_separation-merge'] != 0.0, ('acc', 'curated'
+
+                                                                                                      '-phase_separation-merge')]
+    g4dn_llps_subdf = g4dn_llps_subdf.drop_duplicates()
+
+    g4dn_llps_subdf.to_csv(r'data/gene4denovo-llps-mrg-Pr-list.csv')
+
     ## lst of column names
     mrg_mobip_d4dn_cols_lst = list(merged_mobidbp_g4dn_df.columns)
     # percentage of IDR mutations (merged_mobidbp_g4dn_df/all(mut_acc_mrg_df) )=> 180315/236699 = 76.17 % in IDRs
@@ -264,11 +274,10 @@ if __name__ == '__main__':
     # ECO:0000269|PubMed:8392192, ECO:0000269|PubMed:9013606, ECO:0000269|PubMed:9607315}., '], dtype = 'object')
     print(ASD_mobip_g4dn_limited_df['ExonicFunc.refGene'].value_counts(dropna=False))
 
-
     sys.exit(0)
-
     ### Files import and modify
     ## for content fraction
+    mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')
     mobidb_pivot_contf_df = mobidb_original_df.pivot_table(
         index=['acc'], columns=['feature'], values='content_fraction').fillna(0)
     mobidb_pivot_contf_df = mobidb_pivot_contf_df.reset_index()  # added idx nums manually,ACCs recognized separate
@@ -281,6 +290,10 @@ if __name__ == '__main__':
     ndd_acc_lst = ndd_acc_df['Entry'].to_list()
     ndd_contf_df = mobidb_pivot_contf_df[mobidb_pivot_contf_df['acc'].isin(ndd_acc_lst)]
     ndd_contf_df.to_csv(r'data/ndd-contf-dataframe.csv')
+    # get proteins of phase separation feature
+    ndd_llps_subdf = ndd_contf_df.loc[ndd_contf_df['curated-phase_separation-merge'] != 0.0, ('acc', 'curated'
+                                                                                                     '-phase_separation-merge')]
+    ndd_llps_subdf.to_csv(r'data/ndd-llps-merge-Pr-list.csv')
     ## for Length
     mobidb_length_df = mobidb_original_df[['acc', 'length']].drop_duplicates(subset=['acc'])
     mobidb_pivot_length_df = mobidb_original_df.pivot_table(
@@ -289,6 +302,8 @@ if __name__ == '__main__':
     mobidb_pivot_length_df.to_csv(r'data/mobidb-pivot-length-df.csv')
     ndd_length_df = mobidb_pivot_length_df[mobidb_pivot_length_df['acc'].isin(ndd_acc_lst)]  # len(df) = 1089
     ndd_length_df.to_csv(r'data/ndd-length-df.csv')
+
+
     ## Matrix
     # content fraction with nan
     _, mobi_contf_mat, mobi_contf_sum_mat, mobi_contf_sum_norm_mat = matrix_maker_nan(
