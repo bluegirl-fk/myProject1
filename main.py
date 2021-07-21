@@ -176,9 +176,10 @@ if __name__ == '__main__':
     # g4dn_exonic_mutinfo_df = pd.read_csv('data/gene4denovo/exonic-mutinfo.csv')  # (201372, 166)
     # refseq_acc_df1 = pd.read_csv('data/refseq/refseq-acc.tab', sep='\t')  # from Uniprot
 
+
+
     # * merge g4dn exonic mutInfo with Uniprot ACC
     # mut_acc_mrg_df = pd.merge(refseq_acc_df3, g4dn_exonic_mutinfo_df, on='refSeq')
-    # TODO: if filter this db based on my phenotypes, then I get the number of all mutations (inside and outside IDRs)
     # mut_acc_mrg_df.reset_index(level=0, inplace=True)  # (236699, 169)
 
     ## mobidb
@@ -282,16 +283,16 @@ if __name__ == '__main__':
     mobidb_mutfalse_cf_pivot_df = filt_mut_pos_false_df.pivot_table(index=['acc'], columns=['feature'],
                                                                  values='content_fraction').fillna(0)
     mobidb_mutfalse_cc_pivot_df = filt_mut_pos_false_df.pivot_table(index=['acc'], columns=['feature'],
-                                                                    values='content_count')
+                                                                    values='content_count').fillna(0)
+    # TODO: also the content count for muttrue df
 
     ## merged mobidb_muttrue(pivot df) with (g4dn+acc)
-    # merged_mobidbp_g4dn_df = pd.merge(mobidb_muttrue_pivot_df, mut_acc_mrg_df, on='acc')
-    # merged_mobidbp_g4dn_df.to_csv(r'data/gene4denovo/final-merged-with-mobidb-pivot.csv')
-    merged_mobidbp_g4dn_df = pd.read_csv('data/gene4denovo/final-merged-with-mobidb-pivot.csv',
-                                         low_memory=False)  # (180315, 245)
+    mobidbp_g4dn_cf_mutfalse_df = pd.merge(mobidb_mutfalse_cf_pivot_df, mut_acc_mrg_df, on='acc')
+    mobidbp_g4dn_cf_mutfalse_df.to_csv(r'data/gene4denovo/merged-with-mobidb-pivot-mutfalse.csv')
+    merged_mobidbp_g4dn_mutfalse_df = pd.read_csv('data/gene4denovo/merged-with-mobidb-pivot-mutfalse.csv', low_memory=False)
+
     phenotypes_lst = ['ASD', 'EE', 'ID', 'CMS', 'SCZ', 'NDDs']
-    # (41081, 245)
-    phens_mobip_g4dn_muttrue_df = merged_mobidbp_g4dn_df[merged_mobidbp_g4dn_df.Phenotype.isin(phenotypes_lst)]
+    phens_mobip_g4dn_mutfalse_df = merged_mobidbp_g4dn_mutfalse_df[merged_mobidbp_g4dn_mutfalse_df.Phenotype.isin(phenotypes_lst)]
 
     sys.exit(0)
     ### Files import and modify
