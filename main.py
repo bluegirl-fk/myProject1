@@ -175,12 +175,25 @@ if __name__ == '__main__':
     # ## g4dn mutInfo + uniprot ACCs file
     # g4dn_exonic_mutinfo_df = pd.read_csv('data/gene4denovo/exonic-mutinfo.csv')  # (201372, 166)
     # refseq_acc_df1 = pd.read_csv('data/refseq/refseq-acc.tab', sep='\t')  # from Uniprot
-
-
-
-    # * merge g4dn exonic mutInfo with Uniprot ACC
+    #
+    # refseq_acc_df1.columns = ['refseq_id', 'isoforms', 'acc', 'organism', 'Length', 'Gene names']
+    # del refseq_acc_df1['organism']  # (50930, 5)
+    # refseq_acc_df2 = refseq_acc_df1['refseq_id'].str.split(',', expand=True).stack()
+    # idx_tmp = refseq_acc_df2.index._get_level_values(0)
+    # refseq_acc_df3 = refseq_acc_df1.iloc[idx_tmp].copy()
+    # refseq_acc_df3['refSeq'] = refseq_acc_df2.values
+    # del refseq_acc_df3['refseq_id']  # (93949, 5)
+    #
+    # # * merge g4dn exonic mutInfo with Uniprot ACC
     # mut_acc_mrg_df = pd.merge(refseq_acc_df3, g4dn_exonic_mutinfo_df, on='refSeq')
+    # del mut_acc_mrg_df['Gene names']
+    # del mut_acc_mrg_df['idx']
+    # del mut_acc_mrg_df['sub-idx']
+    # mut_acc_mrg_df['position'] = mut_acc_mrg_df['position'].fillna(0).astype(int)  # (551773, 169)
+    # mut_acc_mrg_df = mut_acc_mrg_df.drop_duplicates(ignore_index=True)
     # mut_acc_mrg_df.reset_index(level=0, inplace=True)  # (236699, 169)
+    # mut_acc_mrg_df.to_csv(r'data/mut-acc-mrg-df.csv')
+    mut_acc_mrg_df = pd.read_csv('data/mut-acc-mrg-df.csv')
 
     ## mobidb
     # mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')  # (1212280,6)
@@ -289,10 +302,10 @@ if __name__ == '__main__':
     ## merged mobidb_muttrue(pivot df) with (g4dn+acc)
     mobidbp_g4dn_cf_mutfalse_df = pd.merge(mobidb_mutfalse_cf_pivot_df, mut_acc_mrg_df, on='acc')
     mobidbp_g4dn_cf_mutfalse_df.to_csv(r'data/gene4denovo/merged-with-mobidb-pivot-mutfalse.csv')
-    merged_mobidbp_g4dn_mutfalse_df = pd.read_csv('data/gene4denovo/merged-with-mobidb-pivot-mutfalse.csv', low_memory=False)
-
-    phenotypes_lst = ['ASD', 'EE', 'ID', 'CMS', 'SCZ', 'NDDs']
-    phens_mobip_g4dn_mutfalse_df = merged_mobidbp_g4dn_mutfalse_df[merged_mobidbp_g4dn_mutfalse_df.Phenotype.isin(phenotypes_lst)]
+    # merged_mobidbp_g4dn_mutfalse_df = pd.read_csv('data/gene4denovo/merged-with-mobidb-pivot-mutfalse.csv',
+    #                                               low_memory=False)
+    # phenotypes_lst = ['ASD', 'EE', 'ID', 'CMS', 'SCZ', 'NDDs']
+    # phens_mobip_g4dn_mutfalse_df = merged_mobidbp_g4dn_mutfalse_df[merged_mobidbp_g4dn_mutfalse_df.Phenotype.isin(phenotypes_lst)]
 
     sys.exit(0)
     ### Files import and modify
