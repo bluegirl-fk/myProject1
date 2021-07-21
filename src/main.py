@@ -7,6 +7,8 @@ import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
 import sys
+import pointmutation as pm
+import testmutation2 as mt
 
 mobidb_features_lst = []
 mobidb_predictors_cont_fra_dict = {}
@@ -283,9 +285,21 @@ def expand_regions(region_ranges_lst):
 
 
 if __name__ == '__main__':
+
+
+    # # martina stuff:
+    # # first py file
+    # pm.generate_mutation_file()
+    # # second py file
+    # mt.generateggg()
+    # pm.generate_mutation_file2()
+
+    # -------
+
+
     # This is the main!
     ## Gene4denovo(exonic mutations)
-    # exonic_g4dn_df = pd.read_csv('data/gene4denovo/exonic-df.csv')  # (70879, 156)
+    exonic_g4dn_df = pd.read_csv('../data/gene4denovo/exonic-df.csv')  # (70879, 156)
     ## mut position df import
     # rseq_mutinfo_df = pd.read_csv('data/gene4denovo/subdf-mut-beforeACC.csv')  # (201372, 11)
     # # merge with gene4dn exonic, now original exonic g4dn file + mutInfo e.g position
@@ -295,16 +309,16 @@ if __name__ == '__main__':
     # g4dn_exonic_mutinfo_df = pd.read_csv('data/gene4denovo/exonic-mutinfo.csv')  # (201372, 166)
     # refseq_acc_df1 = pd.read_csv('data/refseq/refseq-acc.tab', sep='\t')  # from Uniprot
     # # * merge g4dn exonic mutInfo with Uniprot ACC
-    mut_acc_mrg_df = pd.read_csv('data/mut-acc-mrg-df.csv')  # (236699, 169)
+    mut_acc_mrg_df = pd.read_csv('../data/mut-acc-mrg-df.csv')  # (236699, 169)
 
     ## mobidb
-    mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')  # (1212280,6)
-    final_mut_check_df = pd.read_csv('data/mutations-position-mobidb-all.csv')  # (4258689, 10)
+    mobidb_original_df = pd.read_csv('../data/mobidb_result.tsv', sep='\t')  # (1212280,6)
+    final_mut_check_df = pd.read_csv('../data/mutations-position-mobidb-all.csv')  # (4258689, 10)
 
     # filtered with mutations inside IDRs
     filtered_mut_pos_df = final_mut_check_df[final_mut_check_df['is_in_startend'] == 1]  # (1003250, 10)
     filtered_mut_pos_df.to_csv(r'data/gene4denovo/mobidb-mut-pos-true.csv')
-    mobidb_mutpos_true_df = pd.read_csv('data/gene4denovo/mobidb-mut-pos-true.csv')
+    mobidb_mutpos_true_df = pd.read_csv('../data/gene4denovo/mobidb-mut-pos-true.csv')
 
     ## mobidb pivot table, content count
     mobidb_muttrue_cc_pivot_df = mobidb_mutpos_true_df.pivot_table(
@@ -320,7 +334,7 @@ if __name__ == '__main__':
     ## merged mobidb_muttrue(pivot df) with (g4dn+acc)
     # merged_mobidbp_g4dn_df = pd.merge(mobidbp_muttrue_cf_df, mut_acc_mrg_df, on='acc')
     # merged_mobidbp_g4dn_df.to_csv(r'data/gene4denovo/final-merged-with-mobidb-pivot.csv')
-    merged_mobidbp_g4dn_df = pd.read_csv('data/gene4denovo/final-merged-with-mobidb-pivot.csv',
+    merged_mobidbp_g4dn_df = pd.read_csv('../data/gene4denovo/final-merged-with-mobidb-pivot.csv',
                                          low_memory=False)  # (180315, 245)
     phenotypes_lst = ['ASD', 'EE', 'ID', 'CMS', 'SCZ', 'NDDs']
     # (41081, 245)
@@ -340,7 +354,7 @@ if __name__ == '__main__':
     # mobidb_mut_check_df = pd.read_csv('data/mutations-position-mobidb-all.csv')
     # filtered_mut_pos_false_df = mobidb_mut_check_df[mobidb_mut_check_df['is_in_startend'] == 0]
     # filtered_mut_pos_false_df.to_csv(r'data/gene4denovo/mobidb-mut-pos-false.csv')  # (3255439, 10)
-    filt_mut_pos_false_df = pd.read_csv('data/gene4denovo/mobidb-mut-pos-false.csv')
+    filt_mut_pos_false_df = pd.read_csv('../data/gene4denovo/mobidb-mut-pos-false.csv')
     mobidb_mutfalse_cf_pivot_df = filt_mut_pos_false_df.pivot_table(index=['acc'], columns=['feature'],
                                                                     values='content_fraction').fillna(0)
     mobidb_mutfalse_cc_pivot_df = filt_mut_pos_false_df.pivot_table(index=['acc'], columns=['feature'],
@@ -350,7 +364,7 @@ if __name__ == '__main__':
     ## merged mobidb_muttrue(pivot df) with (g4dn+acc)
     # mobidbp_g4dn_cf_mutfalse_df = pd.merge(mobidb_mutfalse_cf_pivot_df, mut_acc_mrg_df, on='acc')
     # mobidbp_g4dn_cf_mutfalse_df.to_csv(r'data/gene4denovo/merged-with-mobidb-pivot-mutfalse.csv')
-    merged_mobidbp_g4dn_mutfalse_df = pd.read_csv('data/gene4denovo/merged-with-mobidb-pivot-mutfalse.csv',
+    merged_mobidbp_g4dn_mutfalse_df = pd.read_csv('../data/gene4denovo/merged-with-mobidb-pivot-mutfalse.csv',
                                                   low_memory=False)
     phenotypes_lst = ['ASD', 'EE', 'ID', 'CMS', 'SCZ', 'NDDs']
     phens_mobip_g4dn_mutfalse_df = merged_mobidbp_g4dn_mutfalse_df[
@@ -366,7 +380,7 @@ if __name__ == '__main__':
 
     ### Files import and modify
     ## for content fraction
-    mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')
+    mobidb_original_df = pd.read_csv('../data/mobidb_result.tsv', sep='\t')
     mobidb_pivot_contf_df = mobidb_original_df.pivot_table(
         index=['acc'], columns=['feature'], values='content_fraction').fillna(0)
     mobidb_pivot_contf_df = mobidb_pivot_contf_df.reset_index()  # added idx nums manually,ACCs recognized separate
@@ -375,7 +389,7 @@ if __name__ == '__main__':
     mobidb_features_lst = mobidb_pivot_contf_df.columns.str.split(',').tolist()  # this also contains the 'acc' column
     mobidb_features_lst = list(itertools.chain(*mobidb_features_lst))  # flat list
 
-    ndd_acc_df = pd.read_csv('data/allUniqueEntry.tab', sep='\t')
+    ndd_acc_df = pd.read_csv('../data/allUniqueEntry.tab', sep='\t')
     ndd_acc_lst = ndd_acc_df['Entry'].to_list()
     ndd_contf_df = mobidb_pivot_contf_df[mobidb_pivot_contf_df['acc'].isin(ndd_acc_lst)]
     ndd_contf_df.to_csv(r'data/ndd-contf-dataframe.csv')
