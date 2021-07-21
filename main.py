@@ -312,7 +312,7 @@ if __name__ == '__main__':
     ## mobidb pivot table, content fraction
     # mobidbp_muttrue_cf_df = mobidb_mutpos_true_df.pivot_table(
     #     index=['acc'], columns=['feature'], values='content_fraction').fillna(0)
-
+    #TODO: from here
     ## merged mobidb_muttrue(normal df) with (g4dn+acc)
     # # merged_filtered_mobidb_d4dn_df = pd.merge(filtered_mut_pos_df, mut_acc_mrg_df, on='index')
     # # merged_filtered_mobidb_d4dn_df.to_csv(r'data/gene4denovo/final-merged-mobi-g4dn-true.csv')
@@ -348,14 +348,19 @@ if __name__ == '__main__':
     # TODO: also the content count for muttrue df
 
     ## merged mobidb_muttrue(pivot df) with (g4dn+acc)
-    mobidbp_g4dn_cf_mutfalse_df = pd.merge(mobidb_mutfalse_cf_pivot_df, mut_acc_mrg_df, on='acc')
-    mobidbp_g4dn_cf_mutfalse_df.to_csv(r'data/gene4denovo/merged-with-mobidb-pivot-mutfalse.csv')
+    # mobidbp_g4dn_cf_mutfalse_df = pd.merge(mobidb_mutfalse_cf_pivot_df, mut_acc_mrg_df, on='acc')
+    # mobidbp_g4dn_cf_mutfalse_df.to_csv(r'data/gene4denovo/merged-with-mobidb-pivot-mutfalse.csv')
     merged_mobidbp_g4dn_mutfalse_df = pd.read_csv('data/gene4denovo/merged-with-mobidb-pivot-mutfalse.csv',
                                                   low_memory=False)
     phenotypes_lst = ['ASD', 'EE', 'ID', 'CMS', 'SCZ', 'NDDs']
     phens_mobip_g4dn_mutfalse_df = merged_mobidbp_g4dn_mutfalse_df[
         merged_mobidbp_g4dn_mutfalse_df.Phenotype.isin(phenotypes_lst)]
-    phens_mobip_g4dn_mutfalse_df = phens_mobip_g4dn_mutfalse_df
+    phens_mobip_g4dn_mutfalse_df = phens_mobip_g4dn_mutfalse_df.drop(
+        columns=['Unnamed: 0', 'index', 'Unnamed: 0.1', 'mutNA', 'AAChange_refGene_x', 'Rare_or_Common',
+                 'Func.refGene', 'Gene.refGene', 'GeneDetail.refGene', 'AAChange_refGene_y', 'GeneFullName.refGene',
+                 'GeneFullName.ensGene', 'GeneFunction.ensGene', 'GeneExpressionTissue.ensGene',
+                 'GeneDisease.ensGene', 'OMIM.ensGene', 'MGI.ensGene', 'RVIS.ensGene', 'LoFtool.ensGene', 'GDI.ensGene',
+                 'Episcore.ensGene', 'Aggarwala.ensGene', 'pLi_EXAC.ensGene', 'HIPred.ensGene'])  # (41081, 221)
 
     sys.exit(0)
 
