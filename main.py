@@ -213,7 +213,7 @@ if __name__ == '__main__':
     # mobidb_mutpos_df.to_csv(r'data/mutations-position-mobidb-all.csv')
     # final_mut_check_df = pd.read_csv('data/mutations-position-mobidb-all.csv')  # (4258689, 10)
 
-    # filtered with only mutations in IDRs
+    # filtered with mutations inside IDRs
     # filtered_mut_pos_df = final_mut_check_df[final_mut_check_df['is_in_startend'] == 1]  # (1003250, 10)
     # filtered_mut_pos_df.to_csv(r'data/gene4denovo/mobidb-mut-pos-true.csv')
     # mobidb_mutpos_true_df = pd.read_csv('data/gene4denovo/mobidb-mut-pos-true.csv')
@@ -242,15 +242,15 @@ if __name__ == '__main__':
     ASD_mobip_g4dn_limited_df = phens_mobip_g4dn_limited_df[
         phens_mobip_g4dn_limited_df.Phenotype.isin(phen_asd)]  # (28486, 221)
 
-    g4dn_llps_subdf = phens_mobip_g4dn_limited_df.loc[phens_mobip_g4dn_limited_df['curated-phase_separation-merge'] != 0.0, ('acc', 'curated'
-
-                                                                                                      '-phase_separation-merge')]
+    g4dn_llps_subdf = phens_mobip_g4dn_limited_df.loc[phens_mobip_g4dn_limited_df['curated-phase_separation-merge'] !=
+                                                      0.0, ('acc', 'curated-phase_separation-merge')]
     g4dn_llps_subdf = g4dn_llps_subdf.drop_duplicates()
 
     g4dn_llps_subdf.to_csv(r'data/gene4denovo-llps-mrg-Pr-list.csv')
 
     ## lst of column names
     mrg_mobip_d4dn_cols_lst = list(merged_mobidbp_g4dn_df.columns)
+
     # percentage of IDR mutations (merged_mobidbp_g4dn_df/all(mut_acc_mrg_df) )=> 180315/236699 = 76.17 % in IDRs
     # print(ASD_mobip_g4dn_limited_df['ExonicFunc.refGene'].value_counts().keys()[0:1])  # => ['nonsynonymous SNV']
     # print(ASD_mobip_g4dn_limited_df['Chr'].value_counts().keys()[0:5])  # => ['2', '1', '3', '19', '12']
@@ -273,6 +273,25 @@ if __name__ == '__main__':
     # {ECO:0000269|PubMed:12176756, ECO:0000269|PubMed:17071743, ECO:0000269|PubMed:7737988,
     # ECO:0000269|PubMed:8392192, ECO:0000269|PubMed:9013606, ECO:0000269|PubMed:9607315}., '], dtype = 'object')
     print(ASD_mobip_g4dn_limited_df['ExonicFunc.refGene'].value_counts(dropna=False))
+
+    # filtered with mutations out of IDRs
+    # mobidb_mut_check_df = pd.read_csv('data/mutations-position-mobidb-all.csv')
+    # filtered_mut_pos_false_df = mobidb_mut_check_df[mobidb_mut_check_df['is_in_startend'] == 0]
+    # filtered_mut_pos_false_df.to_csv(r'data/gene4denovo/mobidb-mut-pos-false.csv')  # (3255439, 10)
+    filt_mut_pos_false_df = pd. read_csv('data/gene4denovo/mobidb-mut-pos-false.csv')
+    mobidb_mutfalse_cf_pivot_df = filt_mut_pos_false_df.pivot_table(index=['acc'], columns=['feature'],
+                                                                 values='content_fraction').fillna(0)
+    mobidb_mutfalse_cc_pivot_df = filt_mut_pos_false_df.pivot_table(index=['acc'], columns=['feature'],
+                                                                    values='content_count')
+
+    ## merged mobidb_muttrue(pivot df) with (g4dn+acc)
+    # merged_mobidbp_g4dn_df = pd.merge(mobidb_muttrue_pivot_df, mut_acc_mrg_df, on='acc')
+    # merged_mobidbp_g4dn_df.to_csv(r'data/gene4denovo/final-merged-with-mobidb-pivot.csv')
+    merged_mobidbp_g4dn_df = pd.read_csv('data/gene4denovo/final-merged-with-mobidb-pivot.csv',
+                                         low_memory=False)  # (180315, 245)
+    phenotypes_lst = ['ASD', 'EE', 'ID', 'CMS', 'SCZ', 'NDDs']
+    # (41081, 245)
+    phens_mobip_g4dn_muttrue_df = merged_mobidbp_g4dn_df[merged_mobidbp_g4dn_df.Phenotype.isin(phenotypes_lst)]
 
     sys.exit(0)
     ### Files import and modify
