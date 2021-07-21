@@ -13,12 +13,13 @@ def main():
 def prep_orig_df(input_df):  # this gets df, renames some columns and deletes extra columns
     del input_df['Unnamed: 0']  # TODO:delete the rest of columns here instead of doing it in the end, easier processing
     input_df = input_df.reset_index()
-    input_df = input_df.rename(columns={'index': 'idx', 'AAChange.refGene': 'AAChange_refGene'})
+    input_df = input_df.rename(columns={'index': 'idx1', 'AAChange.refGene': 'AAChange_refGene'})
     return input_df
 
 
 def pr_mut_subdf_handler(input_org_df, desired_col, new_cols_count, new_cols_lst):  # gets one column and turns it into
     # new df with several columns, aim is to get mutation position and other info in separate columns
+    # stacked the refseq mut positions, now have repeated proteins with possible dif mut positions per each
     subdf1 = input_org_df[[desired_col]]
     subdf1 = subdf1[desired_col].str.split(',', expand=True).stack().to_frame(desired_col)
     subdf2 = subdf1[desired_col].str.split(pat=':', expand=True)
@@ -35,6 +36,13 @@ def pr_mut_subdf_handler(input_org_df, desired_col, new_cols_count, new_cols_lst
     # TODO: consider reset_index here, fist check if you are not using it anywhere
     return subdf3
 
+
+def merge_dfs_on_index(df1, df2, mutual_col, saving_route):
+    df1 = pd.read_csv(cfg.data['gene4']+'/subdf-mut-beforeACC.csv')  # (201372, 11)
+    df1 = df1.rename(columns={'Unnamed: 0': 'idx1', 'Unnamed: 1': 'sub-idx1'})
+    merged_df = pd.merge(df1, df2, on=mutual_col)
+    merged_df.to_csv(cfg.data['gene4'] + saving_route)
+    return merged_df
 
 def generate_mutation_file():
     # ### G4dn code more ## Gene4denovo ## only exonic mutations # g4dn_exonic_df = pd.read_csv(
@@ -61,26 +69,11 @@ if __name__ == '__main__':
                                                                                      'mutNA', 'AAChange_refGene', 'aa1',
                                                                                      'aa2', 'position', 'frameshift',
                                                                                      'mutPr'])  # (201372, 9)
-    refseqid_lst = refseq_mut_subdf['refSeq'].tolist()  # len: 201372
-    # wrote this list to txt, retrieved ACCs from uniprot
+    # * Got refseq_ids from refseq_mut_subdf['refSeq'] and wrote this list to txt, retrieved ACCs from uniprot
     # (splited my text file using bash : split -l 70000 refseq-gene4dn.txt, the 7000 is number of the lines)
+    g4dn_exo_mutinfo_df = merge_dfs_on_index(refseq_mut_subdf, g4dn_exonic_df, 'idx1', '/exonic-mutinfo.csv')
+    # TODO: till here
 
-
-
-
-
-    # stacked the refseq mut positions, now have repeated
-    # proteins but with possible dif mut positions per each protein # (several possible rows per protein) #
-    # aachange_g4dn_subdf3.to_csv(r'data/gene4denovo/subdf-mut-beforeACC.csv')  # (201372, 9) # Then made a list of
-    # refSeq ids from this df, wrote to .txt, retrived ACCs from uniprot # splited my text file using bash : split -l
-    # 70000 refseq-gene4dn.txt, the 7000 is number of the lines
-    #
-    # ## mut position df import
-    # # rseq_mutinfo_df = pd.read_csv('data/gene4denovo/subdf-mut-beforeACC.csv')  # (201372, 11)
-    # # # merge with gene4dn exonic, now original exonic g4dn file + mutInfo e.g position
-    # # g4dn_exonic_mutinfo_df = pd.merge(rseq_mutinfo_df, g4dn_exonic_df, on='idx')  # (201372, 166)
-    # # g4dn_exonic_mutinfo_df.to_csv(r'data/gene4denovo/exonic-mutinfo.csv')
-    #
     # # ## g4dn mutInfo + uniprot ACCs file
     # # g4dn_exonic_mutinfo_df = pd.read_csv('data/gene4denovo/exonic-mutinfo.csv')  # (201372, 166)
     # # refseq_acc_df1 = pd.read_csv('data/refseq/refseq-acc.tab', sep='\t')  # from Uniprot
