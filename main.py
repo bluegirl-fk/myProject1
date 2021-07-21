@@ -207,13 +207,13 @@ def expand_regions(region_ranges_lst):
     # # filtered_mut_pos_df.to_csv(r'data/gene4denovo/mobidb-mut-pos-true.csv')
     # # mobidb_mutpos_true_df = pd.read_csv('data/gene4denovo/mobidb-mut-pos-true.csv')
     #
-    # # mobidb_muttrue_pivot_df = mobidb_mutpos_true_df.pivot_table(
+    # # mobidbp_muttrue_cf_df = mobidb_mutpos_true_df.pivot_table(
     # #     index=['acc'], columns=['feature'], values='content_fraction').fillna(0)  # also content_count could be used
     # ## merged mobidb_muttrue(normal df) with (g4dn+acc)
     # # # merged_filtered_mobidb_d4dn_df = pd.merge(filtered_mut_pos_df, mut_acc_mrg_df, on='index')
     # # # merged_filtered_mobidb_d4dn_df.to_csv(r'data/gene4denovo/final-merged-mobi-g4dn-true.csv')
     #
-    # ## merged mobidb_muttrue(pivot df) with (g4dn+acc) # merged_mobidbp_g4dn_df = pd.merge(mobidb_muttrue_pivot_df,
+    # ## merged mobidb_muttrue(pivot df) with (g4dn+acc) # merged_mobidbp_g4dn_df = pd.merge(mobidbp_muttrue_cf_df,
     # mut_acc_mrg_df, on='acc') # merged_mobidbp_g4dn_df.to_csv(
     # r'data/gene4denovo/final-merged-with-mobidb-pivot.csv') merged_mobidbp_g4dn_df = pd.read_csv(
     # 'data/gene4denovo/final-merged-with-mobidb-pivot.csv', low_memory=False)  # (180315, 245) phenotypes_lst = [
@@ -298,22 +298,27 @@ if __name__ == '__main__':
     mut_acc_mrg_df = pd.read_csv('data/mut-acc-mrg-df.csv')  # (236699, 169)
 
     ## mobidb
-    # mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')  # (1212280,6)
-    # final_mut_check_df = pd.read_csv('data/mutations-position-mobidb-all.csv')  # (4258689, 10)
+    mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')  # (1212280,6)
+    final_mut_check_df = pd.read_csv('data/mutations-position-mobidb-all.csv')  # (4258689, 10)
 
-    ## filtered with mutations inside IDRs
-    # filtered_mut_pos_df = final_mut_check_df[final_mut_check_df['is_in_startend'] == 1]  # (1003250, 10)
-    # filtered_mut_pos_df.to_csv(r'data/gene4denovo/mobidb-mut-pos-true.csv')
-    # mobidb_mutpos_true_df = pd.read_csv('data/gene4denovo/mobidb-mut-pos-true.csv')
+    # filtered with mutations inside IDRs
+    filtered_mut_pos_df = final_mut_check_df[final_mut_check_df['is_in_startend'] == 1]  # (1003250, 10)
+    filtered_mut_pos_df.to_csv(r'data/gene4denovo/mobidb-mut-pos-true.csv')
+    mobidb_mutpos_true_df = pd.read_csv('data/gene4denovo/mobidb-mut-pos-true.csv')
 
-    # mobidb_muttrue_pivot_df = mobidb_mutpos_true_df.pivot_table(
-    #     index=['acc'], columns=['feature'], values='content_fraction').fillna(0)  # also content_count could be used
+    ## mobidb pivot table, content count
+    mobidb_muttrue_cc_pivot_df = mobidb_mutpos_true_df.pivot_table(
+            index=['acc'], columns=['feature'], values='content_count').fillna(0)
+    ## mobidb pivot table, content fraction
+    # mobidbp_muttrue_cf_df = mobidb_mutpos_true_df.pivot_table(
+    #     index=['acc'], columns=['feature'], values='content_fraction').fillna(0)
+
     ## merged mobidb_muttrue(normal df) with (g4dn+acc)
     # # merged_filtered_mobidb_d4dn_df = pd.merge(filtered_mut_pos_df, mut_acc_mrg_df, on='index')
     # # merged_filtered_mobidb_d4dn_df.to_csv(r'data/gene4denovo/final-merged-mobi-g4dn-true.csv')
 
     ## merged mobidb_muttrue(pivot df) with (g4dn+acc)
-    # merged_mobidbp_g4dn_df = pd.merge(mobidb_muttrue_pivot_df, mut_acc_mrg_df, on='acc')
+    # merged_mobidbp_g4dn_df = pd.merge(mobidbp_muttrue_cf_df, mut_acc_mrg_df, on='acc')
     # merged_mobidbp_g4dn_df.to_csv(r'data/gene4denovo/final-merged-with-mobidb-pivot.csv')
     merged_mobidbp_g4dn_df = pd.read_csv('data/gene4denovo/final-merged-with-mobidb-pivot.csv',
                                          low_memory=False)  # (180315, 245)
