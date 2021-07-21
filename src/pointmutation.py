@@ -10,11 +10,30 @@ def main():
     generate_mutation_file2()
 
 
-def prepare_df(input_df):
-    del input_df['Unnamed: 0']
+def prep_orig_df(input_df):  # this gets df, renames some columns and deletes extra columns
+    del input_df['Unnamed: 0']  # TODO:delete the rest of columns here instead of doing it in the end, easier processing
     input_df = input_df.reset_index()
     input_df = input_df.rename(columns={'index': 'idx', 'AAChange.refGene': 'AAChange_refGene'})
     return input_df
+
+
+def pr_mut_subdf_handler(input_org_df, desired_col, new_cols_count, new_cols_lst):  # gets one column and turns it into
+    # new df with several columns, aim is to get mutation position and other info in separate columns
+    subdf1 = input_org_df[[desired_col]]
+    subdf1 = subdf1[desired_col].str.split(',', expand=True).stack().to_frame(desired_col)
+    subdf2 = subdf1[desired_col].str.split(pat=':', expand=True)
+    subdf3 = subdf2[subdf2.columns[:new_cols_count]]  # del rest of None columns
+    subdf3.columns = new_cols_lst
+
+    subdf3['mutPr'] = subdf3.AAChange_refGene.str.split(pat='fs*', expand=True, )
+    subdf3['aa1'] = subdf3['mutPr'].str[2]
+    subdf3['aa2'] = subdf3['mutPr'].str[-1]
+    subdf3['position'] = subdf3['mutPr'].str.replace(r'\D', '')
+    subdf3['frameshift'] = subdf3['AAChange_refGene'].str.split('fs', 1).str[1]
+    del subdf3['mutPr']
+    subdf3.to_csv(cfg.data['gene4'] + '/subdf-mut-beforeACC.csv')
+    # TODO: consider reset_index here, fist check if you are not using it anywhere
+    return subdf3
 
 
 def generate_mutation_file():
@@ -36,8 +55,19 @@ def generate_mutation_file2():
 
 
 if __name__ == '__main__':
-    g4dn_exonic_df = pd.read_csv('data/gene4denovo/exonic-df.csv')  # (70879, 156)
-    g4dn_exonic_df = prepare_df(g4dn_exonic_df)
+    g4dn_exonic_df = pd.read_csv(cfg.data['gene4'] + '/exonic-df.csv')
+    g4dn_exonic_df = prep_orig_df(g4dn_exonic_df)  # (70879, 156)
+    refseq_mut_subdf = pr_mut_subdf_handler(g4dn_exonic_df, 'AAChange_refGene', 10, ['Gene_refGene', 'refSeq', 'exon#',
+                                                                                     'mutNA', 'AAChange_refGene', 'aa1',
+                                                                                     'aa2', 'position', 'frameshift',
+                                                                                     'mutPr'])  # (201372, 9)
+    refseqid_lst = refseq_mut_subdf['refSeq'].tolist()  # len: 201372
+    # wrote this list to txt, retrieved ACCs from uniprot
+    # (splited my text file using bash : split -l 70000 refseq-gene4dn.txt, the 7000 is number of the lines)
+
+
+
+
 
     # stacked the refseq mut positions, now have repeated
     # proteins but with possible dif mut positions per each protein # (several possible rows per protein) #
