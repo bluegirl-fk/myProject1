@@ -62,8 +62,8 @@ def refseq_acc_df_handler(input_df, file_name):
 def g4dn_mut_acc_merger(df1, df2, merger_column, file_name):
     mrg_df = pd.merge(df1, df2, on=merger_column)
     del mrg_df['Gene names']
-    del mrg_df['idx']
-    del mrg_df['sub-idx']
+    del mrg_df['idx1']
+    del mrg_df['sub-idx1']
     mrg_df['position'] = mrg_df['position'].fillna(0).astype(int)  # (551773, 169)
     mrg_df = mrg_df.drop_duplicates(ignore_index=True)
     mrg_df.reset_index(level=0, inplace=True)  # (236699, 169)
