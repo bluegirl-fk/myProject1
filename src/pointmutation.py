@@ -125,7 +125,7 @@ def mobi_mut_in_df_generator(input_df):
     mut_in_cf_df = mobi_mut_in_df.pivot_table(index=['acc'], columns=['feature'],
                                               values='content_fraction').fillna(0)
     mut_in_cf_df.to_csv(cfg.data['gene4'] + '/mobidb-pivot-cf-mut-true.csv')
-    mut_in_cc_df = mut_in_cf_df = mobi_mut_in_df.pivot_table(index=['acc'], columns=['feature'],
+    mut_in_cc_df = mobi_mut_in_df.pivot_table(index=['acc'], columns=['feature'],
                                                              values='content_count').fillna(0)
     mut_in_cc_df.to_csv(cfg.data['gene4'] + '/mobidb-pivot-cc-mut-true.csv')
     return mobi_mut_in_df, mut_in_cf_df, mut_in_cc_df
@@ -139,7 +139,7 @@ def mobi_mut_out_df_generator(input_df):
     mut_out_cf_df = mobi_mut_out_df.pivot_table(index=['acc'], columns=['feature'],
                                                 values='content_fraction').fillna(0)
     mut_out_cf_df.to_csv(cfg.data['gene4'] + '/mobidb-pivot-cf-mut-false.csv')
-    mut_out_cc_df = mut_in_cf_df = mobi_mut_out_df.pivot_table(index=['acc'], columns=['feature'],
+    mut_out_cc_df = mobi_mut_out_df.pivot_table(index=['acc'], columns=['feature'],
                                                                values='content_count').fillna(0)
     mut_out_cc_df.to_csv(cfg.data['gene4'] + '/mobidb-pivot-cc-mut-flase.csv')
     return mobi_mut_out_df, mut_out_cf_df, mut_out_cc_df
@@ -182,7 +182,7 @@ def generate_mutation_file2():
     # ...............
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     g4dn_exonic_df = pd.read_csv(cfg.data['gene4'] + '/exonic-df.csv')
     g4dn_exonic_df = prep_orig_df(g4dn_exonic_df)  # (70879, 156)
     refseq_mut_subdf = pr_mut_subdf_handler(g4dn_exonic_df, 'AAChange_refGene', 10,
@@ -201,17 +201,31 @@ if __name__ == '__main__':
     mut_acc_mrg_df = g4dn_mut_acc_merger(refseq_acc_modified_df, g4dn_exo_mutinfo_df, 'refSeq', '/mut-acc-mrg-df.csv')
 
     ## mobidb
-    mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')  # (1212280,6)
+    mobidb_original_df = pd.read_csv(cfg.data['']+'/mobidb_result.tsv', sep='\t')  # (1212280,6)
     mobidb_original_df.columns = ['acc', 'feature', 'startend', 'content_fraction', 'content_count', 'length']
     mobi_mutpos_checked_df = mobi_mut_inidr_checker(mobidb_original_df, mut_acc_mrg_df, '/mut-pos-mobi.csv')
+if __name__ == '__main__':
+    g4dn_exonic_df = pd.read_csv(cfg.data['gene4'] + '/exonic-df.csv')
+    g4dn_exonic_df = prep_orig_df(g4dn_exonic_df)  # (70879, 156)
+    refseq_mut_subdf = pr_mut_subdf_handler(g4dn_exonic_df, 'AAChange_refGene', 10,
+                                            ['Gene_refGene', 'refSeq', 'exon#', 'mutNA', 'AAChange_refGene', 'aa1',
+                                             'aa2', 'position', 'frameshift', 'mutPr'])  # (201372, 9)
+    g4dn_exo_mutinfo_df = merge_dfs_on_index(refseq_mut_subdf, g4dn_exonic_df, 'idx1', '/exonic-mutinfo.csv')
+    refseq_acc_df = pd.read_csv(cfg.data['rseq'] + '/refseq-acc.tab', sep='\t')  # from Uniprot
+    refseq_acc_modified_df = refseq_acc_df_handler(refseq_acc_df, '/refseg-acc-modified.csv')  # (93949, 5)
+    mut_acc_mrg_df = g4dn_mut_acc_merger(refseq_acc_modified_df, g4dn_exo_mutinfo_df, 'refSeq', '/mut-acc-mrg-df.csv')
+
+
+    mobi_mutpos_checked_df = pd.read_csv(cfg.data['gene4'] + '/mut-pos-mobi.csv')
     # mobidb filtered based on dif criteria of mutation in/out idr, pivot tables(mobip) with cont frac & cont count
     mobi_mut_in_idr_df, mobip_mut_in_cf_df, mobip_mut_in_cc_df = mobi_mut_in_df_generator(mobi_mutpos_checked_df)
-    mobi_mut_out_idr_df, mobip_mut_out_cf_df, mobip_mut_in_cc_df = mobi_mut_out_df_generator(mobi_mutpos_checked_df)
+    mobi_mut_out_idr_df, mobip_mut_out_cf_df, mobip_mut_out_cc_df = mobi_mut_out_df_generator(mobi_mutpos_checked_df)
     # merged mobidb categorized dfs with g4dn mutinfo acc (mut_acc_mrg_df)
     _, mobip_g4dn_in_cf_df, mobip_g4dn_in_cc_df, _, mobip_g4dn_out_cf_df, mobip_g4dn_out_cc_df = mobi_g4dn_merger \
         (mobi_mut_in_idr_df, mobip_mut_in_cf_df, mobip_mut_in_cc_df,
          mobi_mut_out_idr_df, mobip_mut_out_cf_df, mobip_mut_in_cc_df,
          mut_acc_mrg_df)
+sys.exit()
 
 # TODO: run and if works fine, open them as csv files and then use as reference file,
 # maybe make another file to process that one
