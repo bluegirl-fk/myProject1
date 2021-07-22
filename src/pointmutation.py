@@ -186,20 +186,22 @@ if __name__ == '__main__':
     mobidb_original_df.columns = ['acc', 'feature', 'startend', 'content_fraction', 'content_count', 'length']
     mobi_mutpos_checked_df = mobi_mut_inidr_checker(mobidb_original_df, mut_acc_mrg_df, '/mut-pos-mobi.csv')
     # mobidb filtered based on dif criterias of mutation in/out idr, pivot tables(mobip) with cont frac & cont count
-    mobi_mut_in_idr_df,mobip_mut_in_cf_df,mobip_mut_in_cc_df = mobi_mut_in_df_generator(mobi_mutpos_checked_df)
+    mobi_mut_in_idr_df, mobip_mut_in_cf_df, mobip_mut_in_cc_df = mobi_mut_in_df_generator(mobi_mutpos_checked_df)
     mobi_mut_out_idr_df, mobip_mut_out_cf_df, mobip_mut_in_cc_df = mobi_mut_out_df_generator(mobi_mutpos_checked_df)
 
-def mobi_g4dn_merger(df1, df2, filename):
 
+def mobi_g4dn_merger(dfs_lst, g4dn_mutinfo_acc_df):
+    # inputs: dif categorized mobidb dfs + mut_acc_mrg_df
+    merged_dfs_lst = []
+    for each_df in dfs_lst:
+        df_g4dn_mrgdf = pd.merge(each_df, g4dn_mutinfo_acc_df, on='acc')
+        df_g4dn_mrgdf.to_csv(cfg.data['gene4'] + '/' + each_df + '-mrg.csv')
+        merged_dfs_lst.append(df_g4dn_mrgdf)
+    return merged_dfs_lst
 
-    # # # merged mobidb_muttrue(normal df) with (g4dn+acc)
-# # # merged_filtered_mobidb_d4dn_df = pd.merge(filtered_mut_pos_df, mut_acc_mrg_df, on='index')
-# # # merged_filtered_mobidb_d4dn_df.to_csv(r'data/gene4denovo/final-merged-mobi-g4dn-true.csv')
-#
-# ## merged mobidb_muttrue(pivot df) with (g4dn+acc) # merged_mobidbp_g4dn_df = pd.merge(mobidbp_muttrue_cf_df,
-# mut_acc_mrg_df, on='acc') # merged_mobidbp_g4dn_df.to_csv(
-# r'data/gene4denovo/final-merged-with-mobidb-pivot.csv')
-
+    = mobi_g4dn_merger(
+        [mobi_mut_in_idr_df, mobip_mut_in_cf_df, mobip_mut_in_cc_df, mobi_mut_out_idr_df, mobip_mut_out_cf_df,
+         mobip_mut_in_cc_df], mut_acc_mrg_df)
 
 
 # merged_mobidbp_g4dn_df = pd.read_csv(
