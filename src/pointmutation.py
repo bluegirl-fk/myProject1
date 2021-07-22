@@ -113,6 +113,39 @@ def mobi_mut_inidr_checker(mobi_df, mutinfo_df, filename):
     return mobi_mutpos_df
 
 
+def mobi_mut_pos_categorizer(input_df, normal_or_pivot_mobi, cf_or_cc, in_or_out):
+    # input_df = mobi_mutpos_checked_df # output = 6 dataframes
+    # this will generate different possible dataframes based on:
+    # cf_or_cc: if we have the pivot table, we can have either content_fraction or content_count as df values
+    # in_or_out: if mutation is in idr or not
+    if in_or_out.lower() == 'in':
+        mobi_mut_in_idr_df = input_df[input_df['is_in_startend'] == 1]  # ()
+        mobi_mut_in_idr_df.to_csv(cfg.data['gene4'] + '/mobidb-mut-pos-true.csv')
+        # if needed not-pivoted(original mobidb to be merged), here merge mut_acc_mrg_df with mobi_mut_in_idr_df
+        if normal_or_pivot_mobi.lower() == 'pivot' and cf_or_cc.lower() == 'cf':
+            mut_in_cf_df = mobi_mut_in_idr_df.pivot_table(index=['acc'], columns=['feature'],
+                                                          values='content_fraction').fillna(0)
+            mut_in_cf_df.to_csv(cfg.data['gene4'] + '/mobidb-pivot-cf-mut-true.csv')
+        elif normal_or_pivot_mobi.lower() == 'pivot' and cf_or_cc.lower() == 'cc':
+            mut_in_cc_df = mut_in_cf_df = mobi_mut_in_idr_df.pivot_table(index=['acc'], columns=['feature'],
+                                                          values='content_count').fillna(0)
+            mut_in_cc_df.to_csv(cfg.data['gene4'] + '/mobidb-pivot-cc-mut-true.csv')
+
+    elif in_or_out.lower() == 'out':
+        mobi_mut_out_idr_df = input_df[input_df['is_in_startend'] == 0]  # ()
+        mobi_mut_out_idr_df.to_csv(cfg.data['gene4'] + '/mobidb-mut-pos-false.csv')
+        # if needed not-pivoted(original mobidb to be merged), here merge mut_acc_mrg_df with mobi_mut_out_idr_df
+        if normal_or_pivot_mobi.lower() == 'pivot' and cf_or_cc.lower() == 'cf':
+            mut_out_cf_df = mobi_mut_out_idr_df.pivot_table(index=['acc'], columns=['feature'],
+                                                          values='content_fraction').fillna(0)
+            mut_out_cf_df.to_csv(cfg.data['gene4'] + '/mobidb-pivot-cf-mut-false.csv')
+        elif normal_or_pivot_mobi.lower() == 'pivot' and cf_or_cc.lower() == 'cc':
+            mut_out_cc_df = mut_in_cf_df = mobi_mut_out_idr_df.pivot_table(index=['acc'], columns=['feature'],
+                                                          values='content_count').fillna(0)
+            mut_out_cc_df.to_csv(cfg.data['gene4'] + '/mobidb-pivot-cc-mut-flase.csv')
+    else:
+        print('are you sure you entered the right input(s)?')
+    return mobi_mut_in_idr_df, mut_in_cf_df, mut_in_cc_df, mobi_mut_out_idr_df, mut_out_cf_df, mut_out_cc_df
 def generate_mutation_file():
     # ### G4dn code more ## Gene4denovo ## only exonic mutations # g4dn_exonic_df = pd.read_csv(
     # 'data/gene4denovo/exonic-df.csv')  # (70879, 156) # stacked the refseq mut positions, now have repeated
@@ -155,23 +188,12 @@ if __name__ == '__main__':
     mobi_mutpos_checked_df = mobi_mut_inidr_checker(mobidb_original_df, mut_acc_mrg_df, '/mut-pos-mobi.csv')
 
 
-def muts_categorizer(input_df, normal_or_pivot_mobi, cf_or_cc, in_or_out):
-    #input_df = mobi_mutpos_checked_df
-    # this will generate different possible dataframes based on:
-    # cf_or_cc: if we have the pivot table, we can have either content_fraction or content_count as df values
-    # in_or_out: if mutation is in idr or not
-    if in_or_out.lower() == 'in':
-        mobi_mut_in_idr_df = input_df[input_df['is_in_startend'] == 1]  # (1003250, 10)
-        mobi_mut_in_idr_df.to_csv(cfg.data['gene4'] + '/mobidb-mut-pos-true.csv')
-        if normal_or_pivot_mobi == 'pivot' && cf_or_cc == 'cf':
-    elif in_or_out.lower() == 'out':
-        mut_out_idr_df = input_df[input_df['is_in_startend'] == 0]
-    else:
-        print('are you sure you entered the correct input?')
-    mobi_mut_in_idr_df = pd.read_csv(cfg.data['gene4'] + '/mobidb-mut-pos-true.csv')
-    if cf_or_cc.lower() == 'cf':
-        mut_in_cf_df = mobi_mut_in_idr_df.pivot_table(index=['acc'], columns=['feature'], values='content_fraction').fillna(0)
-    elif cf_or_cc.lower() == 'cc':
+
+
+
+mobi_mut_in_idr_df, mobip_mut_in_cf_df, mobip_mut_in_cc_df, mobi_mut_out_idr_df, mobip_mut_out_cf_df, mobip_mut_in_cc_df\
+    = mobi_mut_pos_categorizer(mobi_mutpos_checked_df)
+
 
     # ## merged mobidb_muttrue(normal df) with (g4dn+acc)
     # # # merged_filtered_mobidb_d4dn_df = pd.merge(filtered_mut_pos_df, mut_acc_mrg_df, on='index')
