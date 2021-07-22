@@ -113,39 +113,38 @@ def mobi_mut_inidr_checker(mobi_df, mutinfo_df, filename):
     return mobi_mutpos_df
 
 
-def mobi_mut_pos_categorizer(input_df, normal_or_pivot_mobi, cf_or_cc, in_or_out):
+def mobi_mut_in_df_generator(input_df):
+    # for mutations inside IDR
     # input_df = mobi_mutpos_checked_df # output = 6 dataframes
     # this will generate different possible dataframes based on:
     # cf_or_cc: if we have the pivot table, we can have either content_fraction or content_count as df values
     # in_or_out: if mutation is in idr or not
-    if in_or_out.lower() == 'in':
-        mobi_mut_in_idr_df = input_df[input_df['is_in_startend'] == 1]  # ()
-        mobi_mut_in_idr_df.to_csv(cfg.data['gene4'] + '/mobidb-mut-pos-true.csv')
-        # if needed not-pivoted(original mobidb to be merged), here merge mut_acc_mrg_df with mobi_mut_in_idr_df
-        if normal_or_pivot_mobi.lower() == 'pivot' and cf_or_cc.lower() == 'cf':
-            mut_in_cf_df = mobi_mut_in_idr_df.pivot_table(index=['acc'], columns=['feature'],
-                                                          values='content_fraction').fillna(0)
-            mut_in_cf_df.to_csv(cfg.data['gene4'] + '/mobidb-pivot-cf-mut-true.csv')
-        elif normal_or_pivot_mobi.lower() == 'pivot' and cf_or_cc.lower() == 'cc':
-            mut_in_cc_df = mut_in_cf_df = mobi_mut_in_idr_df.pivot_table(index=['acc'], columns=['feature'],
-                                                          values='content_count').fillna(0)
-            mut_in_cc_df.to_csv(cfg.data['gene4'] + '/mobidb-pivot-cc-mut-true.csv')
+    mobi_mut_in_df = input_df[input_df['is_in_startend'] == 1]  # mutations inside IDR# ()
+    mobi_mut_in_df.to_csv(cfg.data['gene4'] + '/mobidb-mut-pos-true.csv')
+    # if needed not-pivoted(original mobidb to be merged), here merge mut_acc_mrg_df with mobi_mut_in_df
+    mut_in_cf_df = mobi_mut_in_df.pivot_table(index=['acc'], columns=['feature'],
+                                              values='content_fraction').fillna(0)
+    mut_in_cf_df.to_csv(cfg.data['gene4'] + '/mobidb-pivot-cf-mut-true.csv')
+    mut_in_cc_df = mut_in_cf_df = mobi_mut_in_df.pivot_table(index=['acc'], columns=['feature'],
+                                                             values='content_count').fillna(0)
+    mut_in_cc_df.to_csv(cfg.data['gene4'] + '/mobidb-pivot-cc-mut-true.csv')
+    return mobi_mut_in_df, mut_in_cf_df, mut_in_cc_df
 
-    elif in_or_out.lower() == 'out':
-        mobi_mut_out_idr_df = input_df[input_df['is_in_startend'] == 0]  # ()
-        mobi_mut_out_idr_df.to_csv(cfg.data['gene4'] + '/mobidb-mut-pos-false.csv')
-        # if needed not-pivoted(original mobidb to be merged), here merge mut_acc_mrg_df with mobi_mut_out_idr_df
-        if normal_or_pivot_mobi.lower() == 'pivot' and cf_or_cc.lower() == 'cf':
-            mut_out_cf_df = mobi_mut_out_idr_df.pivot_table(index=['acc'], columns=['feature'],
-                                                          values='content_fraction').fillna(0)
-            mut_out_cf_df.to_csv(cfg.data['gene4'] + '/mobidb-pivot-cf-mut-false.csv')
-        elif normal_or_pivot_mobi.lower() == 'pivot' and cf_or_cc.lower() == 'cc':
-            mut_out_cc_df = mut_in_cf_df = mobi_mut_out_idr_df.pivot_table(index=['acc'], columns=['feature'],
-                                                          values='content_count').fillna(0)
-            mut_out_cc_df.to_csv(cfg.data['gene4'] + '/mobidb-pivot-cc-mut-flase.csv')
-    else:
-        print('are you sure you entered the right input(s)?')
-    return mobi_mut_in_idr_df, mut_in_cf_df, mut_in_cc_df, mobi_mut_out_idr_df, mut_out_cf_df, mut_out_cc_df
+
+def mobi_mut_out_df_generator(input_df):
+    # for mutations not inside IDR
+    mobi_mut_out_df = input_df[input_df['is_in_startend'] == 0]  # ()
+    mobi_mut_out_df.to_csv(cfg.data['gene4'] + '/mobidb-mut-pos-false.csv')
+    # if needed not-pivoted(original mobidb to be merged), here merge mut_acc_mrg_df with mobi_mut_out_df
+    mut_out_cf_df = mobi_mut_out_df.pivot_table(index=['acc'], columns=['feature'],
+                                                values='content_fraction').fillna(0)
+    mut_out_cf_df.to_csv(cfg.data['gene4'] + '/mobidb-pivot-cf-mut-false.csv')
+    mut_out_cc_df = mut_in_cf_df = mobi_mut_out_df.pivot_table(index=['acc'], columns=['feature'],
+                                                               values='content_count').fillna(0)
+    mut_out_cc_df.to_csv(cfg.data['gene4'] + '/mobidb-pivot-cc-mut-flase.csv')
+    return mobi_mut_out_df, mut_out_cf_df, mut_out_cc_df
+
+
 def generate_mutation_file():
     # ### G4dn code more ## Gene4denovo ## only exonic mutations # g4dn_exonic_df = pd.read_csv(
     # 'data/gene4denovo/exonic-df.csv')  # (70879, 156) # stacked the refseq mut positions, now have repeated
@@ -186,86 +185,88 @@ if __name__ == '__main__':
     mobidb_original_df = pd.read_csv('data/mobidb_result.tsv', sep='\t')  # (1212280,6)
     mobidb_original_df.columns = ['acc', 'feature', 'startend', 'content_fraction', 'content_count', 'length']
     mobi_mutpos_checked_df = mobi_mut_inidr_checker(mobidb_original_df, mut_acc_mrg_df, '/mut-pos-mobi.csv')
+    # mobidb filtered based on dif criterias of mutation in/out idr, pivot tables(mobip) with cont frac & cont count
+    mobi_mut_in_idr_df,mobip_mut_in_cf_df,mobip_mut_in_cc_df = mobi_mut_in_df_generator(mobi_mutpos_checked_df)
+    mobi_mut_out_idr_df, mobip_mut_out_cf_df, mobip_mut_in_cc_df = mobi_mut_out_df_generator(mobi_mutpos_checked_df)
+
+def mobi_g4dn_merger(df1, df2, filename):
+
+
+    # # # merged mobidb_muttrue(normal df) with (g4dn+acc)
+# # # merged_filtered_mobidb_d4dn_df = pd.merge(filtered_mut_pos_df, mut_acc_mrg_df, on='index')
+# # # merged_filtered_mobidb_d4dn_df.to_csv(r'data/gene4denovo/final-merged-mobi-g4dn-true.csv')
+#
+# ## merged mobidb_muttrue(pivot df) with (g4dn+acc) # merged_mobidbp_g4dn_df = pd.merge(mobidbp_muttrue_cf_df,
+# mut_acc_mrg_df, on='acc') # merged_mobidbp_g4dn_df.to_csv(
+# r'data/gene4denovo/final-merged-with-mobidb-pivot.csv')
 
 
 
-
-
-mobi_mut_in_idr_df, mobip_mut_in_cf_df, mobip_mut_in_cc_df, mobi_mut_out_idr_df, mobip_mut_out_cf_df, mobip_mut_in_cc_df\
-    = mobi_mut_pos_categorizer(mobi_mutpos_checked_df)
-
-
-    # ## merged mobidb_muttrue(normal df) with (g4dn+acc)
-    # # # merged_filtered_mobidb_d4dn_df = pd.merge(filtered_mut_pos_df, mut_acc_mrg_df, on='index')
-    # # # merged_filtered_mobidb_d4dn_df.to_csv(r'data/gene4denovo/final-merged-mobi-g4dn-true.csv')
-    #
-    # ## merged mobidb_muttrue(pivot df) with (g4dn+acc) # merged_mobidbp_g4dn_df = pd.merge(mobidbp_muttrue_cf_df,
-    # mut_acc_mrg_df, on='acc') # merged_mobidbp_g4dn_df.to_csv(
-    # r'data/gene4denovo/final-merged-with-mobidb-pivot.csv') merged_mobidbp_g4dn_df = pd.read_csv(
-    # 'data/gene4denovo/final-merged-with-mobidb-pivot.csv', low_memory=False)
+# merged_mobidbp_g4dn_df = pd.read_csv(
+# 'data/gene4denovo/final-merged-with-mobidb-pivot.csv', low_memory=False)
 #       (180315, 245) phenotypes_lst = [
-    # 'ASD', 'EE', 'ID', 'CMS', 'SCZ', 'NDDs'] # (41081, 245) phens_mobip_g4dn_muttrue_df = merged_mobidbp_g4dn_df[
-    # merged_mobidbp_g4dn_df.Phenotype.isin(phenotypes_lst)] phens_mobip_g4dn_limited_df =
-    # phens_mobip_g4dn_muttrue_df.drop( columns=['Unnamed: 0', 'index', 'Unnamed: 0.1', 'mutNA',
-    # 'AAChange_refGene_x', 'Rare_or_Common', 'Func.refGene', 'Gene.refGene', 'GeneDetail.refGene',
-    # 'AAChange_refGene_y', 'GeneFullName.refGene', 'GeneFullName.ensGene', 'GeneFunction.ensGene',
-    # 'GeneExpressionTissue.ensGene', 'GeneDisease.ensGene', 'OMIM.ensGene', 'MGI.ensGene', 'RVIS.ensGene',
-    # 'LoFtool.ensGene', 'GDI.ensGene', 'Episcore.ensGene', 'Aggarwala.ensGene', 'pLi_EXAC.ensGene',
-    # 'HIPred.ensGene'])  # (41081, 221) phen_asd = ['ASD'] ASD_mobip_g4dn_limited_df = phens_mobip_g4dn_limited_df[
-    # phens_mobip_g4dn_limited_df.Phenotype.isin(phen_asd)]  # (28486, 221)
-    #
-    # g4dn_llps_subdf = phens_mobip_g4dn_limited_df.loc[phens_mobip_g4dn_limited_df['curated-phase_separation-merge'] !=
-    #                                                   0.0, ('acc', 'curated-phase_separation-merge')]
-    # g4dn_llps_subdf = g4dn_llps_subdf.drop_duplicates()
-    #
-    # g4dn_llps_subdf.to_csv(r'data/gene4denovo-llps-mrg-Pr-list.csv')
-    #
-    # ## lst of column names
-    # mrg_mobip_d4dn_cols_lst = list(merged_mobidbp_g4dn_df.columns)
-    #
-    # # percentage of idr mutations (merged_mobidbp_g4dn_df/all(mut_acc_mrg_df) )=> 180315/236699 = 76.17 % in idrs #
-    # print(ASD_mobip_g4dn_limited_df['ExonicFunc.refGene'].value_counts().keys()[0:1])  # => ['nonsynonymous SNV'] #
-    # print(ASD_mobip_g4dn_limited_df['Chr'].value_counts().keys()[0:5])  # => ['2', '1', '3', '19', '12'] # print(
-    # ASD_mobip_g4dn_limited_df['GeneFunction.refGene'].value_counts().keys()[0:4])   # => # [1- May be involved in
-    # transcriptional regulation., 2- Key component in the assembly and functioning of vertebrate # striated muscles.
-    # By providing connections at the level of individual microfilaments, it contributes to the fine # balance of
-    # forces between the two halves of the sarcomere. The size and extensibility of the cross-links are the # main
-    # determinants of sarcomere extensibility properties of muscle. In non-muscle cells, seems to play a role in #
-    # chromosome condensation and chromosome segregation during mitosis. Might link the lamina network to chromatin
-    # or # nuclear actin, or both during interphase. {ECO:0000269|PubMed:9804419}. # 3- Voltage-sensitive calcium
-    # channels (VSCC) mediate the entry of calcium ions into excitable cells and are also # involved in a variety of
-    # calcium-dependent processes, including muscle contraction, hormone or neurotransmitter # release,
-    # gene expression, cell motility, cell division and cell death. The isoform alpha-1C gives rise to L-type #
-    # calcium currents. Long-lasting (L-type) calcium channels belong to the ' high - voltage activated ' (HVA)
-    # group. # They are blocked by dihydropyridines (DHP), phenylalkylamines, benzothiazepines,
-    # and by omega-agatoxin-IIIA # (omega-Aga-IIIA). They are however insensitive to omega-conotoxin- GVIA (
-    # omega-CTx-GVIA) and omega-agatoxin-IVA # (omega-Aga-IVA). Calcium channels containing the alpha-1C subunit play
-    # an important role in excitation-contraction # coupling in the heart. The various isoforms display marked
-    # differences in the sensitivity to DHP compounds. # Binding of calmodulin or CABP1 at the same regulatory sites
-    # results in an opposit effects on the channel function. # {ECO:0000269|PubMed:12176756,
-    # ECO:0000269|PubMed:17071743, ECO:0000269|PubMed:7737988, # ECO:0000269|PubMed:8392192,
-    # ECO:0000269|PubMed:9013606, ECO:0000269|PubMed:9607315}., '], dtype = 'object') print(
-    # ASD_mobip_g4dn_limited_df['ExonicFunc.refGene'].value_counts(dropna=False))
-    #
-    # # filtered with mutations out of idrs
-    # # mobidb_mut_check_df = pd.read_csv('data/mutations-position-mobidb-all.csv')
-    # # filtered_mut_pos_false_df = mobidb_mut_check_df[mobidb_mut_check_df['is_in_startend'] == 0]
-    # # filtered_mut_pos_false_df.to_csv(r'data/gene4denovo/mobidb-mut-pos-false.csv')  # (3255439, 10)
-    # filt_mut_pos_false_df = pd.read_csv('data/gene4denovo/mobidb-mut-pos-false.csv')
-    # mobidb_mutfalse_cf_pivot_df = filt_mut_pos_false_df.pivot_table(index=['acc'], columns=['feature'],
-    #                                                                 values='content_fraction').fillna(0)
-    # mobidb_mutfalse_cc_pivot_df = filt_mut_pos_false_df.pivot_table(index=['acc'], columns=['feature'],
-    #                                                                 values='content_count').fillna(0)
-    # # TODO: also the content count for muttrue df
-    #
-    # ## merged mobidb_muttrue(pivot df) with (g4dn+acc)
-    # mobidbp_g4dn_cf_mutfalse_df = pd.merge(mobidb_mutfalse_cf_pivot_df, mut_acc_mrg_df, on='acc')
-    # mobidbp_g4dn_cf_mutfalse_df.to_csv(r'data/gene4denovo/merged-with-mobidb-pivot-mutfalse.csv')
-    # merged_mobidbp_g4dn_mutfalse_df = pd.read_csv('data/gene4denovo/merged-with-mobidb-pivot-mutfalse.csv',
-    #                                               low_memory=False)
-    # phenotypes_lst = ['ASD', 'EE', 'ID', 'CMS', 'SCZ', 'NDDs']
-    # phens_mobip_g4dn_mutfalse_df = merged_mobidbp_g4dn_mutfalse_df[
-    #     merged_mobidbp_g4dn_mutfalse_df.Phenotype.isin(phenotypes_lst)]
-    # phens_mobip_g4dn_mutfalse_df = phens_mobip_g4dn_mutfalse_df
+# 'ASD', 'EE', 'ID', 'CMS', 'SCZ', 'NDDs'] # (41081, 245) phens_mobip_g4dn_muttrue_df = merged_mobidbp_g4dn_df[
+# merged_mobidbp_g4dn_df.Phenotype.isin(phenotypes_lst)] phens_mobip_g4dn_limited_df =
+# phens_mobip_g4dn_muttrue_df.drop( columns=['Unnamed: 0', 'index', 'Unnamed: 0.1', 'mutNA',
+# 'AAChange_refGene_x', 'Rare_or_Common', 'Func.refGene', 'Gene.refGene', 'GeneDetail.refGene',
+# 'AAChange_refGene_y', 'GeneFullName.refGene', 'GeneFullName.ensGene', 'GeneFunction.ensGene',
+# 'GeneExpressionTissue.ensGene', 'GeneDisease.ensGene', 'OMIM.ensGene', 'MGI.ensGene', 'RVIS.ensGene',
+# 'LoFtool.ensGene', 'GDI.ensGene', 'Episcore.ensGene', 'Aggarwala.ensGene', 'pLi_EXAC.ensGene',
+# 'HIPred.ensGene'])  # (41081, 221) phen_asd = ['ASD'] ASD_mobip_g4dn_limited_df = phens_mobip_g4dn_limited_df[
+# phens_mobip_g4dn_limited_df.Phenotype.isin(phen_asd)]  # (28486, 221)
+#
+# g4dn_llps_subdf = phens_mobip_g4dn_limited_df.loc[phens_mobip_g4dn_limited_df['curated-phase_separation-merge'] !=
+#                                                   0.0, ('acc', 'curated-phase_separation-merge')]
+# g4dn_llps_subdf = g4dn_llps_subdf.drop_duplicates()
+#
+# g4dn_llps_subdf.to_csv(r'data/gene4denovo-llps-mrg-Pr-list.csv')
+#
+# ## lst of column names
+# mrg_mobip_d4dn_cols_lst = list(merged_mobidbp_g4dn_df.columns)
+#
+# # percentage of idr mutations (merged_mobidbp_g4dn_df/all(mut_acc_mrg_df) )=> 180315/236699 = 76.17 % in idrs #
+# print(ASD_mobip_g4dn_limited_df['ExonicFunc.refGene'].value_counts().keys()[0:1])  # => ['nonsynonymous SNV'] #
+# print(ASD_mobip_g4dn_limited_df['Chr'].value_counts().keys()[0:5])  # => ['2', '1', '3', '19', '12'] # print(
+# ASD_mobip_g4dn_limited_df['GeneFunction.refGene'].value_counts().keys()[0:4])   # => # [1- May be involved in
+# transcriptional regulation., 2- Key component in the assembly and functioning of vertebrate # striated muscles.
+# By providing connections at the level of individual microfilaments, it contributes to the fine # balance of
+# forces between the two halves of the sarcomere. The size and extensibility of the cross-links are the # main
+# determinants of sarcomere extensibility properties of muscle. In non-muscle cells, seems to play a role in #
+# chromosome condensation and chromosome segregation during mitosis. Might link the lamina network to chromatin
+# or # nuclear actin, or both during interphase. {ECO:0000269|PubMed:9804419}. # 3- Voltage-sensitive calcium
+# channels (VSCC) mediate the entry of calcium ions into excitable cells and are also # involved in a variety of
+# calcium-dependent processes, including muscle contraction, hormone or neurotransmitter # release,
+# gene expression, cell motility, cell division and cell death. The isoform alpha-1C gives rise to L-type #
+# calcium currents. Long-lasting (L-type) calcium channels belong to the ' high - voltage activated ' (HVA)
+# group. # They are blocked by dihydropyridines (DHP), phenylalkylamines, benzothiazepines,
+# and by omega-agatoxin-IIIA # (omega-Aga-IIIA). They are however insensitive to omega-conotoxin- GVIA (
+# omega-CTx-GVIA) and omega-agatoxin-IVA # (omega-Aga-IVA). Calcium channels containing the alpha-1C subunit play
+# an important role in excitation-contraction # coupling in the heart. The various isoforms display marked
+# differences in the sensitivity to DHP compounds. # Binding of calmodulin or CABP1 at the same regulatory sites
+# results in an opposit effects on the channel function. # {ECO:0000269|PubMed:12176756,
+# ECO:0000269|PubMed:17071743, ECO:0000269|PubMed:7737988, # ECO:0000269|PubMed:8392192,
+# ECO:0000269|PubMed:9013606, ECO:0000269|PubMed:9607315}., '], dtype = 'object') print(
+# ASD_mobip_g4dn_limited_df['ExonicFunc.refGene'].value_counts(dropna=False))
+#
+# # filtered with mutations out of idrs
+# # mobidb_mut_check_df = pd.read_csv('data/mutations-position-mobidb-all.csv')
+# # filtered_mut_pos_false_df = mobidb_mut_check_df[mobidb_mut_check_df['is_in_startend'] == 0]
+# # filtered_mut_pos_false_df.to_csv(r'data/gene4denovo/mobidb-mut-pos-false.csv')  # (3255439, 10)
+# filt_mut_pos_false_df = pd.read_csv('data/gene4denovo/mobidb-mut-pos-false.csv')
+# mobidb_mutfalse_cf_pivot_df = filt_mut_pos_false_df.pivot_table(index=['acc'], columns=['feature'],
+#                                                                 values='content_fraction').fillna(0)
+# mobidb_mutfalse_cc_pivot_df = filt_mut_pos_false_df.pivot_table(index=['acc'], columns=['feature'],
+#                                                                 values='content_count').fillna(0)
+# # TODO: also the content count for muttrue df
+#
+# ## merged mobidb_muttrue(pivot df) with (g4dn+acc)
+# mobidbp_g4dn_cf_mutfalse_df = pd.merge(mobidb_mutfalse_cf_pivot_df, mut_acc_mrg_df, on='acc')
+# mobidbp_g4dn_cf_mutfalse_df.to_csv(r'data/gene4denovo/merged-with-mobidb-pivot-mutfalse.csv')
+# merged_mobidbp_g4dn_mutfalse_df = pd.read_csv('data/gene4denovo/merged-with-mobidb-pivot-mutfalse.csv',
+#                                               low_memory=False)
+# phenotypes_lst = ['ASD', 'EE', 'ID', 'CMS', 'SCZ', 'NDDs']
+# phens_mobip_g4dn_mutfalse_df = merged_mobidbp_g4dn_mutfalse_df[
+#     merged_mobidbp_g4dn_mutfalse_df.Phenotype.isin(phenotypes_lst)]
+# phens_mobip_g4dn_mutfalse_df = phens_mobip_g4dn_mutfalse_df
 
 sys.exit(main())
