@@ -182,7 +182,7 @@ def generate_mutation_file2():
     # ...............
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
     g4dn_exonic_df = pd.read_csv(cfg.data['gene4'] + '/exonic-df.csv')
     g4dn_exonic_df = prep_orig_df(g4dn_exonic_df)  # (70879, 156)
     refseq_mut_subdf = pr_mut_subdf_handler(g4dn_exonic_df, 'AAChange_refGene', 10,
@@ -204,19 +204,6 @@ def generate_mutation_file2():
     mobidb_original_df = pd.read_csv(cfg.data['']+'/mobidb_result.tsv', sep='\t')  # (1212280,6)
     mobidb_original_df.columns = ['acc', 'feature', 'startend', 'content_fraction', 'content_count', 'length']
     mobi_mutpos_checked_df = mobi_mut_inidr_checker(mobidb_original_df, mut_acc_mrg_df, '/mut-pos-mobi.csv')
-if __name__ == '__main__':
-    g4dn_exonic_df = pd.read_csv(cfg.data['gene4'] + '/exonic-df.csv')
-    g4dn_exonic_df = prep_orig_df(g4dn_exonic_df)  # (70879, 156)
-    refseq_mut_subdf = pr_mut_subdf_handler(g4dn_exonic_df, 'AAChange_refGene', 10,
-                                            ['Gene_refGene', 'refSeq', 'exon#', 'mutNA', 'AAChange_refGene', 'aa1',
-                                             'aa2', 'position', 'frameshift', 'mutPr'])  # (201372, 9)
-    g4dn_exo_mutinfo_df = merge_dfs_on_index(refseq_mut_subdf, g4dn_exonic_df, 'idx1', '/exonic-mutinfo.csv')
-    refseq_acc_df = pd.read_csv(cfg.data['rseq'] + '/refseq-acc.tab', sep='\t')  # from Uniprot
-    refseq_acc_modified_df = refseq_acc_df_handler(refseq_acc_df, '/refseg-acc-modified.csv')  # (93949, 5)
-    mut_acc_mrg_df = g4dn_mut_acc_merger(refseq_acc_modified_df, g4dn_exo_mutinfo_df, 'refSeq', '/mut-acc-mrg-df.csv')
-
-
-    mobi_mutpos_checked_df = pd.read_csv(cfg.data['gene4'] + '/mut-pos-mobi.csv')
     # mobidb filtered based on dif criteria of mutation in/out idr, pivot tables(mobip) with cont frac & cont count
     mobi_mut_in_idr_df, mobip_mut_in_cf_df, mobip_mut_in_cc_df = mobi_mut_in_df_generator(mobi_mutpos_checked_df)
     mobi_mut_out_idr_df, mobip_mut_out_cf_df, mobip_mut_out_cc_df = mobi_mut_out_df_generator(mobi_mutpos_checked_df)
