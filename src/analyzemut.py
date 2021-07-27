@@ -13,7 +13,6 @@ def main():
 
 
 if __name__ == '__main__':
-
     # mobi_mut_in_idr_df = pd.read_csv(cfg.data['gene4'] + '/mobidb-mut-pos-true.csv')  # (994383, 11)
     # mobi_mut_out_idr_df = pd.read_csv(cfg.data['gene4'] + '/mobidb-mut-pos-false.csv')  # (3238392, 11)
     #
@@ -47,5 +46,35 @@ if __name__ == '__main__':
     in_mobi_g4dn_df = pd.read_csv(cfg.data['gene4'] + '/in-mobi-newG4DN.csv')
     out_mobi_g4dn_df = pd.read_csv(cfg.data['gene4'] + '/out-mobi-newG4DN.csv')
 
+    # (25961, 27)
+    in_mobi_g4dn_df0 = in_mobi_g4dn_df[['index', 'acc_x', 'length', 'position_x', 'aa1', 'aa2', 'content_fraction',
+                                        'content_count', 'refSeq', 'Gene_refGene', 'exon#', 'frameshift', 'Extreme',
+                                        'Chr', 'Start', 'End', 'Ref', 'Alt', 'ExonicFunc.refGene',
+                                        'GeneFunction.refGene', 'GeneExpressionTissue.refGene', 'GeneDisease.refGene',
+                                        'InterVar_automated', 'Phenotype', 'Platform', 'Study', 'PubMed ID']]
+    # (102495, 27)
+    out_mobi_g4dn_df0 = out_mobi_g4dn_df[['index', 'acc_x', 'length', 'position_x', 'aa1', 'aa2', 'content_fraction',
+                                          'content_count', 'refSeq', 'Gene_refGene', 'exon#', 'frameshift', 'Extreme',
+                                          'Chr', 'Start', 'End', 'Ref', 'Alt', 'ExonicFunc.refGene',
+                                          'GeneFunction.refGene', 'GeneExpressionTissue.refGene', 'GeneDisease.refGene',
+                                          'InterVar_automated', 'Phenotype', 'Platform', 'Study', 'PubMed ID']]
 
+    in_mobi_g4dn_df1 = in_mobi_g4dn_df0.drop_duplicates(subset=['acc_x', 'length', 'position_x', 'aa1', 'aa2',
+                                                                'content_fraction', 'content_count',
+                                                                'Gene_refGene', 'exon#', 'frameshift', 'Extreme',
+                                                                'Chr', 'Start', 'End', 'Ref', 'Alt',
+                                                                'ExonicFunc.refGene', 'GeneFunction.refGene',
+                                                                'GeneExpressionTissue.refGene', 'GeneDisease.refGene',
+                                                                'InterVar_automated', 'Phenotype', 'Platform', 'Study',
+                                                                'PubMed ID'])
+    out_mobi_g4dn_df1 = out_mobi_g4dn_df0.drop_duplicates(subset=['acc_x', 'length', 'position_x', 'aa1', 'aa2',
+                                                                  'content_fraction', 'content_count', 'Gene_refGene',
+                                                                  'exon#', 'frameshift', 'Extreme', 'Chr', 'Start',
+                                                                  'End', 'Ref', 'Alt', 'ExonicFunc.refGene',
+                                                                  'GeneFunction.refGene', 'GeneExpressionTissue.refGene',
+                                                                  'GeneDisease.refGene', 'InterVar_automated',
+                                                                  'Phenotype', 'Platform', 'Study', 'PubMed ID'])
+# TODO: organize this code into methods, check, should I keep same everything that cause different phens in dif studies?
+    # (I don't think so, I could study NDDs together in general, not just separate phenotypes, in this case I should
+    # delete those cases
     sys.exit(main())
