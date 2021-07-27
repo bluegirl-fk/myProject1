@@ -7,7 +7,7 @@ import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
 import sys
-import pointmutation as pm
+import categorizer as pm
 import testmutation2 as mt
 
 mobidb_features_lst = []

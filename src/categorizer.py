@@ -210,8 +210,13 @@ if __name__ == '__main__':
     # mut_acc_mrg_df = pd.read_csv(cfg.data['gene4']+'/mut-acc-mrg-df.csv')
 
     # mobidb filtered based on dif criteria of mutation in/out idr, pivot tables(mobip) with cont frac & cont count
-    mobi_mut_in_idr_df, mobip_mut_in_cf_df, mobip_mut_in_cc_df = mobi_mut_in_df_generator(mobi_mutpos_checked_df)
-    mobi_mut_out_idr_df, mobip_mut_out_cf_df, mobip_mut_out_cc_df = mobi_mut_out_df_generator(mobi_mutpos_checked_df)
+    mobi_mut_in_idr_df, _, _ = mobi_mut_in_df_generator(mobi_mutpos_checked_df)
+    mobi_mut_out_idr_df, _, _ = mobi_mut_out_df_generator(mobi_mutpos_checked_df)
+if __name__ == '__main__':
+    mobi_mut_in_idr_df = pd.read_csv(cfg.data['gene4'] + '/mobidb-mut-pos-true.csv')
+    mobi_mut_out_idr_df = pd.read_csv(cfg.data['gene4'] + '/mobidb-mut-pos-false.csv')
+    # now make a new repository to work with this two dataframes
+
     # merged mobidb categorized dfs with g4dn mutinfo acc (mut_acc_mrg_df)
     _, mobip_g4dn_in_cf_df, mobip_g4dn_in_cc_df, _, mobip_g4dn_out_cf_df, mobip_g4dn_out_cc_df = mobi_g4dn_merger \
         (mobi_mut_in_idr_df, mobip_mut_in_cf_df, mobip_mut_in_cc_df,
