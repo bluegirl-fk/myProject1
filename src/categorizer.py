@@ -144,7 +144,7 @@ def mobi_mut_out_df_generator(input_df):
     mut_out_cc_df.to_csv(cfg.data['gene4'] + '/mobidb-pivot-cc-mut-flase.csv')
     return mobi_mut_out_df, mut_out_cf_df, mut_out_cc_df
 
-
+# TODO: this should merge based on index, not acc!
 def mobi_g4dn_merger(df1, df2, df3, df4, df5, df6, g4dn_mutinfo_acc_df):
     # inputs: dif categorized mobidb dfs + mut_acc_mrg_df
     df1_g4dn_mrgdf = pd.merge(df1, g4dn_mutinfo_acc_df, on='acc')
