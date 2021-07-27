@@ -59,6 +59,8 @@ if __name__ == '__main__':
                                           'GeneFunction.refGene', 'GeneExpressionTissue.refGene', 'GeneDisease.refGene',
                                           'InterVar_automated', 'Phenotype', 'Platform', 'Study', 'PubMed ID']]
 
+    # TODO: try this one instead: just by stating the column to be ignored:
+    # df.drop_duplicates(subset=df.columns.difference(['Description']))
     in_mobi_g4dn_df1 = in_mobi_g4dn_df0.drop_duplicates(subset=['acc_x', 'length', 'position_x', 'aa1', 'aa2',
                                                                 'content_fraction', 'content_count',
                                                                 'Gene_refGene', 'exon#', 'frameshift', 'Extreme',
