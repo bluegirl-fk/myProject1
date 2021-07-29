@@ -43,8 +43,8 @@ if __name__ == '__main__':
     # out_mobi_g4dn_df = pd.merge(mut_out_mobi_lite_df, new_g4dn_df, on='index')  # (102495, 138)
     # out_mobi_g4dn_df.to_csv(cfg.data['gene4'] + '/out-mobi-newG4DN.csv')
 
-    in_mobi_g4dn_df = pd.read_csv(cfg.data['gene4'] + '/in-mobi-newG4DN.csv')
-    out_mobi_g4dn_df = pd.read_csv(cfg.data['gene4'] + '/out-mobi-newG4DN.csv')
+    in_mobi_g4dn_df = pd.read_csv(cfg.data['gene4'] + '/in-mobi-newG4DN.csv', low_memory=False)
+    out_mobi_g4dn_df = pd.read_csv(cfg.data['gene4'] + '/out-mobi-newG4DN.csv', low_memory=False)
 
     # (25961, 27)
     in_mobi_g4dn_df0 = in_mobi_g4dn_df[['index', 'acc_x', 'length', 'position_x', 'aa1', 'aa2', 'content_fraction',
@@ -61,6 +61,7 @@ if __name__ == '__main__':
 
     # TODO: try this one instead: just by stating the column to be ignored:
     # df.drop_duplicates(subset=df.columns.difference(['Description']))
+    # (17329, 27)
     in_mobi_g4dn_df1 = in_mobi_g4dn_df0.drop_duplicates(subset=['acc_x', 'length', 'position_x', 'aa1', 'aa2',
                                                                 'content_fraction', 'content_count',
                                                                 'Gene_refGene', 'exon#', 'frameshift', 'Extreme',
@@ -69,6 +70,7 @@ if __name__ == '__main__':
                                                                 'GeneExpressionTissue.refGene', 'GeneDisease.refGene',
                                                                 'InterVar_automated', 'Phenotype', 'Platform', 'Study',
                                                                 'PubMed ID'])
+    # (67822, 27)
     out_mobi_g4dn_df1 = out_mobi_g4dn_df0.drop_duplicates(subset=['acc_x', 'length', 'position_x', 'aa1', 'aa2',
                                                                   'content_fraction', 'content_count', 'Gene_refGene',
                                                                   'exon#', 'frameshift', 'Extreme', 'Chr', 'Start',
@@ -78,5 +80,18 @@ if __name__ == '__main__':
                                                                   'Phenotype', 'Platform', 'Study', 'PubMed ID'])
 # TODO: organize this code into methods, check, should I keep same everything that cause different phens in dif studies?
     # (I don't think so, I could study NDDs together in general, not just separate phenotypes, in this case I should
-    # delete those cases
-    sys.exit(main())
+    # delete those cases => or do nothing!
+
+    in_mobi_uniprotid_lst = in_mobi_g4dn_df1['acc_x'].unique().tolist()  # 5047
+    out_mobi_uniprotid_lst = out_mobi_g4dn_df1['acc_x'].unique().tolist()  # 9397
+
+
+    with open(cfg.data['gene4']+'/uniprotid_in_idr_lst.txt', 'w') as f:
+        for item in in_mobi_uniprotid_lst:
+            f.write("%s\n" % item)
+
+    with open(cfg.data['gene4']+'/uniprotid_outside_idr_lst.txt', 'w') as f:
+        for item in out_mobi_uniprotid_lst:
+            f.write("%s\n" % item)
+    # remeber this is still not merged with the data of 3 articles
+    # sys.exit(main())
