@@ -86,12 +86,3 @@ if __name__ == '__main__':
     out_mobi_uniprotid_lst = out_mobi_g4dn_df1['acc_x'].unique().tolist()  # 9397
 
 
-    with open(cfg.data['gene4']+'/uniprotid_in_idr_lst.txt', 'w') as f:
-        for item in in_mobi_uniprotid_lst:
-            f.write("%s\n" % item)
-
-    with open(cfg.data['gene4']+'/uniprotid_outside_idr_lst.txt', 'w') as f:
-        for item in out_mobi_uniprotid_lst:
-            f.write("%s\n" % item)
-    # remeber this is still not merged with the data of 3 articles
-    # sys.exit(main())
