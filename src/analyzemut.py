@@ -75,14 +75,30 @@ if __name__ == '__main__':
                                                                   'content_fraction', 'content_count', 'Gene_refGene',
                                                                   'exon#', 'frameshift', 'Extreme', 'Chr', 'Start',
                                                                   'End', 'Ref', 'Alt', 'ExonicFunc.refGene',
-                                                                  'GeneFunction.refGene', 'GeneExpressionTissue.refGene',
+                                                                  'GeneFunction.refGene',
+                                                                  'GeneExpressionTissue.refGene',
                                                                   'GeneDisease.refGene', 'InterVar_automated',
                                                                   'Phenotype', 'Platform', 'Study', 'PubMed ID'])
-# TODO: organize this code into methods, check, should I keep same everything that cause different phens in dif studies?
+    # TODO: organize this code into methods, check, should I keep same everything that cause different phens in dif studies?
     # (I don't think so, I could study NDDs together in general, not just separate phenotypes, in this case I should
     # delete those cases => or do nothing!
 
     in_mobi_uniprotid_lst = in_mobi_g4dn_df1['acc_x'].unique().tolist()  # 5047
     out_mobi_uniprotid_lst = out_mobi_g4dn_df1['acc_x'].unique().tolist()  # 9397
 
+    # check if your first dataset of proteins is inside your new protein lists
+    first_proteins_df = pd.read_csv(cfg.data[''] + '/allUniqueEntry.tab', sep='\t')
+    first_proteins_lst = first_proteins_df['Entry'].tolist()
 
+    all_g4dn_acc_lst = in_mobi_uniprotid_lst + out_mobi_uniprotid_lst  # 14444
+
+    mapped_pr_lst = []
+    unmapped_pr_lst = []
+    for i in first_proteins_lst:
+        if i in all_g4dn_acc_lst:
+            mapped_pr_lst.append(i)
+        else:
+            unmapped_pr_lst.append(i)
+
+
+sys.exit()
