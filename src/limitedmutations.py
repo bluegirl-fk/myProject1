@@ -12,9 +12,9 @@ def main():
     return
 
 
-if __name__ == '__main__':
-
-    all_candidate_genes_df = pd.read_csv(cfg.data['gene4'] + '/limitedmut/Candidate_gene_1.2.txt', sep='\t')  # (124137, 12)
+def genes_lst_maker():
+    all_candidate_genes_df = pd.read_csv(cfg.data['gene4'] + '/limitedmut/Candidate_gene_1.2.txt',
+                                         sep='\t')  # (124137, 12)
     phens_lst = ['ASD', 'ID', 'SCZ', 'EE']
     candidate_gens_df = all_candidate_genes_df[all_candidate_genes_df.Groups.isin(phens_lst)]  # (27844, 12)
     ctrl_lst = ['Control']
@@ -22,5 +22,10 @@ if __name__ == '__main__':
 
     more_accurate_genes_df = candidate_gens_df.loc[candidate_gens_df['FDR'] <= 0.05]
     more_accurate_genes_lst = more_accurate_genes_df['Gene symbol'].unique().tolist()  # 181
+    return more_accurate_genes_lst
 
-sys.exit()
+
+if __name__ == '__main__':
+
+
+    sys.exit()

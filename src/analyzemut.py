@@ -66,20 +66,18 @@ if __name__ == '__main__':
     in_mobi_g4dn_df1 = in_mobi_g4dn_df0.drop_duplicates(subset=['acc_x', 'length', 'position_x', 'aa1', 'aa2',
                                                                 'content_fraction', 'content_count',
                                                                 'Gene_refGene', 'exon#', 'frameshift', 'Extreme',
-                                                                'Chr', 'Start', 'End', 'Ref', 'Alt',
+                                                                'Chr', 'Ref', 'Alt',
                                                                 'ExonicFunc.refGene', 'GeneFunction.refGene',
                                                                 'GeneExpressionTissue.refGene', 'GeneDisease.refGene',
-                                                                'InterVar_automated', 'Phenotype', 'Platform', 'Study',
-                                                                'PubMed ID'])
+                                                                'InterVar_automated', 'Phenotype', 'Platform'])
     # (67822, 27)
     out_mobi_g4dn_df1 = out_mobi_g4dn_df0.drop_duplicates(subset=['acc_x', 'length', 'position_x', 'aa1', 'aa2',
                                                                   'content_fraction', 'content_count', 'Gene_refGene',
-                                                                  'exon#', 'frameshift', 'Extreme', 'Chr', 'Start',
-                                                                  'End', 'Ref', 'Alt', 'ExonicFunc.refGene',
+                                                                  'exon#', 'frameshift', 'Extreme', 'Chr', 'Ref', 'Alt', 'ExonicFunc.refGene',
                                                                   'GeneFunction.refGene',
                                                                   'GeneExpressionTissue.refGene',
                                                                   'GeneDisease.refGene', 'InterVar_automated',
-                                                                  'Phenotype', 'Platform', 'Study', 'PubMed ID'])
+                                                                  'Phenotype', 'Platform'])
     # TODO: organize this code into methods, check, should I keep same everything that cause different phens in dif studies?
     # (I don't think so, I could study NDDs together in general, not just separate phenotypes, in this case I should
     # delete those cases => or do nothing!
@@ -101,7 +99,12 @@ if __name__ == '__main__':
         else:
             unmapped_pr_lst.append(i)
 
-    candidate_in_g4mobi_df = in_mobi_g4dn_df1[in_mobi_g4dn_df1.Gene_refGene.isin(lmut.more_accurate_genes_lst)]
-    candidate_out_g4mobi_df = out_mobi_g4dn_df1[out_mobi_g4dn_df1.Gene_refGene.isin(lmut.more_accurate_genes_lst)]
+    ## trying to see how many accurate genes are in mobi_g4dn merged files (both inside IDRs and outside)
+    more_accurate_genes_lst = lmut.genes_lst_maker()
 
-    sys.exit(main())
+    candidate_in_g4mobi_df = in_mobi_g4dn_df1[in_mobi_g4dn_df1.Gene_refGene.isin(more_accurate_genes_lst)]
+    candidate_out_g4mobi_df = out_mobi_g4dn_df1[out_mobi_g4dn_df1.Gene_refGene.isin(more_accurate_genes_lst)]
+
+    candidate_in_g4mobi_df = candidate_in_g4mobi_df.drop_duplicates(subset=candidate_in_g4mobi_df.columns.difference(['index']))
+    candidate_out_g4mobi_df = candidate_out_g4mobi_df.drop_duplicates(subset=candidate_out_g4mobi_df.columns.difference(['index']))
+sys.exit(main())
