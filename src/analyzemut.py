@@ -5,6 +5,7 @@
 import pandas as pd
 import config as cfg
 import sys
+import limitedmutations as lmut
 
 
 def main():
@@ -100,5 +101,7 @@ if __name__ == '__main__':
         else:
             unmapped_pr_lst.append(i)
 
+    candidate_in_g4mobi_df = in_mobi_g4dn_df1[in_mobi_g4dn_df1.Gene_refGene.isin(lmut.more_accurate_genes_lst)]
+    candidate_out_g4mobi_df = out_mobi_g4dn_df1[out_mobi_g4dn_df1.Gene_refGene.isin(lmut.more_accurate_genes_lst)]
 
-sys.exit()
+    sys.exit(main())
