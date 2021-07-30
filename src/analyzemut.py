@@ -106,5 +106,8 @@ if __name__ == '__main__':
     candidate_out_g4mobi_df = out_mobi_g4dn_df1[out_mobi_g4dn_df1.Gene_refGene.isin(more_accurate_genes_lst)]
 
     candidate_in_g4mobi_df = candidate_in_g4mobi_df.drop_duplicates(subset=candidate_in_g4mobi_df.columns.difference(['index']))
+    candidate_in_unique_pr_lst = candidate_in_g4mobi_df['acc_x'].unique().tolist()
+
     candidate_out_g4mobi_df = candidate_out_g4mobi_df.drop_duplicates(subset=candidate_out_g4mobi_df.columns.difference(['index']))
+    candidate_out_unique_pr_lst = candidate_out_g4mobi_df['acc_x'].unique().tolist()
 sys.exit(main())
