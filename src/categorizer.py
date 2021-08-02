@@ -96,16 +96,20 @@ def mutidr_bool_array_maker(input_df):
     return array_is_in
 
 
+# made a column with bool values to check if it is ndd protein or not
 def mobi_mut_inidr_checker(mobi_df, mutinfo_df, filename):
     # mutinfo_df is mut_acc_mrg_df and is needed to get mut position from to check if in idr based on mobidb startend
     # converting disorder content ranges in each cell to a list
     mobi_df['startend'] = mobi_df['startend'].str.split(',')
     # subdf of mut pos to be merged with mobidb
     mutinfo_subdf = mutinfo_df[['index', 'acc', 'position']]  # (236699, 3)
+    mutinfo_subdf['ndd'] = 1
 
     ##  lots of rows cuz accs are repeated in both databases with dif features or mutation per each ACC
     # (maybe it could be done with pivot table already and have a matrix instead, like before with the heatmaps)
-    mobi_mutpos_df = pd.merge(mobi_df, mutinfo_subdf, on='acc')  # (4258689, 8)
+    mobi_mutpos_df = pd.concat([mobi_df, mutinfo_subdf], axis=1)  # (4258689, 8)
+    mobi_mutpos_df['ndd'] = mobi_mutpos_df['ndd'].fillna(0)
+
     array_is_in = mutidr_bool_array_maker(mobi_mutpos_df)
     ## add bool array to the df
     mobi_mutpos_df['is_in_startend'] = array_is_in
@@ -126,7 +130,7 @@ def mobi_mut_in_df_generator(input_df):
                                               values='content_fraction').fillna(0)
     mut_in_cf_df.to_csv(cfg.data['gene4'] + '/mobidb-pivot-cf-mut-true.csv')
     mut_in_cc_df = mobi_mut_in_df.pivot_table(index=['acc'], columns=['feature'],
-                                                             values='content_count').fillna(0)
+                                              values='content_count').fillna(0)
     mut_in_cc_df.to_csv(cfg.data['gene4'] + '/mobidb-pivot-cc-mut-true.csv')
     return mobi_mut_in_df, mut_in_cf_df, mut_in_cc_df
 
@@ -140,9 +144,10 @@ def mobi_mut_out_df_generator(input_df):
                                                 values='content_fraction').fillna(0)
     mut_out_cf_df.to_csv(cfg.data['gene4'] + '/mobidb-pivot-cf-mut-false.csv')
     mut_out_cc_df = mobi_mut_out_df.pivot_table(index=['acc'], columns=['feature'],
-                                                               values='content_count').fillna(0)
+                                                values='content_count').fillna(0)
     mut_out_cc_df.to_csv(cfg.data['gene4'] + '/mobidb-pivot-cc-mut-flase.csv')
     return mobi_mut_out_df, mut_out_cf_df, mut_out_cc_df
+
 
 # TODO: this should merge based on index, not acc!
 def mobi_g4dn_merger(df1, df2, df3, df4, df5, df6, g4dn_mutinfo_acc_df):
@@ -181,8 +186,7 @@ def generate_mutation_file2():
     df = pd.read_csv(cfg.data['gene4'] + '/yourfile.csv', sep='\t')
     # ...............
 
-
-# if __name__ == '__main__':
+if __name__ == '__main__':
     g4dn_exonic_df = pd.read_csv(cfg.data['gene4'] + '/exonic-df.csv')
     g4dn_exonic_df = prep_orig_df(g4dn_exonic_df)  # (70879, 156)
     refseq_mut_subdf = pr_mut_subdf_handler(g4dn_exonic_df, 'AAChange_refGene', 10,
@@ -201,31 +205,11 @@ def generate_mutation_file2():
     mut_acc_mrg_df = g4dn_mut_acc_merger(refseq_acc_modified_df, g4dn_exo_mutinfo_df, 'refSeq', '/mut-acc-mrg-df.csv')
 
     ## mobidb
-    mobidb_original_df = pd.read_csv(cfg.data['']+'/mobidb_result.tsv', sep='\t')  # (1212280,6)
+    mobidb_original_df = pd.read_csv(cfg.data[''] + '/mobidb_result.tsv', sep='\t')  # (1212280,6)
     mobidb_original_df.columns = ['acc', 'feature', 'startend', 'content_fraction', 'content_count', 'length']
-    mobi_mutpos_checked_df = mobi_mut_inidr_checker(mobidb_original_df, mut_acc_mrg_df, '/mut-pos-mobi.csv')
-    ### extra code added here:
-# if __name__ == '__main__':
-    mobi_mutpos_checked_df = pd.read_csv(cfg.data['gene4']+'/mut-pos-mobi.csv')
-    # mut_acc_mrg_df = pd.read_csv(cfg.data['gene4']+'/mut-acc-mrg-df.csv')
-
-    # mobidb filtered based on dif criteria of mutation in/out idr, pivot tables(mobip) with cont frac & cont count
-    mobi_mut_in_idr_df, _, _ = mobi_mut_in_df_generator(mobi_mutpos_checked_df)
-    mobi_mut_out_idr_df, _, _ = mobi_mut_out_df_generator(mobi_mutpos_checked_df)
-if __name__ == '__main__':
-    # mobi_mut_in_idr_df = pd.read_csv(cfg.data['gene4'] + '/mobidb-mut-pos-true.csv')
-    # mobi_mut_out_idr_df = pd.read_csv(cfg.data['gene4'] + '/mobidb-mut-pos-false.csv')
-    mobi_mutpos_checked_df = pd.read_csv(cfg.data['gene4']+'/mut-pos-mobi.csv', low_memory=False)
-    mobi_pr_unique_lst = mobi_mutpos_checked_df['acc'].unique().tolist()  # 17633
+    mobi_mutpos_checked_df = mobi_mut_inidr_checker(mobidb_original_df, mut_acc_mrg_df, '/mut-pos-mobi1.csv')
 
 
-
-
-    # # merged mobidb categorized dfs with g4dn mutinfo acc (mut_acc_mrg_df) based on idx
-    # _, mobip_g4dn_in_cf_df, mobip_g4dn_in_cc_df, _, mobip_g4dn_out_cf_df, mobip_g4dn_out_cc_df = mobi_g4dn_merger \
-    #     (mobi_mut_in_idr_df, mobip_mut_in_cf_df, mobip_mut_in_cc_df,
-    #      mobi_mut_out_idr_df, mobip_mut_out_cf_df, mobip_mut_in_cc_df,
-    #      mut_acc_mrg_df)
 sys.exit()
 
 # TODO: run and if works fine, open them as csv files and then use as reference file,
