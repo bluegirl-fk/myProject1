@@ -23,8 +23,8 @@ def genes_lst_maker():  # this is candidate genes from download page
 
     ctrl_lst = ['Control']
     control_df = all_candidate_genes_df[all_candidate_genes_df.Groups.isin(ctrl_lst)]  # (20907, 12)
-    ctrl_pos_df = control_df.loc[control_df['FDR'] <= 0.05]
-    ctrl_pos_lst = ctrl_pos_df['Gene symbol'].unique().tolist()
+    # ctrl_pos_df = control_df.loc[control_df['FDR'] <= 0.05] # this gives 0 results
+    ctrl_pos_lst = control_df['Gene symbol'].unique().tolist()  # 20907
     return positive_genes_lst, ctrl_pos_lst
 
 
