@@ -3,7 +3,7 @@
 import config as cfg
 import pandas as pd
 import sys
-
+import limitedmutations as lmut
 
 def main():
     # generate_mutation_file()
@@ -192,8 +192,12 @@ if __name__ == '__main__':
     refseq_mut_subdf = pr_mut_subdf_handler(g4dn_exonic_df, 'AAChange_refGene', 10,
                                             ['Gene_refGene', 'refSeq', 'exon#', 'mutNA', 'AAChange_refGene', 'aa1',
                                              'aa2', 'position', 'frameshift', 'mutPr'])  # (201372, 9)
+    # (201372, 166)
     g4dn_exo_mutinfo_df = merge_dfs_on_index(refseq_mut_subdf, g4dn_exonic_df, 'idx1', '/exonic-mutinfo.csv')
-    # TODO maybe insert the candidate genes here!
+    ## positive candidate genes list
+    pos_candidate_gene_lst, ctrl_candidate_genes_lst = lmut.genes_lst_maker()  # 181
+    # (24387, 166)
+    g4dn_exo_pos_cand_df = g4dn_exo_mutinfo_df[g4dn_exo_mutinfo_df.Gene_refGene.isin(pos_candidate_gene_lst)]
     # * Got refseq_ids from refseq_mut_subdf['refSeq'] and wrote this list to txt, retrieved ACCs from uniprot
     # (split my text file using bash : split -l 70000 refseq-gene4dn.txt, the 7000 is number of the lines)
 
