@@ -115,4 +115,6 @@ if __name__ == '__main__':
     candidate_out_g4mobi_df = candidate_out_g4mobi_df.drop_duplicates(subset=candidate_out_g4mobi_df.columns.difference(['index']))
     ## Unique proteins N:173
     candidate_out_unique_pr_lst = candidate_out_g4mobi_df['acc_x'].unique().tolist()
+
+    # TODO: change the names first, then make merged dfs with phens_pos_genes_df and g4mobi
 sys.exit(main())
