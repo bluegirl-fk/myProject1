@@ -94,5 +94,7 @@ if __name__ == '__main__':
     pos_cand_idr_pr_lst = pos_cand_idr_g4mobi_df['acc_x'].unique().tolist()
     pos_cand_oidr_pr_lst = pos_cand_oidr_g4mobi_df['acc_x'].unique().tolist()
 
-    # TODO: change the names first, then make merged dfs with phens_pos_genes_df and g4mobi
+    # TODO: make merged dfs with phens_pos_genes_df and g4mobi (instead of gene list as input) => what D wanted
+    # TODO: the same thing for control
+
 sys.exit(main())
