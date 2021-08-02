@@ -56,15 +56,14 @@ if __name__ == '__main__':
                                                                   'GeneExpressionTissue.refGene',
                                                                   'GeneDisease.refGene', 'InterVar_automated',
                                                                   'Phenotype', 'Platform'])
-
+    ## number of unique proteins
     in_mobi_uniprotid_lst = in_mobi_g4dn_df1['acc_x'].unique().tolist()  # 5047
     out_mobi_uniprotid_lst = out_mobi_g4dn_df1['acc_x'].unique().tolist()  # 9397
+    all_g4dn_acc_lst = in_mobi_uniprotid_lst + out_mobi_uniprotid_lst  # 14444
 
-    # check if your first dataset of proteins is inside your new protein lists
+    ##  if first dataset of proteins (1090) is inside g4dn proteins
     first_proteins_df = pd.read_csv(cfg.data[''] + '/allUniqueEntry.tab', sep='\t')
     first_proteins_lst = first_proteins_df['Entry'].tolist()
-
-    all_g4dn_acc_lst = in_mobi_uniprotid_lst + out_mobi_uniprotid_lst  # 14444
 
     mapped_pr_lst = []
     unmapped_pr_lst = []
@@ -74,22 +73,22 @@ if __name__ == '__main__':
         else:
             unmapped_pr_lst.append(i)
 
-    ## trying to see how many accurate genes are in mobi_g4dn merged files (both inside IDRs and outside)
-    more_accurate_genes_lst = lmut.genes_lst_maker()  # 181
-
+    ## check if positive candidate genes in mobi_g4dn merged files (both inside IDRs and outside)
+    # positive genes imported from limitedmutations.py method genes_lst_maker()
+    pos_candidate_gene_lst = lmut.genes_lst_maker()  # 181
+    ## this two new dfs could have redundant proteins (several prs from one gene can have muts in or out idr or both!)
     # (2143, 27)
-    candidate_in_g4mobi_df = in_mobi_g4dn_df1[in_mobi_g4dn_df1.Gene_refGene.isin(more_accurate_genes_lst)]
+    pos_cand_idr_g4mobi_df = in_mobi_g4dn_df1[in_mobi_g4dn_df1.Gene_refGene.isin(pos_candidate_gene_lst)]
+    pos_cand_idr_g4mobi_df = pos_cand_idr_g4mobi_df.drop_duplicates(
+        subset=pos_cand_idr_g4mobi_df.columns.difference(['index']))
     # (6853, 27)
-    candidate_out_g4mobi_df = out_mobi_g4dn_df1[out_mobi_g4dn_df1.Gene_refGene.isin(more_accurate_genes_lst)]
+    pos_cand_oidr_g4mobi_df = out_mobi_g4dn_df1[out_mobi_g4dn_df1.Gene_refGene.isin(pos_candidate_gene_lst)]
+    pos_cand_oidr_g4mobi_df = pos_cand_oidr_g4mobi_df.drop_duplicates(
+        subset=pos_cand_oidr_g4mobi_df.columns.difference(['index']))
 
-    candidate_in_g4mobi_df = candidate_in_g4mobi_df.drop_duplicates(subset=candidate_in_g4mobi_df.columns.difference(['index']))
-    ## Unique proteins N:131
-    candidate_in_unique_pr_lst = candidate_in_g4mobi_df['acc_x'].unique().tolist()
-
-
-    candidate_out_g4mobi_df = candidate_out_g4mobi_df.drop_duplicates(subset=candidate_out_g4mobi_df.columns.difference(['index']))
-    ## Unique proteins N:173
-    candidate_out_unique_pr_lst = candidate_out_g4mobi_df['acc_x'].unique().tolist()
+    ## Unique proteins, total: 304, in:131, out: 173
+    pos_cand_idr_pr_lst = pos_cand_idr_g4mobi_df['acc_x'].unique().tolist()
+    pos_cand_oidr_pr_lst = pos_cand_oidr_g4mobi_df['acc_x'].unique().tolist()
 
     # TODO: change the names first, then make merged dfs with phens_pos_genes_df and g4mobi
 sys.exit(main())
