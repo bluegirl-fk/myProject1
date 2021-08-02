@@ -53,6 +53,10 @@ if __name__ == '__main__':
     # (67822, 27)
     out_mobi_g4dn_df1 = col_based_drop_duplicate(out_mobi_g4dn_df0)
 
+    ## add a new column with boolean values for in IDR or not
+    in_mobi_g4dn_df1['is_in_idr'] = 1  # (17329, 28)
+    out_mobi_g4dn_df1['is_in_idr'] = 0  # (67822, 28)
+
     ## number of unique proteins
     in_mobi_uniprotid_lst = in_mobi_g4dn_df1['acc_x'].unique().tolist()  # 5047
     out_mobi_uniprotid_lst = out_mobi_g4dn_df1['acc_x'].unique().tolist()  # 9397
@@ -85,7 +89,8 @@ if __name__ == '__main__':
         subset=pos_cand_oidr_g4mobi_df.columns.difference(['index']))
 
     ## concat pos_cand_idr_g4mobi_df and pos_cand_oidr_g4mobi_df
-    joined = pos_cand_idr_g4mobi_df.append(pos_cand_oidr_g4mobi_df, sort=False)
+    positive_cand_g4mobi_df = pos_cand_idr_g4mobi_df.append(pos_cand_oidr_g4mobi_df, sort=False)
+
     # control df
     # (first concat mobi_g4dn in and out dfs, then put ctrl in that df ), also same for pos_cand_genes_lst
 
@@ -93,7 +98,6 @@ if __name__ == '__main__':
     pos_cand_idr_pr_lst = pos_cand_idr_g4mobi_df['acc_x'].unique().tolist()
     pos_cand_oidr_pr_lst = pos_cand_oidr_g4mobi_df['acc_x'].unique().tolist()
 
-    # TODO: make merged dfs with phens_pos_genes_df and g4mobi (instead of gene list as input) => what D wanted
-    # TODO: the same thing for control, these into methods
+
 
 sys.exit(main())
