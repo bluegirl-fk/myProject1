@@ -100,14 +100,19 @@ if __name__ == '__main__':
             unmapped_pr_lst.append(i)
 
     ## trying to see how many accurate genes are in mobi_g4dn merged files (both inside IDRs and outside)
-    more_accurate_genes_lst = lmut.genes_lst_maker()
+    more_accurate_genes_lst = lmut.genes_lst_maker()  # 181
 
+    # (2143, 27)
     candidate_in_g4mobi_df = in_mobi_g4dn_df1[in_mobi_g4dn_df1.Gene_refGene.isin(more_accurate_genes_lst)]
+    # (6853, 27)
     candidate_out_g4mobi_df = out_mobi_g4dn_df1[out_mobi_g4dn_df1.Gene_refGene.isin(more_accurate_genes_lst)]
 
     candidate_in_g4mobi_df = candidate_in_g4mobi_df.drop_duplicates(subset=candidate_in_g4mobi_df.columns.difference(['index']))
+    ## Unique proteins N:131
     candidate_in_unique_pr_lst = candidate_in_g4mobi_df['acc_x'].unique().tolist()
 
+
     candidate_out_g4mobi_df = candidate_out_g4mobi_df.drop_duplicates(subset=candidate_out_g4mobi_df.columns.difference(['index']))
+    ## Unique proteins N:173
     candidate_out_unique_pr_lst = candidate_out_g4mobi_df['acc_x'].unique().tolist()
 sys.exit(main())
