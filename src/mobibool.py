@@ -21,5 +21,7 @@ if __name__ == '__main__':
     brain_pr_df['brain'] = 1
     mobi_brain_bool_df = pd.concat([mobi_ndd_idr_df, brain_pr_df], axis=1)
     mobi_brain_bool_df['brain'] = mobi_brain_bool_df['brain'].fillna(0)
+    mobi_brain_bool_df = mobi_brain_bool_df.drop(['brain_acc'], axis=1)  # (1212280, 11)
 
+    pos_cands_g4mobi_df = pd.read_csv(cfg.data['gene4'] + '/positive_cand_g4mobi_concat.csv')
     sys.exit()
