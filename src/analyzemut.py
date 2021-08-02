@@ -20,29 +20,10 @@ if __name__ == '__main__':
     # # (25961, 11)
     # mut_in_mobi_lite_df = mobi_mut_in_idr_df.loc[mobi_mut_in_idr_df['feature'] == 'prediction-disorder-mobidb_lite']
     # # (102495, 11)
-    # mut_out_mobi_lite_df = mobi_mut_out_idr_df.loc[mobi_mut_out_idr_df['feature'] == 'prediction-disorder-mobidb_lite']
+    # mut_out_mobi_lite_df = mobi_mut_out_idr_df.loc[mobi_mut_out_idr_df['feature']=='prediction-disorder-mobidb_lite']
 
     ## merge with g4dn
-    # mut_acc_mrg_df = pd.read_csv(cfg.data['gene4'] + '/mut-acc-mrg-df.csv', low_memory=False)  # (235393, 169)
-    # # TODO: deal with this error: Process finished with exit code 137 (interrupted by signal 9: SIGKILL)
-    #
-    #  # (235393, 126)
-    # new_g4dn_df = mut_acc_mrg_df.drop( columns=['Unnamed: 0', 'mutNA', 'AAChange_refGene_x',
-    #  'Ratio_of_tools (ReVe,gt,0.7)', 'Rare_or_Common', 'Func.refGene', 'Gene.refGene', 'GeneDetail.refGene',
-    #  'AAChange_refGene_y', 'GeneFullName.refGene', 'GeneFullName.ensGene', 'GeneFunction.ensGene',
-    #  'GeneExpressionTissue.ensGene', 'GeneDetail.ensGene', 'AAChange.knownGene', 'GeneDisease.knownGene',
-    #  'OMIM.knownGene', 'MGI.knownGene', 'RVIS.knownGene', 'LoFtool.knownGene', 'GDI.knownGene',
-    #  'Episcore.knownGene', 'Aggarwala.knownGene', 'pLi_EXAC.knownGene', 'HIPred.knownGene' ,
-    #  'GeneFullName.knownGene', 'GeneFunction.knownGene', 'GeneExpressionTissue.knownGene', 'GeneDetail.knownGene',
-    #  'AAChange.ensGene', 'GeneDisease.ensGene', 'OMIM.ensGene', 'MGI.ensGene', 'RVIS.ensGene', 'LoFtool.ensGene',
-    #  'GDI.ensGene', 'Episcore.ensGene', 'Aggarwala.ensGene', 'pLi_EXAC.ensGene', 'HIPred.ensGene', 'avsnp150',
-    #  'Otherinfo'])
-    # new_g4dn_df.to_csv(cfg.data['gene4'] + '/new-g4dn-df.csv')
-    # new_g4dn_df = pd.read_csv(cfg.data['gene4'] + '/new-g4dn-df.csv', low_memory=False)
-    # in_mobi_g4dn_df = pd.merge(mut_in_mobi_lite_df, new_g4dn_df, on='index')
-    # in_mobi_g4dn_df.to_csv(cfg.data['gene4'] + '/in-mobi-newG4DN.csv')  # (25961, 138)
-    # out_mobi_g4dn_df = pd.merge(mut_out_mobi_lite_df, new_g4dn_df, on='index')  # (102495, 138)
-    # out_mobi_g4dn_df.to_csv(cfg.data['gene4'] + '/out-mobi-newG4DN.csv')
+
 
     in_mobi_g4dn_df = pd.read_csv(cfg.data['gene4'] + '/in-mobi-newG4DN.csv', low_memory=False)
     out_mobi_g4dn_df = pd.read_csv(cfg.data['gene4'] + '/out-mobi-newG4DN.csv', low_memory=False)
