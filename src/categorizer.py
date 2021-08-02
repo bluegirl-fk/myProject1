@@ -205,7 +205,7 @@ def generate_mutation_file2():
     mobidb_original_df.columns = ['acc', 'feature', 'startend', 'content_fraction', 'content_count', 'length']
     mobi_mutpos_checked_df = mobi_mut_inidr_checker(mobidb_original_df, mut_acc_mrg_df, '/mut-pos-mobi.csv')
     ### extra code added here:
-if __name__ == '__main__':
+# if __name__ == '__main__':
     mobi_mutpos_checked_df = pd.read_csv(cfg.data['gene4']+'/mut-pos-mobi.csv')
     # mut_acc_mrg_df = pd.read_csv(cfg.data['gene4']+'/mut-acc-mrg-df.csv')
 
@@ -213,15 +213,19 @@ if __name__ == '__main__':
     mobi_mut_in_idr_df, _, _ = mobi_mut_in_df_generator(mobi_mutpos_checked_df)
     mobi_mut_out_idr_df, _, _ = mobi_mut_out_df_generator(mobi_mutpos_checked_df)
 if __name__ == '__main__':
-    mobi_mut_in_idr_df = pd.read_csv(cfg.data['gene4'] + '/mobidb-mut-pos-true.csv')
-    mobi_mut_out_idr_df = pd.read_csv(cfg.data['gene4'] + '/mobidb-mut-pos-false.csv')
-    # now make a new repository to work with this two dataframes
+    # mobi_mut_in_idr_df = pd.read_csv(cfg.data['gene4'] + '/mobidb-mut-pos-true.csv')
+    # mobi_mut_out_idr_df = pd.read_csv(cfg.data['gene4'] + '/mobidb-mut-pos-false.csv')
+    mobi_mutpos_checked_df = pd.read_csv(cfg.data['gene4']+'/mut-pos-mobi.csv', low_memory=False)
+    mobi_pr_unique_lst = mobi_mutpos_checked_df['acc'].unique().tolist()  # 17633
 
-    # merged mobidb categorized dfs with g4dn mutinfo acc (mut_acc_mrg_df)
-    _, mobip_g4dn_in_cf_df, mobip_g4dn_in_cc_df, _, mobip_g4dn_out_cf_df, mobip_g4dn_out_cc_df = mobi_g4dn_merger \
-        (mobi_mut_in_idr_df, mobip_mut_in_cf_df, mobip_mut_in_cc_df,
-         mobi_mut_out_idr_df, mobip_mut_out_cf_df, mobip_mut_in_cc_df,
-         mut_acc_mrg_df)
+
+
+
+    # # merged mobidb categorized dfs with g4dn mutinfo acc (mut_acc_mrg_df) based on idx
+    # _, mobip_g4dn_in_cf_df, mobip_g4dn_in_cc_df, _, mobip_g4dn_out_cf_df, mobip_g4dn_out_cc_df = mobi_g4dn_merger \
+    #     (mobi_mut_in_idr_df, mobip_mut_in_cf_df, mobip_mut_in_cc_df,
+    #      mobi_mut_out_idr_df, mobip_mut_out_cf_df, mobip_mut_in_cc_df,
+    #      mut_acc_mrg_df)
 sys.exit()
 
 # TODO: run and if works fine, open them as csv files and then use as reference file,
