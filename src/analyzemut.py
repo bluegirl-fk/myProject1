@@ -75,16 +75,20 @@ if __name__ == '__main__':
 
     ## check if positive candidate genes in mobi_g4dn merged files (both inside IDRs and outside)
     # positive genes imported from limitedmutations.py method genes_lst_maker()
-    pos_candidate_gene_lst = lmut.genes_lst_maker()  # 181
+    pos_candidate_gene_lst, ctrl_candidate_genes_lst = lmut.genes_lst_maker()  # 181
+
     ## this two new dfs could have redundant proteins (several prs from one gene can have muts in or out idr or both!)
-    # (2143, 27)
+    # (2143, 27) protein mutations in IDR
     pos_cand_idr_g4mobi_df = in_mobi_g4dn_df1[in_mobi_g4dn_df1.Gene_refGene.isin(pos_candidate_gene_lst)]
     pos_cand_idr_g4mobi_df = pos_cand_idr_g4mobi_df.drop_duplicates(
         subset=pos_cand_idr_g4mobi_df.columns.difference(['index']))
-    # (6853, 27)
+    # (6853, 27) protein mutations out IDR
     pos_cand_oidr_g4mobi_df = out_mobi_g4dn_df1[out_mobi_g4dn_df1.Gene_refGene.isin(pos_candidate_gene_lst)]
     pos_cand_oidr_g4mobi_df = pos_cand_oidr_g4mobi_df.drop_duplicates(
         subset=pos_cand_oidr_g4mobi_df.columns.difference(['index']))
+
+    # control df
+    # (first concat mobi_g4dn in and out dfs, then put ctrl in that df ), also same for pos_cand_genes_lst
 
     ## Unique proteins, total: 304, in:131, out: 173
     pos_cand_idr_pr_lst = pos_cand_idr_g4mobi_df['acc_x'].unique().tolist()
