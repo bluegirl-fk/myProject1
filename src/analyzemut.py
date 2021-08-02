@@ -13,10 +13,28 @@ def main():
     return
 
 
+def df_col_selecter(inputdf):
+    inputdf1 = inputdf[['index', 'acc_x', 'length', 'position_x', 'aa1', 'aa2', 'content_fraction',
+                                        'content_count', 'refSeq', 'Gene_refGene', 'exon#', 'frameshift', 'Extreme',
+                                        'Chr', 'Start', 'End', 'Ref', 'Alt', 'ExonicFunc.refGene',
+                                        'GeneFunction.refGene', 'GeneExpressionTissue.refGene', 'GeneDisease.refGene',
+                                        'InterVar_automated', 'Phenotype', 'Platform', 'Study', 'PubMed ID']]
+    return inputdf1
+
+
+def col_based_drop_duplicate(inputdf):
+    inputdf1 = inputdf.drop_duplicates(subset=['acc_x', 'length', 'position_x', 'aa1', 'aa2',
+                                                                'content_fraction', 'content_count', 'Gene_refGene',
+                                                                'exon#', 'frameshift', 'Extreme', 'Chr', 'Ref', 'Alt',
+                                                                'ExonicFunc.refGene', 'GeneFunction.refGene',
+                                                                'GeneExpressionTissue.refGene', 'GeneDisease.refGene',
+                                                                'InterVar_automated', 'Phenotype', 'Platform'])
+    return inputdf1
+
+
 if __name__ == '__main__':
     # mobi_mut_in_idr_df = pd.read_csv(cfg.data['gene4'] + '/mobidb-mut-pos-true.csv')  # (994383, 11)
     # mobi_mut_out_idr_df = pd.read_csv(cfg.data['gene4'] + '/mobidb-mut-pos-false.csv')  # (3238392, 11)
-    #
     # # (25961, 11)
     # mut_in_mobi_lite_df = mobi_mut_in_idr_df.loc[mobi_mut_in_idr_df['feature'] == 'prediction-disorder-mobidb_lite']
     # # (102495, 11)
@@ -26,36 +44,15 @@ if __name__ == '__main__':
 
     in_mobi_g4dn_df = pd.read_csv(cfg.data['gene4'] + '/in-mobi-newG4DN.csv', low_memory=False)
     out_mobi_g4dn_df = pd.read_csv(cfg.data['gene4'] + '/out-mobi-newG4DN.csv', low_memory=False)
-
-    # (25961, 27)
-    in_mobi_g4dn_df0 = in_mobi_g4dn_df[['index', 'acc_x', 'length', 'position_x', 'aa1', 'aa2', 'content_fraction',
-                                        'content_count', 'refSeq', 'Gene_refGene', 'exon#', 'frameshift', 'Extreme',
-                                        'Chr', 'Start', 'End', 'Ref', 'Alt', 'ExonicFunc.refGene',
-                                        'GeneFunction.refGene', 'GeneExpressionTissue.refGene', 'GeneDisease.refGene',
-                                        'InterVar_automated', 'Phenotype', 'Platform', 'Study', 'PubMed ID']]
-    # (102495, 27)
-    out_mobi_g4dn_df0 = out_mobi_g4dn_df[['index', 'acc_x', 'length', 'position_x', 'aa1', 'aa2', 'content_fraction',
-                                          'content_count', 'refSeq', 'Gene_refGene', 'exon#', 'frameshift', 'Extreme',
-                                          'Chr', 'Start', 'End', 'Ref', 'Alt', 'ExonicFunc.refGene',
-                                          'GeneFunction.refGene', 'GeneExpressionTissue.refGene', 'GeneDisease.refGene',
-                                          'InterVar_automated', 'Phenotype', 'Platform', 'Study', 'PubMed ID']]
-
+    ## limiting the columns
+    in_mobi_g4dn_df0 = df_col_selecter(in_mobi_g4dn_df)  # (25961, 27)
+    out_mobi_g4dn_df0 = df_col_selecter(out_mobi_g4dn_df)  # (102495, 27)
+    ## drop duplicates except columns: index, refSeq, Start, End, Study, PubmedID
     # (17329, 27)
-    in_mobi_g4dn_df1 = in_mobi_g4dn_df0.drop_duplicates(subset=['acc_x', 'length', 'position_x', 'aa1', 'aa2',
-                                                                'content_fraction', 'content_count',
-                                                                'Gene_refGene', 'exon#', 'frameshift', 'Extreme',
-                                                                'Chr', 'Ref', 'Alt',
-                                                                'ExonicFunc.refGene', 'GeneFunction.refGene',
-                                                                'GeneExpressionTissue.refGene', 'GeneDisease.refGene',
-                                                                'InterVar_automated', 'Phenotype', 'Platform'])
+    in_mobi_g4dn_df1 = col_based_drop_duplicate(in_mobi_g4dn_df0)
     # (67822, 27)
-    out_mobi_g4dn_df1 = out_mobi_g4dn_df0.drop_duplicates(subset=['acc_x', 'length', 'position_x', 'aa1', 'aa2',
-                                                                  'content_fraction', 'content_count', 'Gene_refGene',
-                                                                  'exon#', 'frameshift', 'Extreme', 'Chr', 'Ref', 'Alt', 'ExonicFunc.refGene',
-                                                                  'GeneFunction.refGene',
-                                                                  'GeneExpressionTissue.refGene',
-                                                                  'GeneDisease.refGene', 'InterVar_automated',
-                                                                  'Phenotype', 'Platform'])
+    out_mobi_g4dn_df1 = col_based_drop_duplicate(out_mobi_g4dn_df0)
+
     ## number of unique proteins
     in_mobi_uniprotid_lst = in_mobi_g4dn_df1['acc_x'].unique().tolist()  # 5047
     out_mobi_uniprotid_lst = out_mobi_g4dn_df1['acc_x'].unique().tolist()  # 9397
@@ -87,6 +84,8 @@ if __name__ == '__main__':
     pos_cand_oidr_g4mobi_df = pos_cand_oidr_g4mobi_df.drop_duplicates(
         subset=pos_cand_oidr_g4mobi_df.columns.difference(['index']))
 
+    ## concat pos_cand_idr_g4mobi_df and pos_cand_oidr_g4mobi_df
+    joined = pos_cand_idr_g4mobi_df.append(pos_cand_oidr_g4mobi_df, sort=False)
     # control df
     # (first concat mobi_g4dn in and out dfs, then put ctrl in that df ), also same for pos_cand_genes_lst
 
@@ -95,6 +94,6 @@ if __name__ == '__main__':
     pos_cand_oidr_pr_lst = pos_cand_oidr_g4mobi_df['acc_x'].unique().tolist()
 
     # TODO: make merged dfs with phens_pos_genes_df and g4mobi (instead of gene list as input) => what D wanted
-    # TODO: the same thing for control
+    # TODO: the same thing for control, these into methods
 
 sys.exit(main())
