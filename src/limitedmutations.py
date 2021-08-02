@@ -17,18 +17,21 @@ def genes_lst_maker():  # this is candidate genes from download page
                                          sep='\t')  # (124137, 12)
     phens_lst = ['ASD', 'ID', 'SCZ', 'EE']
     candidate_gens_df = all_candidate_genes_df[all_candidate_genes_df.Groups.isin(phens_lst)]  # (27844, 12)
+
+    positive_genes_df = candidate_gens_df.loc[candidate_gens_df['FDR'] <= 0.05]
+    positive_genes_lst = positive_genes_df['Gene symbol'].unique().tolist()  # 181
+
     ctrl_lst = ['Control']
     control_df = all_candidate_genes_df[all_candidate_genes_df.Groups.isin(ctrl_lst)]  # (20907, 12)
-
-    more_accurate_genes_df = candidate_gens_df.loc[candidate_gens_df['FDR'] <= 0.05]
-    more_accurate_genes_lst = more_accurate_genes_df['Gene symbol'].unique().tolist()  # 181
-    return more_accurate_genes_lst
+    ctrl_pos_df = control_df.loc[control_df['FDR'] <= 0.05]
+    ctrl_pos_lst = ctrl_pos_df['Gene symbol'].unique().tolist()
+    return positive_genes_lst, ctrl_pos_lst
 
 
 if __name__ == '__main__':
 
-    ## Candidate genes from excel file
-    genes_df = pd.read_excel(cfg.data['gene4'] + '/Gene.xlsx', engine='openpyxl')  # (8271, 13)
+    ## Candidate genes from excel file (list is not complete)
+    # genes_df = pd.read_excel(cfg.data['gene4'] + '/Gene.xlsx', engine='openpyxl')  # (8271, 13)
 
 
     sys.exit()
