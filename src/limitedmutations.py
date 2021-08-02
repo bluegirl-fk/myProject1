@@ -29,18 +29,6 @@ if __name__ == '__main__':
 
     ## Candidate genes from excel file
     genes_df = pd.read_excel(cfg.data['gene4'] + '/Gene.xlsx', engine='openpyxl')  # (8271, 13)
-    genes_df.to_csv(cfg.data['gene4'] + 'new_genes_file.csv')
-    phens_lst = ['ASD', 'ID', 'SCZ', 'EE']
-    phens_genes_df = genes_df[genes_df.group_name.isin(phens_lst)]  # (1815, 13)
 
-    ctrl_lst = ['Control']
-    control_genes_df = genes_df[genes_df.group_name.isin(ctrl_lst)]  # (1266, 13)
-
-    ## unique proteins lists of phens and control
-    fdr_based_genes_df = phens_genes_df.loc[phens_genes_df['FDR'] <= 0.05]
-    # fdr_based_genes_lst = fdr_based_genes_df['gene_symbol'].unique.tolist()
-    #
-    # fdr_based_ctrl_df = control_genes_df.loc[phens_genes_df['FDR'] <= 0.05]
-    # fdr_based_ctrl_lst = fdr_based_ctrl_df['gene_symbol'].unique().tolist()
 
     sys.exit()
