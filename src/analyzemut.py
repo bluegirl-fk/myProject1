@@ -22,8 +22,7 @@ if __name__ == '__main__':
     # # (102495, 11)
     # mut_out_mobi_lite_df = mobi_mut_out_idr_df.loc[mobi_mut_out_idr_df['feature']=='prediction-disorder-mobidb_lite']
 
-    ## merge with g4dn
-
+    ## merge with g4dn (proteins mutation position checked)
 
     in_mobi_g4dn_df = pd.read_csv(cfg.data['gene4'] + '/in-mobi-newG4DN.csv', low_memory=False)
     out_mobi_g4dn_df = pd.read_csv(cfg.data['gene4'] + '/out-mobi-newG4DN.csv', low_memory=False)
@@ -41,8 +40,6 @@ if __name__ == '__main__':
                                           'GeneFunction.refGene', 'GeneExpressionTissue.refGene', 'GeneDisease.refGene',
                                           'InterVar_automated', 'Phenotype', 'Platform', 'Study', 'PubMed ID']]
 
-    # TODO: try this one instead: just by stating the column to be ignored:
-    # df.drop_duplicates(subset=df.columns.difference(['Description']))
     # (17329, 27)
     in_mobi_g4dn_df1 = in_mobi_g4dn_df0.drop_duplicates(subset=['acc_x', 'length', 'position_x', 'aa1', 'aa2',
                                                                 'content_fraction', 'content_count',
@@ -59,9 +56,6 @@ if __name__ == '__main__':
                                                                   'GeneExpressionTissue.refGene',
                                                                   'GeneDisease.refGene', 'InterVar_automated',
                                                                   'Phenotype', 'Platform'])
-    # TODO: organize this code into methods, check, should I keep same everything that cause different phens in dif studies?
-    # (I don't think so, I could study NDDs together in general, not just separate phenotypes, in this case I should
-    # delete those cases => or do nothing!
 
     in_mobi_uniprotid_lst = in_mobi_g4dn_df1['acc_x'].unique().tolist()  # 5047
     out_mobi_uniprotid_lst = out_mobi_g4dn_df1['acc_x'].unique().tolist()  # 9397
