@@ -193,7 +193,7 @@ if __name__ == '__main__':
                                             ['Gene_refGene', 'refSeq', 'exon#', 'mutNA', 'AAChange_refGene', 'aa1',
                                              'aa2', 'position', 'frameshift', 'mutPr'])  # (201372, 9)
     g4dn_exo_mutinfo_df = merge_dfs_on_index(refseq_mut_subdf, g4dn_exonic_df, 'idx1', '/exonic-mutinfo.csv')
-
+    # TODO maybe insert the candidate genes here!
     # * Got refseq_ids from refseq_mut_subdf['refSeq'] and wrote this list to txt, retrieved ACCs from uniprot
     # (split my text file using bash : split -l 70000 refseq-gene4dn.txt, the 7000 is number of the lines)
 
@@ -204,11 +204,14 @@ if __name__ == '__main__':
     ## merge g4dn exonic mutInfo with Uniprot ACC # (236699, 169)
     mut_acc_mrg_df = g4dn_mut_acc_merger(refseq_acc_modified_df, g4dn_exo_mutinfo_df, 'refSeq', '/mut-acc-mrg-df.csv')
 
+
     ## mobidb
     mobidb_original_df = pd.read_csv(cfg.data[''] + '/mobidb_result.tsv', sep='\t')  # (1212280,6)
     mobidb_original_df.columns = ['acc', 'feature', 'startend', 'content_fraction', 'content_count', 'length']
     mobi_mutpos_checked_df = mobi_mut_inidr_checker(mobidb_original_df, mut_acc_mrg_df, '/mut-pos-mobi1.csv')
-
+    # concat mobidb original to positive candidates, not mut_acc_mrg_Df cuz that's your limited precise genes
+    # or modify mut_acc_mrg_df with your new proteins list lmut. ...
+    # then add phenotypes column, make bool phen cols and then del phenotype column
 
 sys.exit()
 

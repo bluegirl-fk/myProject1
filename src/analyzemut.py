@@ -90,7 +90,8 @@ if __name__ == '__main__':
         subset=pos_cand_oidr_g4mobi_df.columns.difference(['index']))
 
     ## concat pos_cand_idr_g4mobi_df and pos_cand_oidr_g4mobi_df
-    positive_cand_g4mobi_df = pos_cand_idr_g4mobi_df.append(pos_cand_oidr_g4mobi_df, sort=False)
+    positive_cand_g4mobi_df = pos_cand_idr_g4mobi_df.append(pos_cand_oidr_g4mobi_df, sort=False)  # (8996, 28)
+    positive_cand_g4mobi_df.to_csv(cfg.data['gene4'] + '/positive_cand_g4mobi_concat.csv')
 
     # control df
     # (first concat mobi_g4dn in and out dfs, then put ctrl in that df ), also same for pos_cand_genes_lst
@@ -100,4 +101,4 @@ if __name__ == '__main__':
     pos_cand_oidr_pr_lst = pos_cand_oidr_g4mobi_df['acc_x'].unique().tolist()
 
 
-sys.exit(main())
+    sys.exit(main())
