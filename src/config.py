@@ -7,4 +7,5 @@ data = {
     'rseq': absolute + 'data/refseq',
     '': absolute + 'data',
     'brain': absolute + 'data/brain',
+    'csv': absolute + 'data/to-csv',
 }
