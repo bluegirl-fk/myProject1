@@ -5,6 +5,7 @@ import pandas as pd
 import sys
 import limitedmutations as lmut
 
+
 def main():
     # generate_mutation_file()
     generate_mutation_file2()
@@ -102,12 +103,12 @@ def mobi_mut_inidr_checker(mobi_df, mutinfo_df, filename):
     # converting disorder content ranges in each cell to a list
     mobi_df['startend'] = mobi_df['startend'].str.split(',')
     # subdf of mut pos to be merged with mobidb
-    mutinfo_subdf = mutinfo_df[['index', 'acc', 'position', 'Phenotype']]
+    mutinfo_subdf = mutinfo_df[['index', 'acc', 'position', 'Phenotype', 'Length']]
     mutinfo_subdf['ndd'] = 1
 
     ##  lots of rows cuz accs are repeated in both databases with dif features or mutation per each ACC
     # (maybe it could be done with pivot table already and have a matrix instead, like before with the heatmaps)
-    mobi_mutpos_df = pd.merge(mobi_df, mutinfo_subdf, on='acc')  # (4258689, 8)
+    mobi_mutpos_df = pd.merge(mobi_df, mutinfo_subdf, on='acc')
     mobi_mutpos_df['ndd'] = mobi_mutpos_df['ndd'].fillna(0)
 
     array_is_in = mutidr_bool_array_maker(mobi_mutpos_df)
@@ -186,7 +187,7 @@ def generate_mutation_file2():
     df = pd.read_csv(cfg.data['gene4'] + '/yourfile.csv', sep='\t')
     # ...............
 
-# if __name__ == '__main__':
+    # if __name__ == '__main__':
     g4dn_exonic_df = pd.read_csv(cfg.data['gene4'] + '/exonic-df.csv')
     g4dn_exonic_df = prep_orig_df(g4dn_exonic_df)  # (70879, 156)
     refseq_mut_subdf = pr_mut_subdf_handler(g4dn_exonic_df, 'AAChange_refGene', 10,
@@ -207,19 +208,22 @@ def generate_mutation_file2():
     refseq_acc_modified_df = refseq_acc_df_handler(refseq_acc_df, '/refseg-acc-modified.csv')  # (93949, 5)
 
     ## merge g4dn exonic mutInfo with Uniprot ACC # (22858, 168)
-    mut_acc_mrg_df = g4dn_mut_acc_merger(refseq_acc_modified_df, g4dn_exo_pos_cand_df, 'refSeq', '/mut-acc-mrg-df2001.csv')
-
+    mut_acc_mrg_df = g4dn_mut_acc_merger(refseq_acc_modified_df, g4dn_exo_pos_cand_df, 'refSeq',
+                                         '/mut-acc-mrg-df100.csv')
+    # TODO works fine till here
 
     ## mobidb
     ## delete this line later
+
+
 if __name__ == '__main__':
-    mut_acc_mrg_df = pd.read_csv(cfg.data['gene4'] + '/mut-acc-mrg-df2001.csv', low_memory=False)
+    mut_acc_mrg_df = pd.read_csv(cfg.data['gene4'] + '/mut-acc-mrg-df100.csv', low_memory=False)
 
     mobidb_original_df = pd.read_csv(cfg.data[''] + '/mobidb_result.tsv', sep='\t')  # (1212280,6)
     mobidb_original_df.columns = ['acc', 'feature', 'startend', 'content_fraction', 'content_count', 'length']
     # (1212282, 11)
-    mobi_mutpos_checked_df = mobi_mut_inidr_checker(mobidb_original_df, mut_acc_mrg_df, '/mut-pos-mobi2000.csv')
-
+    mobi_mutpos_checked_df = mobi_mut_inidr_checker(mobidb_original_df, mut_acc_mrg_df, '/mut-pos-mobi100.csv')
+    # the problem with using join instead of concat is that it does not contain all mobidb rows
     sys.exit()
 
 # maybe make another file to process that one
