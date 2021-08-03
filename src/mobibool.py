@@ -4,7 +4,6 @@
 # could be useless now :/ not sure
 
 import pandas as pd
-import numpy as np
 from pandas import DataFrame
 import config as cfg
 import sys
@@ -22,20 +21,20 @@ if __name__ == '__main__':
 
     ## NDD proteins
     positive_cand_g4mobi_df = pd.read_csv(cfg.data['gene4'] + '/positive_cand_g4mobi_concat.csv')
-    ndd_pos_cand_acc_lst = positive_cand_g4mobi_df['acc_x'].unique().tolist()
-    ndd_pos_cand_acc_df = DataFrame(ndd_pos_cand_acc_lst,columns=['acc'])
+    ndd_pos_cand_acc_lst = positive_cand_g4mobi_df['acc_x'].unique().tolist()  # 177
+    ndd_pos_cand_acc_df = DataFrame(ndd_pos_cand_acc_lst, columns=['acc'])
     ndd_pos_cand_acc_df = ndd_pos_cand_acc_df.drop_duplicates()
     ndd_pos_cand_acc_df['ndd'] = 1
     mobi_ndd_bool_df = mobi_brain_bool_df.merge(ndd_pos_cand_acc_df, how='left', on='acc')
-    mobi_ndd_bool_df['ndd'] = mobi_brain_bool_df['ndd'].fillna(0)  # (1212280, 8)
+    mobi_ndd_bool_df['ndd'] = mobi_ndd_bool_df['ndd'].fillna(0)  # (1212289, 8)
 
     ## Phenotypes
-    mobi_bool_df = mobi_brain_bool_df
-    mobi_bool_df['ASD'] = np.where(mobi_bool_df['Phenotype'] == 'ASD', 1, 0)
-    mobi_bool_df['EE'] = np.where(mobi_bool_df['Phenotype'] == 'EE', 1, 0)
-    mobi_bool_df['SCZ'] = np.where(mobi_bool_df['Phenotype'] == 'SCZ', 1, 0)
-    mobi_bool_df['ID'] = np.where(mobi_bool_df['Phenotype'] == 'ID', 1, 0)
+    # 163
+    asd_pos_cand_acc_lst = positive_cand_g4mobi_df.loc[positive_cand_g4mobi_df['Phenotype']=='ASD', 'acc_x'].unique().tolist()
+    asd_pos_cand_acc_df = DataFrame(asd_pos_cand_acc_lst, columns=['acc'])
+    asd_pos_cand_acc_df['asd'] = 1
+    mobi_asd_bool_df = mobi_ndd_bool_df.merge(asd_pos_cand_acc_df, how='left', on='acc')
+    mobi_asd_bool_df['asd'] = mobi_asd_bool_df['asd'].fillna(0)  # (1212289, 9)
+    print("hi")
 
-
-
-    # sys.exit()
+    sys.exit()
