@@ -11,18 +11,15 @@ import sys
 import brain as bd
 
 if __name__ == '__main__':
-    # this file is generated in categorizer.py with mobi_mut_inidr_checker()
-    mobi_ndd_idr_df = pd.read_csv(cfg.data['gene4'] + '/mut-pos-mobi100.csv', low_memory=False)
-    mobi_ndd_idr_df = mobi_ndd_idr_df.drop(['Unnamed: 0', 'index', 'position', 'Length', 'is_in_startend'], axis=1)
-    mobi_ndd_idr_df = mobi_ndd_idr_df.drop_duplicates()
+    mobidb_results_df = pd.read_csv(cfg.data[''] + '/mobidb_result.tsv', sep='\t')
     ## brain proteins
     brain_prot_lst = bd.brain_pr_lst_generator()  # n: 8428
-    brain_pr_df = DataFrame(brain_prot_lst, columns=['brain_acc'])
+    brain_pr_df = DataFrame(brain_prot_lst, columns=['acc'])
     brain_pr_df = brain_pr_df.dropna()  # 8337
     brain_pr_df['brain'] = 1
-    mobi_brain_bool_df = pd.concat([mobi_ndd_idr_df, brain_pr_df], axis=1)
+    mobi_brain_bool_df = mobidb_results_df.merge(brain_pr_df, how='left', on='acc')
     mobi_brain_bool_df['brain'] = mobi_brain_bool_df['brain'].fillna(0)
-    mobi_brain_bool_df = mobi_brain_bool_df.drop(['brain_acc'], axis=1)  # (1212280, 12)
+     # (1212280, 7)
 
     ## Phenotypes
     mobi_bool_df = mobi_brain_bool_df
