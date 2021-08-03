@@ -18,8 +18,16 @@ if __name__ == '__main__':
     brain_pr_df = brain_pr_df.dropna()  # 8337
     brain_pr_df['brain'] = 1
     mobi_brain_bool_df = mobidb_results_df.merge(brain_pr_df, how='left', on='acc')
-    mobi_brain_bool_df['brain'] = mobi_brain_bool_df['brain'].fillna(0)
-     # (1212280, 7)
+    mobi_brain_bool_df['brain'] = mobi_brain_bool_df['brain'].fillna(0)  # (1212280, 7)
+
+    ## NDD proteins
+    positive_cand_g4mobi_df = pd.read_csv(cfg.data['gene4'] + '/positive_cand_g4mobi_concat.csv')
+    ndd_pos_cand_acc_lst = positive_cand_g4mobi_df['acc_x'].unique().tolist()
+    ndd_pos_cand_acc_df = DataFrame(ndd_pos_cand_acc_lst,columns=['acc'])
+    ndd_pos_cand_acc_df = ndd_pos_cand_acc_df.drop_duplicates()
+    ndd_pos_cand_acc_df['ndd'] = 1
+    mobi_ndd_bool_df = mobi_brain_bool_df.merge(ndd_pos_cand_acc_df, how='left', on='acc')
+    mobi_ndd_bool_df['ndd'] = mobi_brain_bool_df['ndd'].fillna(0)  # (1212280, 8)
 
     ## Phenotypes
     mobi_bool_df = mobi_brain_bool_df
@@ -28,6 +36,6 @@ if __name__ == '__main__':
     mobi_bool_df['SCZ'] = np.where(mobi_bool_df['Phenotype'] == 'SCZ', 1, 0)
     mobi_bool_df['ID'] = np.where(mobi_bool_df['Phenotype'] == 'ID', 1, 0)
 
-    positive_cand_g4mobi_df = pd.read_csv(cfg.data['gene4'] + '/positive_cand_g4mobi_concat.csv')
 
-    sys.exit()
+
+    # sys.exit()
