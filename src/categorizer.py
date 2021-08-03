@@ -107,7 +107,7 @@ def mobi_mut_inidr_checker(mobi_df, mutinfo_df, filename):
 
     ##  lots of rows cuz accs are repeated in both databases with dif features or mutation per each ACC
     # (maybe it could be done with pivot table already and have a matrix instead, like before with the heatmaps)
-    mobi_mutpos_df = pd.concat([mobi_df, mutinfo_subdf], axis=1)  # (4258689, 8)
+    mobi_mutpos_df = pd.merge(mobi_df, mutinfo_subdf, on='acc')  # (4258689, 8)
     mobi_mutpos_df['ndd'] = mobi_mutpos_df['ndd'].fillna(0)
 
     array_is_in = mutidr_bool_array_maker(mobi_mutpos_df)
@@ -222,7 +222,6 @@ if __name__ == '__main__':
 
     sys.exit()
 
-# TODO: run and if works fine, open them as csv files and then use as reference file,
 # maybe make another file to process that one
 
 # merged_mobidbp_g4dn_df = pd.read_csv(
