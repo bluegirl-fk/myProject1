@@ -14,6 +14,27 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
+def box_plotter(data, save_route):
+    plt.figure(figsize=(60, 60))  # bigger figsize to have xticklabels shown
+    g = sns.catplot(data=data, kind="box")
+    sns.set_style("ticks")
+    g.set_xticklabels(rotation=45, va="center", position=(0, -0.02))
+    plt.tight_layout()
+    plt.savefig(save_route)
+    plt.show()
+
+
+def violin_plotter(data, save_route):
+    plt.figure(figsize=(12, 12))
+    sns.set_theme(style="whitegrid")
+    g = sns.violinplot(data=data)
+    sns.set_style("ticks")
+    # g.set_xticklabels(labels=df['Phenotype'].unique().tolist(),rotation=45, va="center", position=(0, -0.02))
+    plt.tight_layout()
+    plt.savefig(save_route)
+    plt.show()
+
+
 if __name__ == '__main__':
     mobidb = pd.read_csv(cfg.data[''] + '/mobidb_result.tsv', sep='\t')
     ## brain proteins
@@ -36,21 +57,11 @@ if __name__ == '__main__':
     mobi_3d_series = mobi_feature_df.groupby(['acc', 'feature', 'Phenotype']).content_fraction.mean()
     mobi_3d_df = mobi_3d_series.unstack()
 
-    # plt.figure(figsize=(60, 60))  # bigger figsize to have xticklabels shown
-    # plot = sns.catplot(data=ser_df.loc[(slice(None), 'prediction-disorder-mobidb_lite'), :], kind="box")
-    # sns.set_style("ticks")
-    # plot.set_xticklabels(rotation=45, va="center", position=(0, -0.02))
-    # plt.tight_layout()
-    # plt.show()
 
-    plt.figure(figsize=(12, 12))
-    sns.set_theme(style="whitegrid")
-    # Load the example tips dataset
-    # Draw a nested violinplot and split the violins for easier comparison
-    plot = sns.violinplot(data=mobi_3d_df.loc[(slice(None), 'prediction-disorder-mobidb_lite'), :])
-    sns.set_style("ticks")
-    # plot.set_xticklabels(labels=df['Phenotype'].unique().tolist(),rotation=45, va="center", position=(0, -0.02))
-    plt.tight_layout()
-    plt.show()
+    for feature in features_lst:
+        box_plotter(data=mobi_3d_df.loc[(slice(None), feature), :], save_route=(cfg.plots['box']+ '/'+feature+'.png'))
 
+    for feature in features_lst:
+        violin_plotter(data=mobi_3d_df.loc[(slice(None), feature), :], save_route=(cfg.plots['box']+ '/'+feature+'.png'))
 
+    # TODO: add features, (brain and ndd columns to phenotypes)

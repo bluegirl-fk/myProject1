@@ -8,4 +8,10 @@ data = {
     '': absolute + 'data',
     'brain': absolute + 'data/brain',
     'csv': absolute + 'data/to-csv',
+
+}
+plots = {
+    'box': absolute + 'plots/g4dn/boxplot',
+    'violin': absolute + 'plots/g4dn/violinplot',
+
 }
