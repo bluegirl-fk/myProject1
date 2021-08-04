@@ -58,8 +58,6 @@ if __name__ == '__main__':
     mobidb = mobidb.drop(columns=['start..end', 'acc_x'])
 
     ## trying multi-level index here: from: https://www.youtube.com/watch?v=tcRGa2soc-c
-    # TODO: in the end you should add the brain to the Phenotype column + other features
-
     mobi_feature_df = mobidb[mobidb.feature.isin(features_lst)]  # (194383, 7)
 
     phens_series = mobi_feature_df.groupby(['acc', 'feature', 'Phenotype']).content_fraction.mean()
@@ -69,9 +67,9 @@ if __name__ == '__main__':
     mobi_3d_mrg_df = pd.merge(brain_3d_df, phens_3d_df, left_index=True, right_index=True, how='left')
 
     for feature in features_lst:
-        box_plotter(data=phens_3d_df.loc[(slice(None), feature), :],
-                    save_route=(cfg.plots['box'] + '/' + feature + '.png'))
+        box_plotter(data=mobi_3d_mrg_df.loc[(slice(None), feature), :],
+                    save_route=(cfg.plots['box'] + '/' + feature + '1' + '.png'))
 
     for feature in features_lst:
-        violin_plotter(data=phens_3d_df.loc[(slice(None), feature), :],
-                       save_route=(cfg.plots['box'] + '/' + feature + '.png'))
+        violin_plotter(data=mobi_3d_mrg_df.loc[(slice(None), feature), :],
+                       save_route=(cfg.plots['violin'] + '/' + feature + '1' + '.png'))
