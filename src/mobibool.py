@@ -35,23 +35,6 @@ if __name__ == '__main__':
 
     mobi_3d_series = mobi_feature_df.groupby(['acc', 'feature', 'Phenotype']).content_fraction.mean()
     mobi_3d_df = mobi_3d_series.unstack()
-    ## how to access the values
-    # ser.loc['A6NHU9']
-    # ser.loc['A6NHU9', 'prediction-lip-anchor']
-    # ser.loc[:, 'prediction-lip-anchor']
-    ## works the same with the dataframe
-    # ser_df.loc['A6NHU9']
-    # ser_df.loc[('A6NHU9', 'prediction-lip-anchor'), :]
-    # ser_df.loc[('A6NHU9', 'prediction-lip-anchor'), 'ASD']
-    # ser_df.loc[('A6NHU9', ['prediction-lip-anchor', 'prediction-low_complexity-merge']), :]
-    # ser_df.loc[('A6NHU9', ['prediction-lip-anchor', 'prediction-low_complexity-merge']), ['ASD', 'EE', 'ID', 'SCZ']]
-    # here slice(None) is used to get all ACCs but for specific items of the other idx (feature), so we don't use : here
-    # ser_df.loc[(slice(None), ['prediction-lip-anchor', 'prediction-low_complexity-merge']), :]
-    ## for merging, could be useful for brain! try it later
-    # mrged_df = pd.merge(brain_subdf_sameidx, phens_subdf_same idxkinda, left_index=True, right_index=True, how='left')
-
-    # pivot_df = df.pivot_table(values='content_fraction', index='acc', columns='Phenotype') # not the same cuz not
-    # taking into account the features
 
     # plt.figure(figsize=(60, 60))  # bigger figsize to have xticklabels shown
     # plot = sns.catplot(data=ser_df.loc[(slice(None), 'prediction-disorder-mobidb_lite'), :], kind="box")
