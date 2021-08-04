@@ -40,7 +40,7 @@ if __name__ == '__main__':
     ## brain proteins
     brain_prot_lst = bd.brain_pr_lst_generator()  # n: 8428
     brain_pr_df = DataFrame(brain_prot_lst, columns=['acc'])
-    brain_pr_df['brain'] = 1
+    brain_pr_df['brain'] = 'BRAIN'
     mobidb = mobidb.merge(brain_pr_df, how='left', on='acc')
     ## NDD proteins, could also specify index_col= ..., and pass a list for multiple idxs
     phen_df = pd.read_csv(cfg.data['gene4'] + '/positive_cand_g4mobi_concat.csv', usecols=["acc_x", "Phenotype"])
@@ -48,8 +48,10 @@ if __name__ == '__main__':
     ## merge to get Phenotypes column
     mobidb = mobidb.merge(phen_df, how='left', left_on='acc', right_on='acc_x')
     mobidb = mobidb.drop(columns=['start..end', 'acc_x'])
-    # trying multi-level index here: from: https://www.youtube.com/watch?v=tcRGa2soc-c
-    # TODO: in the end you should add the brain to the Phenotype column
+
+    ## trying multi-level index here: from: https://www.youtube.com/watch?v=tcRGa2soc-c
+    # TODO: in the end you should add the brain to the Phenotype column + other features
+
     features_lst = ['prediction-disorder-mobidb_lite', 'prediction-low_complexity-merge',
                     'prediction-lip-anchor', 'homology-domain-merge']
     mobi_feature_df = mobidb[mobidb.feature.isin(features_lst)]  # (194383, 7)
@@ -57,11 +59,10 @@ if __name__ == '__main__':
     mobi_3d_series = mobi_feature_df.groupby(['acc', 'feature', 'Phenotype']).content_fraction.mean()
     mobi_3d_df = mobi_3d_series.unstack()
 
+    for feature in features_lst:
+        box_plotter(data=mobi_3d_df.loc[(slice(None), feature), :],
+                    save_route=(cfg.plots['box'] + '/' + feature + '.png'))
 
     for feature in features_lst:
-        box_plotter(data=mobi_3d_df.loc[(slice(None), feature), :], save_route=(cfg.plots['box']+ '/'+feature+'.png'))
-
-    for feature in features_lst:
-        violin_plotter(data=mobi_3d_df.loc[(slice(None), feature), :], save_route=(cfg.plots['box']+ '/'+feature+'.png'))
-
-    # TODO: add features, (brain and ndd columns to phenotypes)
+        violin_plotter(data=mobi_3d_df.loc[(slice(None), feature), :],
+                       save_route=(cfg.plots['box'] + '/' + feature + '.png'))
