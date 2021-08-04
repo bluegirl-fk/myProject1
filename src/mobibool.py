@@ -2,6 +2,7 @@
 # with added columns: brain bool, ASD bool, EE bool, ID bool, SCZ bool
 # *index (mutual idx of mut_acc_merged_df and mutinfo subdf which is useful to merge mobidb & g4dn_mutinfo_acc,
 # could be useless now :/ not sure
+## this description will be changed! (August 4th)
 
 import pandas as pd
 import numpy as np
@@ -11,14 +12,6 @@ import sys
 import brain as bd
 import matplotlib.pyplot as plt
 import seaborn as sns
-
-# def phen_col_merger(phenotype, mobi_df):
-#     phen_lst = positive_cand_g4mobi_df.loc[positive_cand_g4mobi_df['Phenotype'] == phenotype, 'acc_x'].unique().tolist()
-#     phen_cand_df = DataFrame(phen_lst, columns=['acc'])
-#     phen_cand_df[phenotype] = 1
-#     mobi_bool_df = mobi_df.merge(phen_cand_df, how='left', on='acc')
-#     mobi_bool_df[phenotype] = mobi_bool_df[phenotype].fillna(0)
-#     return mobi_bool_df, phen_lst
 
 
 if __name__ == '__main__':
@@ -30,17 +23,13 @@ if __name__ == '__main__':
     df = df.merge(brain_pr_df, how='left', on='acc')
     # df = df.set_index("acc")
 
-    # ## NDD proteins
+    # ## NDD proteins, could also specify index_col= ..., and pass a list for multiple idxs
     df_g4 = pd.read_csv(cfg.data['gene4'] + '/positive_cand_g4mobi_concat.csv', usecols=["acc_x", "Phenotype"])
     df_g4 = df_g4.drop_duplicates()
-    # df_g4 = df_g4.set_index("acc_x")
-
-    # # TODO think about a flatter (maybe more redundant) dataframe. Use the Phenotype as index in addition to acc
     df = df.merge(df_g4, how='left', left_on='acc', right_on='acc_x')
-
-    # trying multi-level index here: from: https://www.youtube.com/watch?v=tcRGa2soc-c
-    # TODO: (in the end you should add the brain to the Phenotype column) merge it to the phens existing column
     df = df.drop(columns=['start..end', 'acc_x'])
+    # trying multi-level index here: from: https://www.youtube.com/watch?v=tcRGa2soc-c
+    # TODO: in the end you should add the brain to the Phenotype column
     features_lst = ['prediction-disorder-mobidb_lite', 'prediction-low_complexity-merge',
                     'prediction-lip-anchor', 'homology-domain-merge']
     midx = df[df.feature.isin(features_lst)]  # (194383, 7)
@@ -59,50 +48,36 @@ if __name__ == '__main__':
     # ser_df.loc[('A6NHU9', ['prediction-lip-anchor', 'prediction-low_complexity-merge']), ['ASD', 'EE', 'ID', 'SCZ']]
     # here slice(None) is used to get all ACCs but for specific items of the other idx (feature), so we don't use : here
     # ser_df.loc[(slice(None), ['prediction-lip-anchor', 'prediction-low_complexity-merge']), :]
-
-
-
-
+    ## for merging, could be useful for brain! try it later
+    # mrged_df = pd.merge(brain_subdf_sameidx, phens_subdf_same idxkinda, left_index=True, right_index=True, how='left')
 
     # pivot_df = df.pivot_table(values='content_fraction', index='acc', columns='Phenotype') # not the same cuz not
     # taking into account the features
 
-
-    # ## prev file
-    # prev_df = pd.read_csv(cfg.data['csv'] + '/mobi_phens_bool.csv')
-    # prev_df.brain[prev_df.brain == True] = prev_df.content_fraction
-    # prev_df.ndd[prev_df.ndd == 1] = prev_df.content_fraction
-    # prev_df.ASD[prev_df.ASD == 1] = prev_df.content_fraction
-    # prev_df.EE[prev_df.EE == 1] = prev_df.content_fraction
-    # prev_df.ID[prev_df.ID == 1] = prev_df.content_fraction
-    # prev_df.SCZ[prev_df.SCZ == 1] = prev_df.content_fraction
-    # cols = ["ndd", "ASD", "EE", "ID", "SCZ"]
-    # prev_df[cols] = prev_df[cols].replace({0: np.nan, 0: np.nan})
-    #
-
-    #
-    # mobi_lite_df = prev_df.loc[prev_df['feature'] == 'prediction-disorder-mobidb_lite']
-    # mobi_lite_df = mobi_lite_df[['acc', 'brain', 'ndd', 'ASD', 'EE', 'ID', 'SCZ']]
-    # # mobi_lite_df = mobi_lite_df.rename(columns={'content_fraction': 'human'})
-    #
-    # plt.figure(figsize=(20, 20))  # bigger figsize to have xticklabels shown
-    # plot = sns.catplot(data=mobi_lite_df, kind="box")
-    # # plt.tight_layout()
+    # plt.figure(figsize=(60, 60))  # bigger figsize to have xticklabels shown
+    # plot = sns.catplot(data=ser_df.loc[(slice(None), 'prediction-disorder-mobidb_lite'), :], kind="box")
+    # sns.set_style("ticks")
+    # plot.set_xticklabels(rotation=45, va="center", position=(0, -0.02))
+    # plt.tight_layout()
     # plt.show()
     #
-    # # plt.figure(figsize=(20, 20))
-    # # sns.set_theme(style="whitegrid")
-    # # # Load the example tips dataset
-    # # # Draw a nested violinplot and split the violins for easier comparison
-    # # sns.violinplot(data=mobi_lite_df)
-    # # plt.show()
-    # # #
+    plt.figure(figsize=(12, 12))
+    sns.set_theme(style="whitegrid")
+    # Load the example tips dataset
+    # Draw a nested violinplot and split the violins for easier comparison
+    plot = sns.violinplot(data=ser_df.loc[(slice(None), 'prediction-disorder-mobidb_lite'), :])
+    sns.set_style("ticks")
+    # plot.set_xticklabels(labels=df['Phenotype'].unique().tolist(),rotation=45, va="center", position=(0, -0.02))
+    plt.tight_layout()
+    plt.show()
+    # # Damiano's code for multi index
     # # df_g4['val'] = True
     # # df_g4 = df_g4.set_index(["acc_x", "Phenotype"]).unstack()
     # # df_g4 = df_g4.loc[:, 'val']
     # # df_g4['ndd'] = True
     # # df = df.merge(df_g4, how='left', left_on='acc', right_on='acc_x')
-    # #
+
+
     # # # disorder content
     # # columns = ['acc', 'content_fraction', 'ndd', 'brain', 'ASD']
     # # df_dc = df[df['feature'] == 'prediction-disorder-mobidb_lite'][columns]
