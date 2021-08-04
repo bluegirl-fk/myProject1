@@ -37,11 +37,19 @@ def violin_plotter(data, save_route):
 
 if __name__ == '__main__':
     mobidb = pd.read_csv(cfg.data[''] + '/mobidb_result.tsv', sep='\t')
+    ## selected features
+    features_lst = ['prediction-disorder-mobidb_lite', 'prediction-low_complexity-merge',
+                    'prediction-lip-anchor', 'homology-domain-merge']
     ## brain proteins
     brain_prot_lst = bd.brain_pr_lst_generator()  # n: 8428
     brain_pr_df = DataFrame(brain_prot_lst, columns=['acc'])
     brain_pr_df['brain'] = 'BRAIN'
     mobidb = mobidb.merge(brain_pr_df, how='left', on='acc')
+    ## multi-idx brain to be merged with multi-id phen df
+    mobi_br_subdf = mobidb[['acc', 'feature', 'content_fraction', 'brain']]
+    mobi_br_subdf = mobi_br_subdf[mobi_br_subdf.feature.isin(features_lst)]
+    brain_series = mobi_br_subdf.groupby(['acc', 'feature', 'brain']).content_fraction.mean()
+    brain_3d_df = brain_series.unstack().sort_index()
     ## NDD proteins, could also specify index_col= ..., and pass a list for multiple idxs
     phen_df = pd.read_csv(cfg.data['gene4'] + '/positive_cand_g4mobi_concat.csv', usecols=["acc_x", "Phenotype"])
     phen_df = phen_df.drop_duplicates()
@@ -52,17 +60,18 @@ if __name__ == '__main__':
     ## trying multi-level index here: from: https://www.youtube.com/watch?v=tcRGa2soc-c
     # TODO: in the end you should add the brain to the Phenotype column + other features
 
-    features_lst = ['prediction-disorder-mobidb_lite', 'prediction-low_complexity-merge',
-                    'prediction-lip-anchor', 'homology-domain-merge']
     mobi_feature_df = mobidb[mobidb.feature.isin(features_lst)]  # (194383, 7)
 
-    mobi_3d_series = mobi_feature_df.groupby(['acc', 'feature', 'Phenotype']).content_fraction.mean()
-    mobi_3d_df = mobi_3d_series.unstack()
+    phens_series = mobi_feature_df.groupby(['acc', 'feature', 'Phenotype']).content_fraction.mean()
+    phens_3d_df = phens_series.unstack().sort_index()
+
+    ## merge brain and phens:
+    mobi_3d_mrg_df = pd.merge(brain_3d_df, phens_3d_df, left_index=True, right_index=True, how='left')
 
     for feature in features_lst:
-        box_plotter(data=mobi_3d_df.loc[(slice(None), feature), :],
+        box_plotter(data=phens_3d_df.loc[(slice(None), feature), :],
                     save_route=(cfg.plots['box'] + '/' + feature + '.png'))
 
     for feature in features_lst:
-        violin_plotter(data=mobi_3d_df.loc[(slice(None), feature), :],
+        violin_plotter(data=phens_3d_df.loc[(slice(None), feature), :],
                        save_route=(cfg.plots['box'] + '/' + feature + '.png'))
