@@ -20,3 +20,5 @@ with open(cfg.data['dndb']+'/denovodb-rsid.txt', 'w') as f:
 with open(cfg.data['dndb']+'/denovodb-refseq.txt', 'w') as f:
     for item in refseq_lst:
         f.write("%s\n" % item)
+
+# also mapped to 14000 proteins!!!
