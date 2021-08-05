@@ -12,6 +12,13 @@ data = {
 }
 plots = {
     'box': absolute + 'plots/g4dn/boxplot',
+    'box-cf': absolute + 'plots/g4dn/boxplot/cf',
+    'box-cc': absolute + 'plots/g4dn/boxplot/cc',
+    'box-len': absolute + 'plots/g4dn/boxplot/length',
     'violin': absolute + 'plots/g4dn/violinplot',
+    'vio-cf': absolute + 'plots/g4dn/violinplot/cf',
+    'vio-cc': absolute + 'plots/g4dn/violinplot/cc',
+    'vio-len': absolute + 'plots/g4dn/violinplot/length',
+
 
 }
