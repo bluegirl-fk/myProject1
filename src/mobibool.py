@@ -27,7 +27,7 @@ def box_plotter(data, save_route):
 def violin_plotter(data, save_route):
     plt.figure(figsize=(12, 12))
     sns.set_theme(style="whitegrid")
-    g = sns.violinplot(data=data)
+    g = sns.violinplot(data=data, split=True)
     sns.set_style("ticks")
     # g.set_xticklabels(labels=df['Phenotype'].unique().tolist(),rotation=45, va="center", position=(0, -0.02))
     plt.tight_layout()
@@ -66,10 +66,12 @@ if __name__ == '__main__':
     ## merge brain and phens:
     mobi_3d_mrg_df = pd.merge(brain_3d_df, phens_3d_df, left_index=True, right_index=True, how='left')
 
-    for feature in features_lst:
-        box_plotter(data=mobi_3d_mrg_df.loc[(slice(None), feature), :],
-                    save_route=(cfg.plots['box'] + '/' + feature + '1' + '.png'))
+    phens_lst = ['BRAIN', 'ASD', 'EE', 'CMS', 'ID', 'SCZ', 'BP', 'Mix', 'NDDs', 'TD', 'Control']
 
     for feature in features_lst:
-        violin_plotter(data=mobi_3d_mrg_df.loc[(slice(None), feature), :],
-                       save_route=(cfg.plots['violin'] + '/' + feature + '1' + '.png'))
+        box_plotter(data=mobi_3d_mrg_df.loc[(slice(None), feature), phens_lst],
+                    save_route=(cfg.plots['box'] + '/' + feature + '-limited' + '.png'))
+
+    for feature in features_lst:
+        violin_plotter(data=mobi_3d_mrg_df.loc[(slice(None), feature), phens_lst],
+                       save_route=(cfg.plots['violin'] + '/' + feature + '-limited' + '.png'))
