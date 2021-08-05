@@ -97,7 +97,7 @@ if __name__ == '__main__':
     #                 save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc-all-log1' + '.png'))
     for feature in features_lst:
         violin_plotter(data=mobi_cc_mrg_df.loc[(slice(None), feature), phens_lst],
-                       save_route=(cfg.plots['vio-cc'] + '/' + feature + '-cc-all-log1' + '.png'))
+                       save_route=(cfg.plots['vio-cc'] + '/' + feature + '-cc-all-log2' + '.png'))
 
     ## Length
     len_phens_3d_df = mobi_feature_df.groupby(
@@ -111,7 +111,7 @@ if __name__ == '__main__':
     #                 save_route=(cfg.plots['box-len'] + '/' + feature + '-len-all-log1' + '.png'))
     for feature in features_lst:
         violin_plotter(data=mobi_len_mrg_df.loc[(slice(None), feature), phens_lst],
-                       save_route=(cfg.plots['vio-len'] + '/' + feature + '-len-all-log1' + '.png'))
+                       save_route=(cfg.plots['vio-len'] + '/' + feature + '-len-all-log2' + '.png'))
 
 
 
