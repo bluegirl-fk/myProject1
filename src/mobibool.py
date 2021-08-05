@@ -21,7 +21,7 @@ def box_plotter(data, save_route):
     g.set_xticklabels(rotation=45, va="center", position=(0, -0.02))
     plt.tight_layout()
     plt.savefig(save_route)
-    plt.show()
+    plt.close()
 
 
 def violin_plotter(data, save_route):
@@ -32,7 +32,7 @@ def violin_plotter(data, save_route):
     # g.set_xticklabels(labels=df['Phenotype'].unique().tolist(),rotation=45, va="center", position=(0, -0.02))
     plt.tight_layout()
     plt.savefig(save_route)
-    plt.show()
+    plt.close()
 
 
 if __name__ == '__main__':
@@ -59,22 +59,44 @@ if __name__ == '__main__':
     cf_phens_series = mobi_feature_df.groupby(['acc', 'feature', 'Phenotype']).content_fraction.mean()
     cf_phen_3d_df = cf_phens_series.unstack().sort_index()
     # multi-idx brain to be merged with multi-id phen df
-    mobi_br_subdf = mobidb[['acc', 'feature', 'content_fraction', 'brain']]
+    mobi_br_subdf = mobidb[['acc', 'feature', 'content_fraction', 'content_count', 'length', 'brain']]
     mobi_br_subdf = mobi_br_subdf[mobi_br_subdf.feature.isin(features_lst)]
     cf_brain_3d_df = mobi_br_subdf.groupby(['acc', 'feature', 'brain']).content_fraction.mean().unstack().sort_index()
     ## merge brain and phens:
     mobi_cf_mrg_df = pd.merge(cf_brain_3d_df, cf_phen_3d_df, left_index=True, right_index=True, how='left')
 
-    phens_lst = ['BRAIN', 'ASD', 'EE', 'CMS', 'ID', 'SCZ', 'BP', 'Mix', 'NDDs', 'TD', 'Control']
+    phens_lst = ['BRAIN', 'ASD', 'EE', 'CMS', 'ID', 'SCZ', 'Mix', 'NDDs', 'TD', 'Control']
     for feature in features_lst:
         box_plotter(data=mobi_cf_mrg_df.loc[(slice(None), feature), phens_lst],
-                    save_route=(cfg.plots['box'] + '/' + feature + '-limited' + '.png'))
+                    save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf-limited' + '.png'))
     for feature in features_lst:
         violin_plotter(data=mobi_cf_mrg_df.loc[(slice(None), feature), phens_lst],
-                       save_route=(cfg.plots['violin'] + '/' + feature + '-limited' + '.png'))
+                       save_route=(cfg.plots['vio-cf'] + '/' + feature + '-cf-limited' + '.png'))
 
+    phens_lst = ['BRAIN', 'ASD', 'EE', 'ID', 'SCZ', 'Mix', 'NDDs', 'Control']
     ## Content count
     cc_phens_3d_df = mobi_feature_df.groupby(['acc', 'feature', 'Phenotype']).content_count.mean().unstack().sort_index()
     cc_brain_3d_df = mobi_br_subdf.groupby(['acc', 'feature', 'brain']).content_count.mean().unstack().sort_index()
     mobi_cc_mrg_df = pd.merge(cc_brain_3d_df, cc_phens_3d_df, left_index=True, right_index=True, how='left')
+    for feature in features_lst:
+        box_plotter(data=mobi_cc_mrg_df.loc[(slice(None), feature), phens_lst],
+                    save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc-limited1' + '.png'))
+    for feature in features_lst:
+        violin_plotter(data=mobi_cc_mrg_df.loc[(slice(None), feature), phens_lst],
+                       save_route=(cfg.plots['vio-cc'] + '/' + feature + '-cc-limited1' + '.png'))
+
+    ## Length
+    len_phens_3d_df = mobi_feature_df.groupby(
+        ['acc', 'feature', 'Phenotype']).length.mean().unstack().sort_index()
+    len_brain_3d_df = mobi_br_subdf.groupby(['acc', 'feature', 'brain']).length.mean().unstack().sort_index()
+    mobi_len_mrg_df = pd.merge(len_brain_3d_df, len_phens_3d_df, left_index=True, right_index=True, how='left')
+    for feature in features_lst:
+        box_plotter(data=mobi_len_mrg_df.loc[(slice(None), feature), phens_lst],
+                    save_route=(cfg.plots['box-len'] + '/' + feature + '-len-limited' + '.png'))
+    for feature in features_lst:
+        violin_plotter(data=mobi_len_mrg_df.loc[(slice(None), feature), phens_lst],
+                       save_route=(cfg.plots['vio-len'] + '/' + feature + '-len-limited' + '.png'))
+
+
+
 
