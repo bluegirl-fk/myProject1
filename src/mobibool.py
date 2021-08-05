@@ -11,6 +11,7 @@ import config as cfg
 import sys
 import brain as bd
 import matplotlib.pyplot as plt
+from matplotlib import ticker as mticker
 import seaborn as sns
 
 
@@ -28,10 +29,12 @@ def box_plotter(data, save_route):
 def violin_plotter(data, save_route):
     plt.figure(figsize=(12, 12))
     sns.set_theme(style="whitegrid")
-    g = sns.violinplot(data=data, split=True)
+    g = sns.violinplot(data=data, split=True, bw=.1)
     sns.set_style("ticks")
     # g.set_xticklabels(labels=df['Phenotype'].unique().tolist(),rotation=45, va="center", position=(0, -0.02))
-    plt.yscale('log')
+    # plt.yscale('log')
+    g.yaxis.set_major_formatter(mticker.StrMethodFormatter("$10^{{{x:.0f}}}$"))
+    # g.yaxis.set_ticks([np.log10(x) for p in range(-4, 5) for x in np.linspace(10 ** p, 10 ** (p + 1), 10)],minor=True)
     plt.tight_layout()
     plt.savefig(save_route)
     plt.close()
@@ -74,13 +77,13 @@ if __name__ == '__main__':
     mobi_lim_cf_mrg_df = pd.merge(cf_brain_3d_df, cf_phen_3d_df, left_index=True, right_index=True, how='left')
     mobi_cf_mrg_df = pd.merge(cf_human_3d_df, mobi_lim_cf_mrg_df, left_index=True, right_index=True, how='left')
 
-    phens_lst = ['Human', 'Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'Mix', 'NDDs', 'Control']
-    for feature in features_lst:
-        box_plotter(data=mobi_cf_mrg_df.loc[(slice(None), feature), phens_lst],
-                    save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf-all-log' + '.png'))
-    for feature in features_lst:
-        violin_plotter(data=mobi_cf_mrg_df.loc[(slice(None), feature), phens_lst],
-                       save_route=(cfg.plots['vio-cf'] + '/' + feature + '-cf-all-log' + '.png'))
+    phens_lst = ['Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'Mix', 'NDDs', 'Control']
+    # for feature in features_lst:
+    #     box_plotter(data=mobi_cf_mrg_df.loc[(slice(None), feature), phens_lst],
+    #                 save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf-all-log1' + '.png'))
+    # for feature in features_lst:
+    #     violin_plotter(data=mobi_cf_mrg_df.loc[(slice(None), feature), phens_lst],
+    #                    save_route=(cfg.plots['vio-cf'] + '/' + feature + '-cf-all-log1' + '.png'))
 
     ## Content count
     cc_phens_3d_df = mobi_feature_df.groupby(['acc', 'feature', 'Phenotype']).content_count.mean().unstack().sort_index()
@@ -89,12 +92,12 @@ if __name__ == '__main__':
     mobi_lim_cc_mrg_df = pd.merge(cc_brain_3d_df, cc_phens_3d_df, left_index=True, right_index=True, how='left')
     mobi_cc_mrg_df = pd.merge(cc_human_3d_df, mobi_lim_cc_mrg_df, left_index=True, right_index=True, how='left')
 
-    for feature in features_lst:
-        box_plotter(data=mobi_cc_mrg_df.loc[(slice(None), feature), phens_lst],
-                    save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc-all-log' + '.png'))
+    # for feature in features_lst:
+    #     box_plotter(data=mobi_cc_mrg_df.loc[(slice(None), feature), phens_lst],
+    #                 save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc-all-log1' + '.png'))
     for feature in features_lst:
         violin_plotter(data=mobi_cc_mrg_df.loc[(slice(None), feature), phens_lst],
-                       save_route=(cfg.plots['vio-cc'] + '/' + feature + '-cc-all-log' + '.png'))
+                       save_route=(cfg.plots['vio-cc'] + '/' + feature + '-cc-all-log1' + '.png'))
 
     ## Length
     len_phens_3d_df = mobi_feature_df.groupby(
@@ -103,12 +106,12 @@ if __name__ == '__main__':
     len_human_3d_df = mobi_human_subdf.groupby(['acc', 'feature', 'human']).length.mean().unstack().sort_index()
     mobi_len_lim_mrg_df = pd.merge(len_brain_3d_df, len_phens_3d_df, left_index=True, right_index=True, how='left')
     mobi_len_mrg_df = pd.merge(len_human_3d_df, mobi_len_lim_mrg_df, left_index=True, right_index=True, how='left')
-    for feature in features_lst:
-        box_plotter(data=mobi_len_mrg_df.loc[(slice(None), feature), phens_lst],
-                    save_route=(cfg.plots['box-len'] + '/' + feature + '-len-all-log' + '.png'))
+    # for feature in features_lst:
+    #     box_plotter(data=mobi_len_mrg_df.loc[(slice(None), feature), phens_lst],
+    #                 save_route=(cfg.plots['box-len'] + '/' + feature + '-len-all-log1' + '.png'))
     for feature in features_lst:
         violin_plotter(data=mobi_len_mrg_df.loc[(slice(None), feature), phens_lst],
-                       save_route=(cfg.plots['vio-len'] + '/' + feature + '-len-all-log' + '.png'))
+                       save_route=(cfg.plots['vio-len'] + '/' + feature + '-len-all-log1' + '.png'))
 
 
 
