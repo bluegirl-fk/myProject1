@@ -22,3 +22,16 @@ with open(cfg.data['dndb']+'/denovodb-refseq.txt', 'w') as f:
         f.write("%s\n" % item)
 
 # also mapped to 14000 proteins!!! (put refseq into uniprot anmd idmap)
+valid_rsID_lst = dndb_valid_rsID['Transcript'].unique().tolist()
+with open(cfg.data['dndb']+'/denovodb-valid-rseq.txt', 'w') as f:  # maps to 249 uniprot IDs
+    for item in valid_rsID_lst:
+        f.write("%s\n" % item)
+
+
+valid_acc_df = pd.read_csv(cfg.data['dndb'] + '/valid-acc-from-rseq.tab')
+valid_pr_lst = valid_acc_df['Entry'].unique().tolist()
+phen_df = pd.read_csv(cfg.data['gene4'] + '/positive_cand_g4mobi_concat.csv', usecols=["acc_x", "Phenotype"])
+phens_acc_lst = phen_df['acc_x'].unique().tolist()
+l1 = [i for i in phens_acc_lst if i in valid_pr_lst]  # only 5 mutual proteins among my list and denovodb! maybe I could merge them!
+
+
