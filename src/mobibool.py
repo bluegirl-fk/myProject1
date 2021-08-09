@@ -8,7 +8,6 @@ import pandas as pd
 import numpy as np
 from pandas import DataFrame
 import config as cfg
-import sys
 import brain as bd
 import matplotlib.pyplot as plt
 from matplotlib import ticker as mticker
@@ -40,16 +39,20 @@ def multidx_df_maker(input_dfs_lst, idx_lst):
     return cf_multidx_df, cc_multidx_df, len_multidx_df
 
 
-def box_plotter(data, save_route):
+def box_plotter(data, save_route, dict_key):  # TODO make it in a way to iterate over the dfs to put in the dictionary, other ways?
+    dict = {}
     plt.figure(figsize=(60, 60))  # bigger figsize to have xticklabels shown
     g = sns.catplot(data=data, kind="box")
     sns.set_style("ticks")
+    dict[dict_key] = data.describe().T
     g.set_xticklabels(rotation=45, va="center", position=(0, -0.02))
     # plt.yscale('log')
     plt.tight_layout()
     plt.savefig(save_route)
     plt.close('all')
-    return
+    print(data.describe().T)
+
+    return dict
 
 
 def violin_plotter(data, save_route):
@@ -95,33 +98,35 @@ if __name__ == '__main__':
     # filtering data
     # TODO maybe different filteration per each feature, cause the outcome is different for each, and some still have
     # outliers and are rather difficult to analyse
-    mobi_disorder_df = mobi_disorder_df[mobi_disorder_df < (0.9*mobi_disorder_df.max())]
+    mobi_disorder_df = mobi_disorder_df[mobi_disorder_df < (0.9 * mobi_disorder_df.max())]
     mobi_cont_count_df = mobi_cont_count_df[mobi_cont_count_df <= 1000]
     mobi_length_df = mobi_length_df[mobi_length_df < 6000]
-
 
     # TODO shorter code for plots?
     ## plot (boxplot)
     # disorder content
     for feature in features_lst:
-        box_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
-                    save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf90' + '.png'))
+        cf_dfs_dict = box_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
+                                  save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf90' + '.png'), dict_key=feature)
     # content count
     for feature in features_lst:
-        box_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
-                    save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc1000' + '.png'))
+        cc_dfs_dict = box_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
+                                  save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc1000' + '.png'),
+                                  dict_key=feature)
     # length
-    box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-                save_route=(cfg.plots['box-len'] + '/length-below6000' + '.png'))
-    ## plot (violinplot)
-    # disorder content
     for feature in features_lst:
-        violin_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
-                       save_route=(cfg.plots['vio-cf'] + '/' + feature + '-cf-90' + '.png'))
-    # content count
-    for feature in features_lst:
-        violin_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
-                       save_route=(cfg.plots['vio-cc'] + '/' + feature + '-cc-1000' + '.png'))
-    ## Length
-    violin_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-                   save_route=(cfg.plots['vio-len'] + '/length-below6000' + '.png'))
+        len_dfs_dict = box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
+                    save_route=(cfg.plots['box-len'] + '/length-below6000' + '.png'), dict_key=feature)
+    # ## plot (violinplot)
+    # # disorder content
+    # for feature in features_lst:
+    #     violin_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
+    #                    save_route=(cfg.plots['vio-cf'] + '/' + feature + '-cf-90' + '.png'))
+    # # content count
+    # for feature in features_lst:
+    #     violin_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
+    #                    save_route=(cfg.plots['vio-cc'] + '/' + feature + '-cc-1000' + '.png'))
+    # ## Length
+    # violin_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
+    #                save_route=(cfg.plots['vio-len'] + '/length-below6000' + '.png'))
+    print(mobi_length_df.loc[(slice(None)), phens_lst].describe)
