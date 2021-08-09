@@ -29,6 +29,17 @@ def mobi_phens_col_maker(df1_mobi, df2, df3):
     return new_mobi_all_phens
 
 
+def multidx_df_maker(input_dfs_lst, idx_lst):
+    # multi-level index Phenotypes: from: https://www.youtube.com/watch?v=tcRGa2soc-c
+    # supposed to do this:
+    # mobi_disorder_df = mobi_feature_df.groupby(
+    # ['acc', 'feature', 'phenotype']).content_fraction.mean().unstack().sort_index()
+    cf_multidx_df = input_dfs_lst[0].groupby(idx_lst).content_fraction.mean().unstack().sort_index()
+    cc_multidx_df = input_dfs_lst[0].groupby(idx_lst).content_count.mean().unstack().sort_index()
+    len_multidx_df = input_dfs_lst[1].groupby(idx_lst).length.mean().unstack().sort_index()
+    return cf_multidx_df, cc_multidx_df, len_multidx_df
+
+
 def box_plotter(data, save_route):
     plt.figure(figsize=(60, 60))  # bigger figsize to have xticklabels shown
     g = sns.catplot(data=data, kind="box")
@@ -58,55 +69,52 @@ if __name__ == '__main__':
     ## selected features
     features_lst = ['prediction-disorder-mobidb_lite', 'prediction-low_complexity-merge',
                     'prediction-lip-anchor', 'homology-domain-merge']
-
+    ## selected phenotypes
+    phens_lst = ['Human', 'Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'Mix', 'NDDs', 'Control']
+    ## import dfs # (mobidb)
     mobidb = pd.read_csv(cfg.data[''] + '/mobidb_result.tsv', sep='\t')
-    ## brain proteins
+    # brain
     brain_prot_lst = bd.brain_pr_lst_generator()  # n: 8428
     brain_subdf = DataFrame(brain_prot_lst, columns=['acc'])
-    ## NDD proteins, could also specify index_col= ..., and pass a list for multiple idxs
+    # NDD , could also specify index_col= ..., and pass a list for multiple idxs
     ndd_subdf = pd.read_csv(cfg.data['gene4'] + '/positive_cand_g4mobi_concat.csv', usecols=["acc_x", "Phenotype"])
+
     # new mobidb with one column for phens of NDD, human, and brain
     mobidb = mobi_phens_col_maker(mobidb, brain_subdf, ndd_subdf)
     mobi_feature_df = mobidb[mobidb.feature.isin(features_lst)]
-    # multi-level index Phenotypes: from: https://www.youtube.com/watch?v=tcRGa2soc-c
-    # disorder content
-    mobi_disorder_df = mobi_feature_df.groupby(
-        ['acc', 'feature', 'phenotype']).content_fraction.mean().unstack().sort_index()
-    # content count
-    mobi_cont_count_df = mobi_feature_df.groupby(
-        ['acc', 'feature', 'Phenotype']).content_count.mean().unstack().sort_index()
-    # Length, original mobidb, not the one with selected features
-    mobi_length_df = mobidb.groupby(['acc', 'feature', 'Phenotype']).length.mean().unstack().sort_index()
+    # multi-idx-dfs
+    mobi_disorder_df, mobi_cont_count_df, mobi_length_df = multidx_df_maker(
+        [mobi_feature_df, mobidb], ['acc', 'feature', 'phenotype'])
+    # filtering data
+    mobi_disorder_df = mobi_disorder_df[mobi_disorder_df < (0.9*mobi_disorder_df.max())]
+    mobi_cont_count_df = mobi_cont_count_df[mobi_cont_count_df <= 1000]
     mobi_length_df = mobi_length_df[mobi_length_df < 6000]
-    ## Selected phenotypes for plots
-    phens_lst = ['Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'Mix', 'NDDs', 'Control']
 
+
+    # TODO change plots code as well
     ## plot (boxplot)
     # disorder content
     for feature in features_lst:
         box_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
-                    save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf-all-log1' + '.png'))
+                    save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf90' + '.png'))
     # content count
     for feature in features_lst:
         box_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
-                    save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc-all-log1' + '.png'))
+                    save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc1000' + '.png'))
     # length
-    # for feature in features_lst:
-    #     box_plotter(data=mobi_length_df.loc[(slice(None), feature), phens_lst],
-    #                 save_route=(cfg.plots['box-len'] + '/' + feature + '-len6000' + '.png'))
+    box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
+                save_route=(cfg.plots['box-len'] + '/length-below6000' + '.png'))
 
     ## plot (violinplot)
     # disorder content
     for feature in features_lst:
         violin_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
-                       save_route=(cfg.plots['vio-cf'] + '/' + feature + '-cf-all-log1' + '.png'))
+                       save_route=(cfg.plots['vio-cf'] + '/' + feature + '-cf-90' + '.png'))
     # content count
     for feature in features_lst:
         violin_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
-                       save_route=(cfg.plots['vio-cc'] + '/' + feature + '-cc-all-log2' + '.png'))
+                       save_route=(cfg.plots['vio-cc'] + '/' + feature + '-cc-1000' + '.png'))
 
     ## Length
-        #
-        # violin_plotter(data=mobi_length_df.loc[(slice(None), feature), phens_lst],
-        #                save_route=(cfg.plots['vio-len'] + '/' + feature + '-len6000' + '.png'))
-    # TODO fix the lenghth cause one plot for the whole thing and not for each feature
+    violin_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
+                   save_route=(cfg.plots['vio-len'] + '/length-below6000' + '.png'))
