@@ -20,7 +20,7 @@ def box_plotter(data, save_route):
     g = sns.catplot(data=data, kind="box")
     sns.set_style("ticks")
     g.set_xticklabels(rotation=45, va="center", position=(0, -0.02))
-    plt.yscale('log')
+    # plt.yscale('log')
     plt.tight_layout()
     plt.savefig(save_route)
     plt.close()
@@ -33,7 +33,7 @@ def violin_plotter(data, save_route):
     sns.set_style("ticks")
     # g.set_xticklabels(labels=df['Phenotype'].unique().tolist(),rotation=45, va="center", position=(0, -0.02))
     # plt.yscale('log')
-    g.yaxis.set_major_formatter(mticker.StrMethodFormatter("$10^{{{x:.0f}}}$"))
+    # g.yaxis.set_major_formatter(mticker.StrMethodFormatter("$10^{{{x:.0f}}}$"))
     # g.yaxis.set_ticks([np.log10(x) for p in range(-4, 5) for x in np.linspace(10 ** p, 10 ** (p + 1), 10)],minor=True)
     plt.tight_layout()
     plt.savefig(save_route)
@@ -102,16 +102,17 @@ if __name__ == '__main__':
     ## Length
     len_phens_3d_df = mobi_feature_df.groupby(
         ['acc', 'feature', 'Phenotype']).length.mean().unstack().sort_index()
-    len_brain_3d_df = mobi_br_subdf.groupby(['acc', 'feature', 'brain']).length.mean().unstack().sort_index()
-    len_human_3d_df = mobi_human_subdf.groupby(['acc', 'feature', 'human']).length.mean().unstack().sort_index()
+    len_brain_3d_df = mobi_br_subdf.groupby(['acc', 'brain']).length.mean().unstack().sort_index()
+    len_human_3d_df = mobi_human_subdf.groupby(['acc', 'human']).length.mean().unstack().sort_index()
     mobi_len_lim_mrg_df = pd.merge(len_brain_3d_df, len_phens_3d_df, left_index=True, right_index=True, how='left')
     mobi_len_mrg_df = pd.merge(len_human_3d_df, mobi_len_lim_mrg_df, left_index=True, right_index=True, how='left')
-    # for feature in features_lst:
-    #     box_plotter(data=mobi_len_mrg_df.loc[(slice(None), feature), phens_lst],
-    #                 save_route=(cfg.plots['box-len'] + '/' + feature + '-len-all-log1' + '.png'))
+    mobi_len_mrg_df = mobi_len_mrg_df[mobi_len_mrg_df < 6000]
+    for feature in features_lst:
+        box_plotter(data=mobi_len_mrg_df.loc[(slice(None), feature), phens_lst],
+                    save_route=(cfg.plots['box-len'] + '/' + feature + '-len6000' + '.png'))
     for feature in features_lst:
         violin_plotter(data=mobi_len_mrg_df.loc[(slice(None), feature), phens_lst],
-                       save_route=(cfg.plots['vio-len'] + '/' + feature + '-len-all-log2' + '.png'))
+                       save_route=(cfg.plots['vio-len'] + '/' + feature + '-len6000' + '.png'))
 
 
 
