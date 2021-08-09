@@ -48,7 +48,8 @@ def box_plotter(data, save_route):
     # plt.yscale('log')
     plt.tight_layout()
     plt.savefig(save_route)
-    plt.close()
+    plt.close('all')
+    return
 
 
 def violin_plotter(data, save_route):
@@ -62,13 +63,19 @@ def violin_plotter(data, save_route):
     # g.yaxis.set_ticks([np.log10(x) for p in range(-4, 5) for x in np.linspace(10 ** p, 10 ** (p + 1), 10)],minor=True)
     plt.tight_layout()
     plt.savefig(save_route)
-    plt.close()
+    plt.close('all')
+    return
 
 
 if __name__ == '__main__':
-    ## selected features
+    ## selected features  (12)
     features_lst = ['prediction-disorder-mobidb_lite', 'prediction-low_complexity-merge',
-                    'prediction-lip-anchor', 'homology-domain-merge']
+                    'prediction-lip-anchor', 'homology-domain-merge', 'derived-lip-merge',
+                    'prediction-signal_peptide-uniprot', 'prediction-transmembrane-uniprot',
+                    'curated-conformational_diversity-merge', 'derived-binding_mode_disorder_to_disorder-mobi',
+                    'derived-binding_mode_disorder_to_order-mobi', 'derived-missing_residues_context_dependent-th_90',
+                    'derived-mobile_context_dependent-th_90']  # what about the cysteine-rich?
+
     ## selected phenotypes
     phens_lst = ['Human', 'Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'Mix', 'NDDs', 'Control']
     ## import dfs # (mobidb)
@@ -86,12 +93,14 @@ if __name__ == '__main__':
     mobi_disorder_df, mobi_cont_count_df, mobi_length_df = multidx_df_maker(
         [mobi_feature_df, mobidb], ['acc', 'feature', 'phenotype'])
     # filtering data
+    # TODO maybe different filteration per each feature, cause the outcome is different for each, and some still have
+    # outliers and are rather difficult to analyse
     mobi_disorder_df = mobi_disorder_df[mobi_disorder_df < (0.9*mobi_disorder_df.max())]
     mobi_cont_count_df = mobi_cont_count_df[mobi_cont_count_df <= 1000]
     mobi_length_df = mobi_length_df[mobi_length_df < 6000]
 
 
-    # TODO change plots code as well
+    # TODO shorter code for plots?
     ## plot (boxplot)
     # disorder content
     for feature in features_lst:
@@ -104,7 +113,6 @@ if __name__ == '__main__':
     # length
     box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
                 save_route=(cfg.plots['box-len'] + '/length-below6000' + '.png'))
-
     ## plot (violinplot)
     # disorder content
     for feature in features_lst:
@@ -114,7 +122,6 @@ if __name__ == '__main__':
     for feature in features_lst:
         violin_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
                        save_route=(cfg.plots['vio-cc'] + '/' + feature + '-cc-1000' + '.png'))
-
     ## Length
     violin_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
                    save_route=(cfg.plots['vio-len'] + '/length-below6000' + '.png'))
