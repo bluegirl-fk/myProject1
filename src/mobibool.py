@@ -63,8 +63,9 @@ if __name__ == '__main__':
     ## content_fraction
     # multi-level index Phenotypes: from: https://www.youtube.com/watch?v=tcRGa2soc-c
     mobi_feature_df = mobidb[mobidb.feature.isin(features_lst)]  # (194383, 7)
-    cf_phens_series = mobi_feature_df.groupby(['acc', 'feature', 'Phenotype']).content_fraction.mean()
-    cf_phen_3d_df = cf_phens_series.unstack().sort_index()
+    cf_phen_3d_df = mobi_feature_df.groupby(
+        ['acc', 'feature', 'Phenotype']).content_fraction.mean().unstack().sort_index()
+
     # multi-idx brain to be merged with multi-id phen df
     mobi_br_subdf = mobidb[['acc', 'feature', 'content_fraction', 'content_count', 'length', 'brain']]
     mobi_br_subdf = mobi_br_subdf[mobi_br_subdf.feature.isin(features_lst)]
@@ -72,7 +73,8 @@ if __name__ == '__main__':
     # multi-idx add human
     mobi_human_subdf = mobidb[['acc', 'feature', 'content_fraction', 'content_count', 'length', 'human']]
     mobi_human_subdf = mobi_human_subdf[mobi_human_subdf.feature.isin(features_lst)]
-    cf_human_3d_df = mobi_human_subdf.groupby(['acc', 'feature', 'human']).content_fraction.mean().unstack().sort_index()
+    cf_human_3d_df = mobi_human_subdf.groupby(
+        ['acc', 'feature', 'human']).content_fraction.mean().unstack().sort_index()
     ## merge brain and phens+ merge that one with human
     mobi_lim_cf_mrg_df = pd.merge(cf_brain_3d_df, cf_phen_3d_df, left_index=True, right_index=True, how='left')
     mobi_cf_mrg_df = pd.merge(cf_human_3d_df, mobi_lim_cf_mrg_df, left_index=True, right_index=True, how='left')
@@ -86,7 +88,8 @@ if __name__ == '__main__':
     #                    save_route=(cfg.plots['vio-cf'] + '/' + feature + '-cf-all-log1' + '.png'))
 
     ## Content count
-    cc_phens_3d_df = mobi_feature_df.groupby(['acc', 'feature', 'Phenotype']).content_count.mean().unstack().sort_index()
+    cc_phens_3d_df = mobi_feature_df.groupby(
+        ['acc', 'feature', 'Phenotype']).content_count.mean().unstack().sort_index()
     cc_brain_3d_df = mobi_br_subdf.groupby(['acc', 'feature', 'brain']).content_count.mean().unstack().sort_index()
     cc_human_3d_df = mobi_human_subdf.groupby(['acc', 'feature', 'human']).content_count.mean().unstack().sort_index()
     mobi_lim_cc_mrg_df = pd.merge(cc_brain_3d_df, cc_phens_3d_df, left_index=True, right_index=True, how='left')
@@ -113,7 +116,3 @@ if __name__ == '__main__':
     for feature in features_lst:
         violin_plotter(data=mobi_len_mrg_df.loc[(slice(None), feature), phens_lst],
                        save_route=(cfg.plots['vio-len'] + '/' + feature + '-len6000' + '.png'))
-
-
-
-
