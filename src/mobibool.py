@@ -70,34 +70,43 @@ if __name__ == '__main__':
     mobi_feature_df = mobidb[mobidb.feature.isin(features_lst)]
     # multi-level index Phenotypes: from: https://www.youtube.com/watch?v=tcRGa2soc-c
     # disorder content
-    mobi_disorder_df = mobi_feature_df.groupby(['acc', 'feature', 'phenotype']).content_fraction.mean().unstack().sort_index()
+    mobi_disorder_df = mobi_feature_df.groupby(
+        ['acc', 'feature', 'phenotype']).content_fraction.mean().unstack().sort_index()
     # content count
-    mobi_cont_count_df = mobi_feature_df.groupby(['acc', 'feature', 'Phenotype']).content_count.mean().unstack().sort_index()
+    mobi_cont_count_df = mobi_feature_df.groupby(
+        ['acc', 'feature', 'Phenotype']).content_count.mean().unstack().sort_index()
     # Length, original mobidb, not the one with selected features
     mobi_length_df = mobidb.groupby(['acc', 'feature', 'Phenotype']).length.mean().unstack().sort_index()
     mobi_length_df = mobi_length_df[mobi_length_df < 6000]
     ## Selected phenotypes for plots
     phens_lst = ['Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'Mix', 'NDDs', 'Control']
 
-    # # for feature in features_lst:
-    # #     box_plotter(data=mobi_cf_mrg_df.loc[(slice(None), feature), phens_lst],
-    # #                 save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf-all-log1' + '.png'))
-    # # for feature in features_lst:
-    # #     violin_plotter(data=mobi_cf_mrg_df.loc[(slice(None), feature), phens_lst],
-    # #                    save_route=(cfg.plots['vio-cf'] + '/' + feature + '-cf-all-log1' + '.png'))
-    #
-
-    # # for feature in features_lst:
-    # #     box_plotter(data=mobi_cc_mrg_df.loc[(slice(None), feature), phens_lst],
-    # #                 save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc-all-log1' + '.png'))
+    ## plot (boxplot)
+    # disorder content
+    for feature in features_lst:
+        box_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
+                    save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf-all-log1' + '.png'))
+    # content count
+    for feature in features_lst:
+        box_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
+                    save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc-all-log1' + '.png'))
+    # length
     # for feature in features_lst:
-    #     violin_plotter(data=mobi_cc_mrg_df.loc[(slice(None), feature), phens_lst],
-    #                    save_route=(cfg.plots['vio-cc'] + '/' + feature + '-cc-all-log2' + '.png'))
-    #
-    # ## Length
-    # for feature in features_lst:
-    #     box_plotter(data=mobi_len_mrg_df.loc[(slice(None), feature), phens_lst],
+    #     box_plotter(data=mobi_length_df.loc[(slice(None), feature), phens_lst],
     #                 save_route=(cfg.plots['box-len'] + '/' + feature + '-len6000' + '.png'))
-    # for feature in features_lst:
-    #     violin_plotter(data=mobi_len_mrg_df.loc[(slice(None), feature), phens_lst],
-    #                    save_route=(cfg.plots['vio-len'] + '/' + feature + '-len6000' + '.png'))
+
+    ## plot (violinplot)
+    # disorder content
+    for feature in features_lst:
+        violin_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
+                       save_route=(cfg.plots['vio-cf'] + '/' + feature + '-cf-all-log1' + '.png'))
+    # content count
+    for feature in features_lst:
+        violin_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
+                       save_route=(cfg.plots['vio-cc'] + '/' + feature + '-cc-all-log2' + '.png'))
+
+    ## Length
+        #
+        # violin_plotter(data=mobi_length_df.loc[(slice(None), feature), phens_lst],
+        #                save_route=(cfg.plots['vio-len'] + '/' + feature + '-len6000' + '.png'))
+    # TODO fix the lenghth cause one plot for the whole thing and not for each feature
