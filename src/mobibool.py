@@ -15,6 +15,20 @@ from matplotlib import ticker as mticker
 import seaborn as sns
 
 
+def mobi_phens_col_maker(df1_mobi, df2, df3):
+    # mobidb
+    df1_mobi = df1_mobi.drop(columns='start..end')
+    subdf1 = df1_mobi[['acc']]
+    subdf1['phenotype'] = 'Human'
+    # brain
+    df2['phenotype'] = 'Brain'
+    # ndd
+    df3 = df3.drop_duplicates().rename(columns={'acc_x': 'acc', 'Phenotype': 'phenotype'})
+    all_phens = subdf1.append([df2, df3]).drop_duplicates()
+    new_mobi_all_phens = df1_mobi.merge(all_phens, how='left', on='acc')
+    return new_mobi_all_phens
+
+
 def box_plotter(data, save_route):
     plt.figure(figsize=(60, 60))  # bigger figsize to have xticklabels shown
     g = sns.catplot(data=data, kind="box")
@@ -46,32 +60,13 @@ if __name__ == '__main__':
     #                 'prediction-lip-anchor', 'homology-domain-merge']
 
     mobidb = pd.read_csv(cfg.data[''] + '/mobidb_result.tsv', sep='\t')
-    mobidb = mobidb.drop(columns='start..end')
-    # adding a human column for all the proteins in mobidb
-    mobi_subdf = mobidb[['acc']]
-    mobi_subdf['phenotype'] = 'Human'
     ## brain proteins
     brain_prot_lst = bd.brain_pr_lst_generator()  # n: 8428
     brain_subdf = DataFrame(brain_prot_lst, columns=['acc'])
-    brain_subdf['phenotype'] = 'Brain'
     ## NDD proteins, could also specify index_col= ..., and pass a list for multiple idxs
     ndd_subdf = pd.read_csv(cfg.data['gene4'] + '/positive_cand_g4mobi_concat.csv', usecols=["acc_x", "Phenotype"])
-    ndd_subdf = ndd_subdf.drop_duplicates().rename(columns={'acc_x': 'acc', 'Phenotype': 'phenotype'})
-    all_phens_subdf = mobi_subdf.append([brain_subdf, ndd_subdf]).drop_duplicates()
-    ## merge all phens to mobidb original
-    mobidb = mobidb.merge(all_phens_subdf, how='left', on='acc')
-    def mobi_phens_col_maker(df1_mobi, df2, df3):
-        # mobidb
-        df1_mobi = df1_mobi.drop(columns='start..end')
-        subdf1 = df1_mobi[['acc']]
-        subdf1['phenotype'] = 'Human'
-        # brain
-        df2['phenotype'] = 'Brain'
-        # ndd
-        df3 = df3.drop_duplicates().rename(columns={'acc_x': 'acc', 'Phenotype': 'phenotype'})
-        all_phens = subdf1.append([df2, df3]).drop_duplicates()
-        new_mobi_all_phens = df1_mobi.merge(all_phens, how='left', on='acc')
-        return new_mobi_all_phens
+
+    mobidb = mobi_phens_col_maker(mobidb, brain_subdf, ndd_subdf)
     #
     #
     # ## content_fraction
