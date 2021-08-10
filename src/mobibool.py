@@ -39,7 +39,7 @@ def multidx_df_maker(input_dfs_lst, idx_lst):
     return cf_multidx_df, cc_multidx_df, len_multidx_df
 
 
-def box_plotter(data, title, ylabel, save_route):
+def box_plotter(data, title, ylabel, count, save_route):
     plt.figure(figsize=(60, 60))  # bigger figsize to have xticklabels shown
     g = sns.catplot(data=data, kind="box").set(title=title, xlabel='Phenotypes', ylabel=ylabel)
     sns.set_style("ticks")
@@ -49,8 +49,10 @@ def box_plotter(data, title, ylabel, save_route):
     plt.tight_layout()
     plt.savefig(save_route)
     plt.close('all')
-    info_df = data.describe().T
-    return info_df
+    out_pattern = 'info_tabel-%d.csv'
+    out_path = out_pattern % count
+    data.describe().T.to_csv(cfg.data['phens'] + out_path)
+    return
 
 
 def violin_plotter(data, title, save_route, ylabel):
@@ -106,19 +108,19 @@ if __name__ == '__main__':
     mobi_length_df = mobi_length_df[mobi_length_df < 6000]
 
     # disorder content
-    for (feature, title) in zip(features_lst, titles_lst):
-        cf_dfs_dict = box_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
-                                  save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf90' + '.png'),
-                                  title=title, ylabel='Content (%)')
+    for idx, (feature, title) in zip(features_lst, titles_lst):
+        box_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
+                    save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf90' + '.png'),
+                    title=title, ylabel='Content (%)', count=idx)
     # content count
-    for (feature, title) in zip(features_lst, titles_lst):
-        cc_dfs_dict = box_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
-                                  save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc1000' + '.png'),
-                                  title=title, ylabel='Content (residues)')
+    for idx, (feature, title) in zip(features_lst, titles_lst):
+        box_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
+                    save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc1000' + '.png'),
+                    title=title, ylabel='Content (residues)', count=idx)
     # length
-    len_dfs_dict = box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-                               save_route=(cfg.plots['box-len'] + '/length<6000' + '.png'),
-                               title='Protein sequence length', ylabel='Residues')
+    box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
+                save_route=(cfg.plots['box-len'] + '/length<6000' + '.png'),
+                title='Protein sequence length', ylabel='Residues', count=0)
     ## plot (violinplot)
     # disorder content
     for (feature, title) in zip(features_lst, titles_lst):

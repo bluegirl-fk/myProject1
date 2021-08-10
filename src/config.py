@@ -9,6 +9,7 @@ data = {
     'brain': absolute + 'data/brain',
     'csv': absolute + 'data/to-csv',
     'dndb': absolute + 'data/denovodb',
+    'phens': absolute + 'data/mobibool-phens',
 
 }
 plots = {
