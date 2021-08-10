@@ -39,12 +39,12 @@ def multidx_df_maker(input_dfs_lst, idx_lst):
     return cf_multidx_df, cc_multidx_df, len_multidx_df
 
 
-def box_plotter(data, save_route, dict_key):  # TODO make it in a way to iterate over the dfs to put in the dictionary, other ways?
+def box_plotter(data, title, ylabel, save_route):  # TODO make it in a way to iterate over the dfs to put in the dictionary, other ways?
     dict = {}
     plt.figure(figsize=(60, 60))  # bigger figsize to have xticklabels shown
-    g = sns.catplot(data=data, kind="box")
+    g = sns.catplot(data=data, kind="box").set(title=title, xlabel='Phenotypes', ylabel=ylabel)
     sns.set_style("ticks")
-    dict[dict_key] = data.describe().T
+    # dict[dict_key] = data.describe().T
     g.set_xticklabels(rotation=45, va="center", position=(0, -0.02))
     # plt.yscale('log')
     plt.tight_layout()
@@ -78,6 +78,10 @@ if __name__ == '__main__':
                     'curated-conformational_diversity-merge', 'derived-binding_mode_disorder_to_disorder-mobi',
                     'derived-binding_mode_disorder_to_order-mobi', 'derived-missing_residues_context_dependent-th_90',
                     'derived-mobile_context_dependent-th_90']  # what about the cysteine-rich?
+    titles_lst = ['Disorder content - Mobidb-lite', 'Low complexity', 'Linear Interacting Peptides - Anchor',
+                   'Protein domains', 'Linear Interacting Peptides - derived', 'Signal peptides - Uniprot',
+                   'Transmembrane helices - Uniprot', 'Conformational diversity', 'Binding mode - disorder to disorder',
+                   'Binding mode - disorder to order', 'Missing residues', 'Protein mobility']
 
     ## selected phenotypes
     phens_lst = ['Human', 'Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'Mix', 'NDDs', 'Control']
@@ -102,21 +106,20 @@ if __name__ == '__main__':
     mobi_cont_count_df = mobi_cont_count_df[mobi_cont_count_df <= 1000]
     mobi_length_df = mobi_length_df[mobi_length_df < 6000]
 
-    # TODO shorter code for plots?
-    ## plot (boxplot)
     # disorder content
-    for feature in features_lst:
+    for (feature, title) in zip(features_lst, titles_lst):
         cf_dfs_dict = box_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
-                                  save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf90' + '.png'), dict_key=feature)
+                                  save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf90-NEW' + '.png'), title=title, ylabel='Disorder content (0-1)')
     # content count
     for feature in features_lst:
         cc_dfs_dict = box_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
-                                  save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc1000' + '.png'),
-                                  dict_key=feature)
+                                  save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc1000-NEW' + '.png'),
+                                  title=feature, ylabel='Disorder content count')
     # length
     for feature in features_lst:
         len_dfs_dict = box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-                    save_route=(cfg.plots['box-len'] + '/length-below6000' + '.png'), dict_key=feature)
+                    save_route=(cfg.plots['box-len'] + '/length-below6000-NEW' + '.png'),
+                                   title='Protein sequence length', ylabel='Residues')
     # ## plot (violinplot)
     # # disorder content
     # for feature in features_lst:
