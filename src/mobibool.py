@@ -67,7 +67,7 @@ def violin_plotter(data, title, save_route, ylabel):
     return
 
 
-def several_plotter(plot_type):
+def several_plotter(plot_type):  # TODO better (shorter) way to write this
     # disorder content
     if plot_type == 'box-cf':
         for (feature, title) in zip(features_lst, titles_lst):
