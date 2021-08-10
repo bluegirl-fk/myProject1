@@ -159,3 +159,4 @@ if __name__ == '__main__':
     mobi_cont_count_df.loc[slice(None), phens_lst].describe().T. \
         to_csv(cfg.data['phens'] + '/content-count-statistics.csv')
 
+    Print('test')
