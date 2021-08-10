@@ -103,23 +103,25 @@ if __name__ == '__main__':
     # TODO maybe different filteration per each feature, cause the outcome is different for each, and some still have
     # outliers and are rather difficult to analyse
     mobi_disorder_df = mobi_disorder_df[mobi_disorder_df < (0.9 * mobi_disorder_df.max())]
+    mobi_disorder_df = mobi_disorder_df * 100
     mobi_cont_count_df = mobi_cont_count_df[mobi_cont_count_df <= 1000]
     mobi_length_df = mobi_length_df[mobi_length_df < 6000]
 
     # disorder content
     for (feature, title) in zip(features_lst, titles_lst):
         cf_dfs_dict = box_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
-                                  save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf90-NEW' + '.png'), title=title, ylabel='Disorder content (0-1)')
+                                  save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf90-NEW' + '.png'),
+                                  title=title, ylabel='Disorder content (0-1)')
     # content count
-    for feature in features_lst:
+    for (feature, title) in zip(features_lst, titles_lst):
         cc_dfs_dict = box_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
                                   save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc1000-NEW' + '.png'),
-                                  title=feature, ylabel='Disorder content count')
+                                  title=title, ylabel='Disorder content count')
     # length
-    for feature in features_lst:
+    for (feature, title) in zip(features_lst, titles_lst):
         len_dfs_dict = box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
                     save_route=(cfg.plots['box-len'] + '/length-below6000-NEW' + '.png'),
-                                   title='Protein sequence length', ylabel='Residues')
+                                   title=title, ylabel='Residues')
     # ## plot (violinplot)
     # # disorder content
     # for feature in features_lst:
@@ -132,4 +134,3 @@ if __name__ == '__main__':
     # ## Length
     # violin_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
     #                save_route=(cfg.plots['vio-len'] + '/length-below6000' + '.png'))
-    print(mobi_length_df.loc[(slice(None)), phens_lst].describe)
