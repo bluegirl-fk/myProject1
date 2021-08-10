@@ -39,7 +39,7 @@ def multidx_df_maker(input_dfs_lst, idx_lst):
     return cf_multidx_df, cc_multidx_df, len_multidx_df
 
 
-def box_plotter(data, title, ylabel, count, save_route):
+def box_plotter(data, title, ylabel, txt_name, save_route):
     plt.figure(figsize=(60, 60))  # bigger figsize to have xticklabels shown
     g = sns.catplot(data=data, kind="box").set(title=title, xlabel='Phenotypes', ylabel=ylabel)
     sns.set_style("ticks")
@@ -49,9 +49,6 @@ def box_plotter(data, title, ylabel, count, save_route):
     plt.tight_layout()
     plt.savefig(save_route)
     plt.close('all')
-    out_pattern = 'info_tabel-%d.csv'
-    out_path = out_pattern % count
-    data.describe().T.to_csv(cfg.data['phens'] + out_path)
     return
 
 
@@ -108,31 +105,38 @@ if __name__ == '__main__':
     mobi_length_df = mobi_length_df[mobi_length_df < 6000]
 
     # disorder content
-    for idx, (feature, title) in zip(features_lst, titles_lst):
-        box_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
-                    save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf90' + '.png'),
-                    title=title, ylabel='Content (%)', count=idx)
-    # content count
-    for idx, (feature, title) in zip(features_lst, titles_lst):
-        box_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
-                    save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc1000' + '.png'),
-                    title=title, ylabel='Content (residues)', count=idx)
-    # length
-    box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-                save_route=(cfg.plots['box-len'] + '/length<6000' + '.png'),
-                title='Protein sequence length', ylabel='Residues', count=0)
-    ## plot (violinplot)
-    # disorder content
-    for (feature, title) in zip(features_lst, titles_lst):
-        violin_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
-                       save_route=(cfg.plots['vio-cf'] + '/' + feature + '-cf-90' + '.png'),
-                       title=title, ylabel='Content (%)')
-    # content count
-    for (feature, title) in zip(features_lst, titles_lst):
-        violin_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
-                       save_route=(cfg.plots['vio-cc'] + '/' + feature + '-cc-1000' + '.png'),
-                       title=title, ylabel='Content (residues)')
-    ## Length
-    violin_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-                   save_route=(cfg.plots['vio-len'] + '/length-below6000' + '.png'),
-                   title='Protein sequence length', ylabel='Residues')
+    # for (feature, title) in zip(features_lst, titles_lst):
+    #     box_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
+    #                 save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf90' + '.png'),
+    #                 title=title, ylabel='Content (%)', txt_name=feature)
+    # # content count
+    # for (feature, title) in zip(features_lst, titles_lst):
+    #     box_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
+    #                 save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc1000' + '.png'),
+    #                 title=title, ylabel='Content (residues)', txt_name=feature)
+    # # length
+    # box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
+    #             save_route=(cfg.plots['box-len'] + '/length<6000' + '.png'),
+    #             title='Protein sequence length', ylabel='Residues', txt_name='length')
+    # ## plot (violinplot)
+    # # disorder content
+    # for (feature, title) in zip(features_lst, titles_lst):
+    #     violin_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
+    #                    save_route=(cfg.plots['vio-cf'] + '/' + feature + '-cf-90' + '.png'),
+    #                    title=title, ylabel='Content (%)')
+    # # content count
+    # for (feature, title) in zip(features_lst, titles_lst):
+    #     violin_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
+    #                    save_route=(cfg.plots['vio-cc'] + '/' + feature + '-cc-1000' + '.png'),
+    #                    title=title, ylabel='Content (residues)')
+    # ## Length
+    # violin_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
+    #                save_route=(cfg.plots['vio-len'] + '/length-below6000' + '.png'),
+    #                title='Protein sequence length', ylabel='Residues')
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.max_rows', None)
+    for feature in features_lst:
+        mobi_disorder_df.loc[(slice(None), feature), phens_lst].describe().T\
+            .to_csv(cfg.data['phens'] + '/' + feature + '.csv')
+        # ds.to_csv(os.path.join('..', 'data', 'test.csv'))
+        # .describe().T.to_csv(cfg.data['phens']+'/test.csv')
