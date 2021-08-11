@@ -140,27 +140,21 @@ if __name__ == '__main__':
     mobi_cont_count_df = mobi_cont_count_df[mobi_cont_count_df <= 1000]
     mobi_length_df = mobi_length_df[mobi_length_df < 6000]
 
-    # # box plots for disorder_content, content_count and length
-    # several_plotter('box-cf')
-    # several_plotter('box-cc')
-    # several_plotter('box-len')
+    # box plots for disorder_content, content_count and length
+    several_plotter('box-cf')
+    several_plotter('box-cc')
+    several_plotter('box-len')
     # violin plots for disorder_content, content_count and length
-    # several_plotter('viol-cf')
-    # several_plotter('viol-cc')
-    # several_plotter('viol-len')
+    several_plotter('viol-cf')
+    several_plotter('viol-cc')
+    several_plotter('viol-len')
 
-    # TODO: make this tables with pivot table, to prevent the redundant phens and protein counts
     # writing data statistics to CSV
     pd.set_option('display.max_columns', None)
     pd.set_option('display.max_rows', None)
-    mobi_disorder_df.loc[slice(None), phens_lst].describe().T. \
-        to_csv(cfg.data['phens'] + '/content-fraction-statistics.csv')
-    mobi_length_df.loc[slice(None), phens_lst].describe().T. \
-        to_csv(cfg.data['phens'] + '/length-statistics.csv')
-    mobi_cont_count_df.loc[slice(None), phens_lst].describe().T. \
-        to_csv(cfg.data['phens'] + '/content-count-statistics.csv')
-    # for each_f in features_lst:
-    #     mobi_disorder_df.loc[(slice(None), each_f), phens_lst].describe().T. \
-    #         to_csv(cfg.data['phens'] + '/' + each_f + '-cf.csv')
-    #     mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
-    #         to_csv(cfg.data['phens'] + '/' + each_f + '-cc.csv')
+    for each_f in features_lst:
+        mobi_disorder_df.loc[(slice(None), each_f), phens_lst].describe().T. \
+            to_csv(cfg.data['phens'] + '/' + each_f + '-cf.csv')
+        mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
+            to_csv(cfg.data['phens'] + '/' + each_f + '-cc.csv')
+    mobi_length_df.loc[slice(None), phens_lst].describe().T.to_csv(cfg.data['phens'] + '/length-stats.csv')
