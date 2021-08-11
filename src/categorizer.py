@@ -187,7 +187,8 @@ def generate_mutation_file2():
     df = pd.read_csv(cfg.data['gene4'] + '/yourfile.csv', sep='\t')
     # ...............
 
-    # if __name__ == '__main__':
+
+if __name__ == '__main__':
     g4dn_exonic_df = pd.read_csv(cfg.data['gene4'] + '/exonic-df.csv')
     g4dn_exonic_df = prep_orig_df(g4dn_exonic_df)  # (70879, 156)
     refseq_mut_subdf = pr_mut_subdf_handler(g4dn_exonic_df, 'AAChange_refGene', 10,
@@ -210,14 +211,10 @@ def generate_mutation_file2():
     ## merge g4dn exonic mutInfo with Uniprot ACC # (22858, 168)
     mut_acc_mrg_df = g4dn_mut_acc_merger(refseq_acc_modified_df, g4dn_exo_pos_cand_df, 'refSeq',
                                          '/mut-acc-mrg-df100.csv')
-    # TODO works fine till here
 
     ## mobidb
     ## delete this line later
-
-
-if __name__ == '__main__':
-    mut_acc_mrg_df = pd.read_csv(cfg.data['gene4'] + '/mut-acc-mrg-df100.csv', low_memory=False)
+    # mut_acc_mrg_df = pd.read_csv(cfg.data['gene4'] + '/mut-acc-mrg-df100.csv', low_memory=False)
 
     mobidb_original_df = pd.read_csv(cfg.data[''] + '/mobidb_result.tsv', sep='\t')  # (1212280,6)
     mobidb_original_df.columns = ['acc', 'feature', 'startend', 'content_fraction', 'content_count', 'length']
@@ -225,4 +222,3 @@ if __name__ == '__main__':
     mobi_mutpos_checked_df = mobi_mut_inidr_checker(mobidb_original_df, mut_acc_mrg_df, '/mut-pos-mobi100.csv')
     # the problem with using join instead of concat is that it does not contain all mobidb rows
     sys.exit()
-
