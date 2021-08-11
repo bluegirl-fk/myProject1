@@ -53,7 +53,7 @@ def box_plotter(data, title, ylabel, txt_name, save_route):
 
 
 def violin_plotter(data, title, save_route, ylabel):
-    plt.figure(figsize=(12, 12))
+    plt.figure(figsize=(12, 6))
     sns.set_theme(style="whitegrid")
     g = sns.violinplot(data=data, split=True, bw=.1).set(title=title, xlabel='Phenotypes', ylabel=ylabel)
     sns.set_style("ticks")
@@ -125,8 +125,8 @@ if __name__ == '__main__':
     brain_subdf = DataFrame(brain_prot_lst, columns=['acc'])
     # NDD , could also specify index_col= ..., and pass a list for multiple idxs
     ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
-    ndd_subdf= ndd_subdf.drop_duplicates()
-    ndd_pr_lst = ndd_subdf['acc'].unique().tolist()
+    ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
+    ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
     # new mobidb with one column for phens of NDD, human, and brain
     mobidb = mobi_phens_col_maker(mobidb, brain_subdf, ndd_subdf)
     mobi_feature_df = mobidb[mobidb.feature.isin(features_lst)]
@@ -140,25 +140,27 @@ if __name__ == '__main__':
     mobi_cont_count_df = mobi_cont_count_df[mobi_cont_count_df <= 1000]
     mobi_length_df = mobi_length_df[mobi_length_df < 6000]
 
-    # box plots for disorder_content, content_count and length
-    several_plotter('box-cf')
-    several_plotter('box-cc')
-    several_plotter('box-len')
+    # # box plots for disorder_content, content_count and length
+    # several_plotter('box-cf')
+    # several_plotter('box-cc')
+    # several_plotter('box-len')
     # violin plots for disorder_content, content_count and length
-    several_plotter('viol-cf')
-    several_plotter('viol-cc')
-    several_plotter('viol-len')
+    # several_plotter('viol-cf')
+    # several_plotter('viol-cc')
+    # several_plotter('viol-len')
 
+    # TODO: make this tables with pivot table, to prevent the redundant phens and protein counts
     # writing data statistics to CSV
     pd.set_option('display.max_columns', None)
     pd.set_option('display.max_rows', None)
     mobi_disorder_df.loc[slice(None), phens_lst].describe().T. \
-        to_csv(cfg.data['phens'] + '/content-fraction-statistics1.csv')
+        to_csv(cfg.data['phens'] + '/content-fraction-statistics.csv')
     mobi_length_df.loc[slice(None), phens_lst].describe().T. \
-        to_csv(cfg.data['phens'] + '/length-statistics1.csv')
+        to_csv(cfg.data['phens'] + '/length-statistics.csv')
     mobi_cont_count_df.loc[slice(None), phens_lst].describe().T. \
-        to_csv(cfg.data['phens'] + '/content-count-statistics1.csv')
-    breakpoint()
+        to_csv(cfg.data['phens'] + '/content-count-statistics.csv')
     # for each_f in features_lst:
+    #     mobi_disorder_df.loc[(slice(None), each_f), phens_lst].describe().T. \
+    #         to_csv(cfg.data['phens'] + '/' + each_f + '-cf.csv')
     #     mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
     #         to_csv(cfg.data['phens'] + '/' + each_f + '-cc.csv')

@@ -16,7 +16,7 @@ def genes_lst_maker(fdr_limit):  # this is candidate genes from download page
     all_candidate_genes_df = pd.read_csv(cfg.data['gene4'] + '/limitedmut/Candidate_gene_1.2.txt',
                                          sep='\t')  # (124137, 12)
 
-    positive_genes_df = all_candidate_genes_df.loc[all_candidate_genes_df['FDR'] <= fdr_limit]
+    positive_genes_df = all_candidate_genes_df.loc[all_candidate_genes_df['FDR'] < fdr_limit]
     positive_genes_lst = positive_genes_df['Gene symbol'].unique().tolist()
 
     return positive_genes_lst

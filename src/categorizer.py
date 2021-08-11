@@ -188,7 +188,7 @@ def generate_mutation_file2():
     # ...............
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
     g4dn_exonic_df = pd.read_csv(cfg.data['gene4'] + '/exonic-df.csv')
     g4dn_exonic_df = prep_orig_df(g4dn_exonic_df)  # (70879, 156)
     refseq_mut_subdf = pr_mut_subdf_handler(g4dn_exonic_df, 'AAChange_refGene', 10,
@@ -209,15 +209,15 @@ def generate_mutation_file2():
     refseq_acc_modified_df = refseq_acc_df_handler(refseq_acc_df, '/refseg-acc-modified.csv')  # (93949, 5)
 
     ## merge g4dn exonic mutInfo with Uniprot ACC # (52589, 168)
-    # mut_acc_mrg_df = g4dn_mut_acc_merger(refseq_acc_modified_df, g4dn_exo_pos_cand_df, 'refSeq',
-    #                                      '/mut-acc-mrg-df5percent.csv')
-if __name__ == '__main__':
-    mut_acc_mrg_df = pd.read_csv(cfg.data['gene4'] + '/mut-acc-mrg-df5percent.csv', low_memory=False)
+    mut_acc_mrg_df = g4dn_mut_acc_merger(refseq_acc_modified_df, g4dn_exo_pos_cand_df, 'refSeq',
+                                         '/mut-acc-mrg-df5percent.csv')
+# if __name__ == '__main__':
+#     mut_acc_mrg_df = pd.read_csv(cfg.data['gene4'] + '/mut-acc-mrg-df5percent.csv', low_memory=False)
     # this df will be imported to mobibool and mrged with mobidb
     acc_phen_5p_subdf = mut_acc_mrg_df[['acc', 'Phenotype']].drop_duplicates()  # (4531, 2)
     acc_phen_5p_subdf.to_csv(cfg.data['phens'] + '/acc-phen-5percentFDR.csv')
+    sys.exit()
 
-    breakpoint()
     ## mobidb
     ## delete this line later
     # mut_acc_mrg_df = pd.read_csv(cfg.data['gene4'] + '/mut-acc-mrg-df100.csv', low_memory=False)
