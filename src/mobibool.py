@@ -149,7 +149,7 @@ if __name__ == '__main__':
     several_plotter('viol-cc')
     several_plotter('viol-len')
 
-    ## writing data statistics to CSV
+    # writing data statistics to CSV
     pd.set_option('display.max_columns', None)
     pd.set_option('display.max_rows', None)
     mobi_disorder_df.loc[slice(None), phens_lst].describe().T. \
@@ -158,5 +158,6 @@ if __name__ == '__main__':
         to_csv(cfg.data['phens'] + '/length-statistics.csv')
     mobi_cont_count_df.loc[slice(None), phens_lst].describe().T. \
         to_csv(cfg.data['phens'] + '/content-count-statistics.csv')
-
-    print('test')
+    for each_f in features_lst:
+        mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
+            to_csv(cfg.data['phens'] + '/' + each_f + '-cc.csv')
