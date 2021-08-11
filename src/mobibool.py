@@ -120,13 +120,16 @@ if __name__ == '__main__':
     phens_lst = ['Human', 'Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'Mix', 'NDDs', 'Control']
     ## import dfs # (mobidb)
     mobidb = pd.read_csv(cfg.data[''] + '/mobidb_result.tsv', sep='\t')
-    # brain
-    brain_prot_lst = bd.brain_pr_lst_generator()  # n: 8428
-    brain_subdf = DataFrame(brain_prot_lst, columns=['acc'])
     # NDD , could also specify index_col= ..., and pass a list for multiple idxs
     ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
     ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
     ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
+    ## brain
+    brain_prot_lst = bd.brain_pr_lst_generator()  # n: 8297
+    # Discarding ndd proteins from the brain
+    brain_without_phens_lst = [i for i in brain_prot_lst if i not in ndd_pr_lst]  # 7842, (455 mutual proteins)
+    brain_subdf = DataFrame(brain_without_phens_lst, columns=['acc'])
+
     # new mobidb with one column for phens of NDD, human, and brain
     mobidb = mobi_phens_col_maker(mobidb, brain_subdf, ndd_subdf)
     mobi_feature_df = mobidb[mobidb.feature.isin(features_lst)]

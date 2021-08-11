@@ -44,6 +44,8 @@ def brain_pr_lst_generator():
     # since the number of ensembl IDs are not that much, let's check them first in the first df here (brain df)
     subdf_toget_acc = brain_df[brain_df.Ensembl.isin(gene_ensembl_lst)]
     brain_uniprot_lst = subdf_toget_acc['Uniprot'].tolist()
+    # drop redundancies
+    brain_uniprot_lst = set(brain_uniprot_lst)
     return brain_uniprot_lst
 
 
