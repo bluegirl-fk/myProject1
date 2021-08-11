@@ -8,7 +8,7 @@ import sys
 
 
 def main():
-    print("Hello darkness my old friend..")
+    print("Hello")
     return
 
 
