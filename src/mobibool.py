@@ -72,35 +72,35 @@ def several_plotter(plot_type):  # TODO better (shorter) way to write this
     if plot_type == 'box-cf':
         for (feature, title) in zip(features_lst, titles_lst):
             box_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
-                        save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf90' + '.png'),
+                        save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf90-1' + '.png'),
                         title=title, ylabel='Content (%)', txt_name=feature)
     # content count
     elif plot_type == 'box-cc':
         for (feature, title) in zip(features_lst, titles_lst):
             box_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
-                        save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc1000' + '.png'),
+                        save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc1000-1' + '.png'),
                         title=title, ylabel='Content (residues)', txt_name=feature)
     elif plot_type == 'box-len':
         # length
         box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-                    save_route=(cfg.plots['box-len'] + '/length<6000' + '.png'),
+                    save_route=(cfg.plots['box-len'] + '/length<6000-1' + '.png'),
                     title='Protein sequence length', ylabel='Residues', txt_name='length')
     elif plot_type == 'viol-cf':
         # disorder content
         for (feature, title) in zip(features_lst, titles_lst):
             violin_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
-                           save_route=(cfg.plots['vio-cf'] + '/' + feature + '-cf-90' + '.png'),
+                           save_route=(cfg.plots['vio-cf'] + '/' + feature + '-cf-90-1' + '.png'),
                            title=title, ylabel='Content (%)')
     elif plot_type == 'viol-cc':
         # content count
         for (feature, title) in zip(features_lst, titles_lst):
             violin_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
-                           save_route=(cfg.plots['vio-cc'] + '/' + feature + '-cc-1000' + '.png'),
+                           save_route=(cfg.plots['vio-cc'] + '/' + feature + '-cc-1000-1' + '.png'),
                            title=title, ylabel='Content (residues)')
     elif plot_type == 'viol-len':
         ## Length
         violin_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-                       save_route=(cfg.plots['vio-len'] + '/length-below6000' + '.png'),
+                       save_route=(cfg.plots['vio-len'] + '/length-below6000-1' + '.png'),
                        title='Protein sequence length', ylabel='Residues')
 
 
@@ -125,7 +125,8 @@ if __name__ == '__main__':
     brain_subdf = DataFrame(brain_prot_lst, columns=['acc'])
     # NDD , could also specify index_col= ..., and pass a list for multiple idxs
     ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
-
+    ndd_subdf= ndd_subdf.drop_duplicates()
+    ndd_pr_lst = ndd_subdf['acc'].unique().tolist()
     # new mobidb with one column for phens of NDD, human, and brain
     mobidb = mobi_phens_col_maker(mobidb, brain_subdf, ndd_subdf)
     mobi_feature_df = mobidb[mobidb.feature.isin(features_lst)]
@@ -152,11 +153,12 @@ if __name__ == '__main__':
     pd.set_option('display.max_columns', None)
     pd.set_option('display.max_rows', None)
     mobi_disorder_df.loc[slice(None), phens_lst].describe().T. \
-        to_csv(cfg.data['phens'] + '/content-fraction-statistics.csv')
+        to_csv(cfg.data['phens'] + '/content-fraction-statistics1.csv')
     mobi_length_df.loc[slice(None), phens_lst].describe().T. \
-        to_csv(cfg.data['phens'] + '/length-statistics.csv')
+        to_csv(cfg.data['phens'] + '/length-statistics1.csv')
     mobi_cont_count_df.loc[slice(None), phens_lst].describe().T. \
-        to_csv(cfg.data['phens'] + '/content-count-statistics.csv')
-    for each_f in features_lst:
-        mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
-            to_csv(cfg.data['phens'] + '/' + each_f + '-cc.csv')
+        to_csv(cfg.data['phens'] + '/content-count-statistics1.csv')
+    breakpoint()
+    # for each_f in features_lst:
+    #     mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
+    #         to_csv(cfg.data['phens'] + '/' + each_f + '-cc.csv')
