@@ -77,7 +77,7 @@ if __name__ == '__main__':
     ## check if positive candidate genes in mobi_g4dn merged files (both inside IDRs and outside)
     # positive genes imported from limitedmutations.py method genes_lst_maker()
     # positive candidate genes are the ones with FDR =< 0.05
-    pos_candidate_gene_lst, ctrl_candidate_genes_lst = lmut.genes_lst_maker()  # 181
+    pos_candidate_gene_lst = lmut.genes_lst_maker(0.05)  # 181
 
     ## this two new dfs could have redundant proteins (several prs from one gene can have muts in or out idr or both!)
     # (2143, 27) protein mutations in IDR

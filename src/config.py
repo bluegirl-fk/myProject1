@@ -10,6 +10,7 @@ data = {
     'csv': absolute + 'data/to-csv',
     'dndb': absolute + 'data/denovodb',
     'phens': absolute + 'data/mobibool-phens',
+    'phens-fdr': absolute + 'data/mobibool-phens/acc-phens-FDR',
 
 }
 plots = {

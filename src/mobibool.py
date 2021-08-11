@@ -22,7 +22,7 @@ def mobi_phens_col_maker(df1_mobi, df2, df3):
     # brain
     df2['phenotype'] = 'Brain'
     # ndd
-    df3 = df3.drop_duplicates().rename(columns={'acc_x': 'acc', 'Phenotype': 'phenotype'})
+    df3 = df3.drop_duplicates().rename(columns={'Phenotype': 'phenotype'})
     all_phens = subdf1.append([df2, df3]).drop_duplicates()
     new_mobi_all_phens = df1_mobi.merge(all_phens, how='left', on='acc')
     return new_mobi_all_phens
@@ -124,7 +124,7 @@ if __name__ == '__main__':
     brain_prot_lst = bd.brain_pr_lst_generator()  # n: 8428
     brain_subdf = DataFrame(brain_prot_lst, columns=['acc'])
     # NDD , could also specify index_col= ..., and pass a list for multiple idxs
-    ndd_subdf = pd.read_csv(cfg.data['gene4'] + '/positive_cand_g4mobi_concat.csv', usecols=["acc_x", "Phenotype"])
+    ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
 
     # new mobidb with one column for phens of NDD, human, and brain
     mobidb = mobi_phens_col_maker(mobidb, brain_subdf, ndd_subdf)
@@ -133,8 +133,7 @@ if __name__ == '__main__':
     mobi_disorder_df, mobi_cont_count_df, mobi_length_df = multidx_df_maker(
         [mobi_feature_df, mobidb], ['acc', 'feature', 'phenotype'])
     # filtering data
-    # TODO maybe different filteration per each feature, cause the outcome is different for each, and some still have
-    # outliers and are rather difficult to analyse
+    # TODO maybe different filtering per each feature
     mobi_disorder_df = mobi_disorder_df[mobi_disorder_df < (0.9 * mobi_disorder_df.max())] * 100
     # mobi_disorder_df = mobi_disorder_df * 100
     mobi_cont_count_df = mobi_cont_count_df[mobi_cont_count_df <= 1000]

@@ -48,7 +48,7 @@ def merge_dfs_on_index(df1, df2, mutual_col, saving_route):
     return merged_df
 
 
-def refseq_acc_df_handler(input_df, file_name):
+def refseq_acc_df_handler(input_df, file_name):  # TODO till here should be fine except for mut positions, use acc & gene names
     input_df.columns = ['refseq_id', 'isoforms', 'acc', 'organism', 'Length', 'Gene names']
     del input_df['organism']  # (50930, 5)
     df2 = input_df['refseq_id'].str.split(',', expand=True).stack()
@@ -188,7 +188,7 @@ def generate_mutation_file2():
     # ...............
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     g4dn_exonic_df = pd.read_csv(cfg.data['gene4'] + '/exonic-df.csv')
     g4dn_exonic_df = prep_orig_df(g4dn_exonic_df)  # (70879, 156)
     refseq_mut_subdf = pr_mut_subdf_handler(g4dn_exonic_df, 'AAChange_refGene', 10,
@@ -197,7 +197,7 @@ if __name__ == '__main__':
     # (201372, 166)
     g4dn_exo_mutinfo_df = merge_dfs_on_index(refseq_mut_subdf, g4dn_exonic_df, 'idx1', '/exonic-mutinfo.csv')
     ## positive candidate genes list
-    pos_candidate_gene_lst, ctrl_candidate_genes_lst = lmut.genes_lst_maker()  # 181
+    pos_candidate_gene_lst = lmut.genes_lst_maker(0.05)
     # (24387, 166)
     g4dn_exo_pos_cand_df = g4dn_exo_mutinfo_df[g4dn_exo_mutinfo_df.Gene_refGene.isin(pos_candidate_gene_lst)]
 
@@ -208,10 +208,16 @@ if __name__ == '__main__':
     refseq_acc_df = pd.read_csv(cfg.data['rseq'] + '/refseq-acc.tab', sep='\t')  # from Uniprot
     refseq_acc_modified_df = refseq_acc_df_handler(refseq_acc_df, '/refseg-acc-modified.csv')  # (93949, 5)
 
-    ## merge g4dn exonic mutInfo with Uniprot ACC # (22858, 168)
-    mut_acc_mrg_df = g4dn_mut_acc_merger(refseq_acc_modified_df, g4dn_exo_pos_cand_df, 'refSeq',
-                                         '/mut-acc-mrg-df100.csv')
+    ## merge g4dn exonic mutInfo with Uniprot ACC # (52589, 168)
+    # mut_acc_mrg_df = g4dn_mut_acc_merger(refseq_acc_modified_df, g4dn_exo_pos_cand_df, 'refSeq',
+    #                                      '/mut-acc-mrg-df5percent.csv')
+if __name__ == '__main__':
+    mut_acc_mrg_df = pd.read_csv(cfg.data['gene4'] + '/mut-acc-mrg-df5percent.csv', low_memory=False)
+    # this df will be imported to mobibool and mrged with mobidb
+    acc_phen_5p_subdf = mut_acc_mrg_df[['acc', 'Phenotype']].drop_duplicates()  # (4531, 2)
+    acc_phen_5p_subdf.to_csv(cfg.data['phens'] + '/acc-phen-5percentFDR.csv')
 
+    breakpoint()
     ## mobidb
     ## delete this line later
     # mut_acc_mrg_df = pd.read_csv(cfg.data['gene4'] + '/mut-acc-mrg-df100.csv', low_memory=False)
