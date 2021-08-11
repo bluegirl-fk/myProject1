@@ -72,35 +72,35 @@ def several_plotter(plot_type):  # TODO better (shorter) way to write this
     if plot_type == 'box-cf':
         for (feature, title) in zip(features_lst, titles_lst):
             box_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
-                        save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf90-1' + '.png'),
+                        save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf90-BR' + '.png'),
                         title=title, ylabel='Content (%)', txt_name=feature)
     # content count
     elif plot_type == 'box-cc':
         for (feature, title) in zip(features_lst, titles_lst):
             box_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
-                        save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc1000-1' + '.png'),
+                        save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc1000-BR' + '.png'),
                         title=title, ylabel='Content (residues)', txt_name=feature)
     elif plot_type == 'box-len':
         # length
         box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-                    save_route=(cfg.plots['box-len'] + '/length<6000-1' + '.png'),
+                    save_route=(cfg.plots['box-len'] + '/length<6000-BR' + '.png'),
                     title='Protein sequence length', ylabel='Residues', txt_name='length')
     elif plot_type == 'viol-cf':
         # disorder content
         for (feature, title) in zip(features_lst, titles_lst):
             violin_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
-                           save_route=(cfg.plots['vio-cf'] + '/' + feature + '-cf-90-1' + '.png'),
+                           save_route=(cfg.plots['vio-cf'] + '/' + feature + '-cf-90-BR' + '.png'),
                            title=title, ylabel='Content (%)')
     elif plot_type == 'viol-cc':
         # content count
         for (feature, title) in zip(features_lst, titles_lst):
             violin_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
-                           save_route=(cfg.plots['vio-cc'] + '/' + feature + '-cc-1000-1' + '.png'),
+                           save_route=(cfg.plots['vio-cc'] + '/' + feature + '-cc-1000-BR' + '.png'),
                            title=title, ylabel='Content (residues)')
     elif plot_type == 'viol-len':
         ## Length
         violin_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-                       save_route=(cfg.plots['vio-len'] + '/length-below6000-1' + '.png'),
+                       save_route=(cfg.plots['vio-len'] + '/length-below6000-BR' + '.png'),
                        title='Protein sequence length', ylabel='Residues')
 
 
@@ -110,11 +110,12 @@ if __name__ == '__main__':
                     'prediction-lip-anchor', 'homology-domain-merge',
                     'prediction-signal_peptide-uniprot', 'prediction-transmembrane-uniprot',
                     'curated-conformational_diversity-merge', 'derived-binding_mode_disorder_to_disorder-mobi',
-                    'derived-binding_mode_disorder_to_order-mobi', 'derived-mobile_context_dependent-th_90']
+                    'derived-binding_mode_disorder_to_order-mobi', 'derived-mobile_context_dependent-th_90',
+                    'prediction-disorder-th_50']
     titles_lst = ['Disorder content - Mobidb-lite', 'Low complexity', 'Linear Interacting Peptides - Anchor',
                   'Protein domains', 'Signal peptides - Uniprot', 'Transmembrane helices - Uniprot',
                   'Conformational diversity', 'Binding mode - disorder to disorder',
-                  'Binding mode - disorder to order', 'Protein mobility']
+                  'Binding mode - disorder to order', 'Protein mobility', 'Disorder - majority']
 
     ## selected phenotypes
     phens_lst = ['Human', 'Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'Mix', 'NDDs', 'Control']
@@ -127,7 +128,8 @@ if __name__ == '__main__':
     ## brain
     brain_prot_lst = bd.brain_pr_lst_generator()  # n: 8297
     # Discarding ndd proteins from the brain
-    brain_without_phens_lst = [i for i in brain_prot_lst if i not in ndd_pr_lst]  # 7842, (455 mutual proteins)
+    # mutual_brain_ndd_prs_lst = [i for i in brain_prot_lst if i in ndd_pr_lst]  # 455
+    brain_without_phens_lst = [i for i in brain_prot_lst if i not in ndd_pr_lst]  # 7842
     brain_subdf = DataFrame(brain_without_phens_lst, columns=['acc'])
 
     # new mobidb with one column for phens of NDD, human, and brain
@@ -152,12 +154,12 @@ if __name__ == '__main__':
     several_plotter('viol-cc')
     several_plotter('viol-len')
 
-    # writing data statistics to CSV
-    pd.set_option('display.max_columns', None)
-    pd.set_option('display.max_rows', None)
-    for each_f in features_lst:
-        mobi_disorder_df.loc[(slice(None), each_f), phens_lst].describe().T. \
-            to_csv(cfg.data['phens'] + '/' + each_f + '-cf.csv')
-        mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
-            to_csv(cfg.data['phens'] + '/' + each_f + '-cc.csv')
-    mobi_length_df.loc[slice(None), phens_lst].describe().T.to_csv(cfg.data['phens'] + '/length-stats.csv')
+    # # writing data statistics to CSV
+    # pd.set_option('display.max_columns', None)
+    # pd.set_option('display.max_rows', None)
+    # for each_f in features_lst:
+    #     mobi_disorder_df.loc[(slice(None), each_f), phens_lst].describe().T. \
+    #         to_csv(cfg.data['phens'] + '/' + each_f + '-cf.csv')
+    #     mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
+    #         to_csv(cfg.data['phens'] + '/' + each_f + '-cc.csv')
+    # mobi_length_df.loc[slice(None), phens_lst].describe().T.to_csv(cfg.data['phens'] + '/length-stats.csv')

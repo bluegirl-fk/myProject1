@@ -22,9 +22,10 @@ def genes_lst_maker(fdr_limit):  # this is candidate genes from download page
     return positive_genes_lst
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
+    # all_candidate_genes_df = pd.read_csv(cfg.data['gene4'] + '/limitedmut/Candidate_gene_1.2.txt',
+    #                                      sep='\t')  # (124137, 12)
     ## Candidate genes from excel file (list is not complete)
     # genes_df = pd.read_excel(cfg.data['gene4'] + '/Gene.xlsx', engine='openpyxl')  # (8271, 13)
     # lst_1 = genes_lst_maker(0.05)  # 679 genes
     # lst_2 = genes_lst_maker(0.1)  # 0.02 = 1144, 0.1 = 842
-    sys.exit()
