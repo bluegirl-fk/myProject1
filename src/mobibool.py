@@ -79,35 +79,40 @@ if __name__ == '__main__':
                   'Protein domains', 'Signal peptides - Uniprot', 'Transmembrane helices - Uniprot',
                   'Conformational diversity', 'Binding mode - disorder to disorder',
                   'Binding mode - disorder to order', 'Protein mobility', 'Disorder - majority']
-    # this is a dict with feature names as key and their plot titles as value (then dfs for cc will be added as values)
     titles_lst = [[i] for i in titles_lst]
+    # this is a dict with feature names as key and their plot titles as value (then dfs for cc will be added as values)
     feature_dict = dict(zip(features_lst, titles_lst))
+    # TODO now add the cc specific dfs for each feature, same for cf low complexity(?) or fpr that one maybe ylim!
+    ## selected phenotypes
+    phens_lst = ['Human', 'Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'NDDs', 'Mix', 'Control']
+    ## import dfs # (mobidb)
+    mobidb = pd.read_csv(cfg.data[''] + '/mobidb_result.tsv', sep='\t')
+    # NDD , could also specify index_col= ..., and pass a list for multiple idxs
+    ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
+    ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
+    ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins  => these are all, not the selected phens
+    ## brain
+    brain_prot_lst = bd.brain_pr_lst_generator()  # n: 8297
+    brain_subdf = DataFrame(brain_prot_lst, columns=['acc'])
+    # mutual_brain_ndd_prs_lst = [i for i in brain_prot_lst if i in ndd_pr_lst]  # 455
 
-    # ## selected phenotypes
-    # phens_lst = ['Human', 'Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'NDDs', 'Mix', 'Control']
-    # ## import dfs # (mobidb)
-    # mobidb = pd.read_csv(cfg.data[''] + '/mobidb_result.tsv', sep='\t')
-    # # NDD , could also specify index_col= ..., and pass a list for multiple idxs
-    # ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
-    # ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
-    # ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins  => these are all, not the selected phens
-    # ## brain
-    # brain_prot_lst = bd.brain_pr_lst_generator()  # n: 8297
-    # brain_subdf = DataFrame(brain_prot_lst, columns=['acc'])
-    # # mutual_brain_ndd_prs_lst = [i for i in brain_prot_lst if i in ndd_pr_lst]  # 455
-    #
-    # # new mobidb with one column for phens of NDD, human, and brain
-    # mobidb = mobi_phens_col_maker(mobidb, brain_subdf, ndd_subdf)
-    # mobi_feature_df = mobidb[mobidb.feature.isin(features_lst)]
-    # # multi-idx-dfs
-    # mobi_disorder_df, mobi_cont_count_df, mobi_length_df = multidx_df_maker(
-    #     [mobi_feature_df, mobidb], ['acc', 'feature', 'phenotype'])
-    # # filtering data
-    # # TODO maybe different filtering per each feature
-    # mobi_disorder_df = mobi_disorder_df[mobi_disorder_df < (0.9 * mobi_disorder_df.max())] * 100
-    # # mobi_disorder_df = mobi_disorder_df * 100
-    # mobi_cont_count_df = mobi_cont_count_df[mobi_cont_count_df <= 1000]
-    # mobi_length_df = mobi_length_df[mobi_length_df < 6000]
+    # new mobidb with one column for phens of NDD, human, and brain
+    mobidb = mobi_phens_col_maker(mobidb, brain_subdf, ndd_subdf)
+    mobi_feature_df = mobidb[mobidb.feature.isin(features_lst)]
+    # multi-idx-dfs
+    mobi_disorder_df, mobi_cont_count_df, mobi_length_df = multidx_df_maker(
+        [mobi_feature_df, mobidb], ['acc', 'feature', 'phenotype'])
+    # filtering data
+    # TODO maybe different filtering per each feature
+    mobi_disorder_df = mobi_disorder_df[mobi_disorder_df < (0.9 * mobi_disorder_df.max())] * 100
+    # mobi_disorder_df = mobi_disorder_df * 100
+    mobi_cont_count_df = mobi_cont_count_df[mobi_cont_count_df <= 1000]
+    mobi_length_df = mobi_length_df[mobi_length_df < 6000]
+    def cc_feature_filterer(cf_df, *cf_lim, cc_df, *cc_lim, len_df, *len_lim):
+        for i in cf_df:
+            cf_df = cf_df[cf_df < (cf_lim * cf_df.max())]
+        for i in cc_lim:
+            cc_df = cc_df[cc_df <= cc_lim]
 
     # # box plots for disorder_content, content_count and length
     # # disorder content
