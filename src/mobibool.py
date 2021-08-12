@@ -127,10 +127,8 @@ if __name__ == '__main__':
     ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
     ## brain
     brain_prot_lst = bd.brain_pr_lst_generator()  # n: 8297
-    # Discarding ndd proteins from the brain
+    brain_subdf = DataFrame(brain_prot_lst, columns=['acc'])
     # mutual_brain_ndd_prs_lst = [i for i in brain_prot_lst if i in ndd_pr_lst]  # 455
-    brain_without_phens_lst = [i for i in brain_prot_lst if i not in ndd_pr_lst]  # 7842
-    brain_subdf = DataFrame(brain_without_phens_lst, columns=['acc'])
 
     # new mobidb with one column for phens of NDD, human, and brain
     mobidb = mobi_phens_col_maker(mobidb, brain_subdf, ndd_subdf)
@@ -154,12 +152,12 @@ if __name__ == '__main__':
     several_plotter('viol-cc')
     several_plotter('viol-len')
 
-    # # writing data statistics to CSV
-    # pd.set_option('display.max_columns', None)
-    # pd.set_option('display.max_rows', None)
-    # for each_f in features_lst:
-    #     mobi_disorder_df.loc[(slice(None), each_f), phens_lst].describe().T. \
-    #         to_csv(cfg.data['phens'] + '/' + each_f + '-cf.csv')
-    #     mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
-    #         to_csv(cfg.data['phens'] + '/' + each_f + '-cc.csv')
-    # mobi_length_df.loc[slice(None), phens_lst].describe().T.to_csv(cfg.data['phens'] + '/length-stats.csv')
+    # writing data statistics to CSV
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.max_rows', None)
+    for each_f in features_lst:
+        mobi_disorder_df.loc[(slice(None), each_f), phens_lst].describe().T. \
+            to_csv(cfg.data['phens'] + '/' + each_f + '-cf.csv')
+        mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
+            to_csv(cfg.data['phens'] + '/' + each_f + '-cc.csv')
+    mobi_length_df.loc[slice(None), phens_lst].describe().T.to_csv(cfg.data['phens'] + '/length-stats.csv')
