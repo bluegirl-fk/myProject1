@@ -39,7 +39,7 @@ def multidx_df_maker(input_dfs_lst, idx_lst):
     return cf_multidx_df, cc_multidx_df, len_multidx_df
 
 
-def box_plotter(data, title, ylabel, txt_name, save_route):
+def box_plotter(data, title, ylabel, save_route):
     plt.figure(figsize=(60, 60))  # bigger figsize to have xticklabels shown
     g = sns.catplot(data=data, kind="box").set(title=title, xlabel='Phenotypes', ylabel=ylabel)
     sns.set_style("ticks")
@@ -67,43 +67,6 @@ def violin_plotter(data, title, save_route, ylabel):
     return
 
 
-def several_plotter(plot_type):  # TODO better (shorter) way to write this
-    # disorder content
-    if plot_type == 'box-cf':
-        for (feature, title) in zip(features_lst, titles_lst):
-            box_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
-                        save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf90' + '.png'),
-                        title=title, ylabel='Content (%)', txt_name=feature)
-    # content count
-    elif plot_type == 'box-cc':
-        for (feature, title) in zip(features_lst, titles_lst):
-            box_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
-                        save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc1000' + '.png'),
-                        title=title, ylabel='Content (residues)', txt_name=feature)
-    elif plot_type == 'box-len':
-        # length
-        box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-                    save_route=(cfg.plots['box-len'] + '/length<6000' + '.png'),
-                    title='Protein sequence length', ylabel='Residues', txt_name='length')
-    elif plot_type == 'viol-cf':
-        # disorder content
-        for (feature, title) in zip(features_lst, titles_lst):
-            violin_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
-                           save_route=(cfg.plots['vio-cf'] + '/' + feature + '-cf-90' + '.png'),
-                           title=title, ylabel='Content (%)')
-    elif plot_type == 'viol-cc':
-        # content count
-        for (feature, title) in zip(features_lst, titles_lst):
-            violin_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
-                           save_route=(cfg.plots['vio-cc'] + '/' + feature + '-cc-1000' + '.png'),
-                           title=title, ylabel='Residues')
-    elif plot_type == 'viol-len':
-        ## Length
-        violin_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-                       save_route=(cfg.plots['vio-len'] + '/length-below6000' + '.png'),
-                       title='Protein sequence length', ylabel='Residues')
-
-
 if __name__ == '__main__':
     ## selected features  (10)
     features_lst = ['prediction-disorder-mobidb_lite', 'prediction-low_complexity-merge',
@@ -116,48 +79,73 @@ if __name__ == '__main__':
                   'Protein domains', 'Signal peptides - Uniprot', 'Transmembrane helices - Uniprot',
                   'Conformational diversity', 'Binding mode - disorder to disorder',
                   'Binding mode - disorder to order', 'Protein mobility', 'Disorder - majority']
+    # this is a dict with feature names as key and their plot titles as value (then dfs for cc will be added as values)
+    titles_lst = [[i] for i in titles_lst]
+    feature_dict = dict(zip(features_lst, titles_lst))
 
-    ## selected phenotypes
-    phens_lst = ['Human', 'Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'NDDs', 'Mix','Control']
-    ## import dfs # (mobidb)
-    mobidb = pd.read_csv(cfg.data[''] + '/mobidb_result.tsv', sep='\t')
-    # NDD , could also specify index_col= ..., and pass a list for multiple idxs
-    ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
-    ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
-    ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins  => these are all, not the selected phens
-    ## brain
-    brain_prot_lst = bd.brain_pr_lst_generator()  # n: 8297
-    brain_subdf = DataFrame(brain_prot_lst, columns=['acc'])
-    # mutual_brain_ndd_prs_lst = [i for i in brain_prot_lst if i in ndd_pr_lst]  # 455
+    # ## selected phenotypes
+    # phens_lst = ['Human', 'Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'NDDs', 'Mix', 'Control']
+    # ## import dfs # (mobidb)
+    # mobidb = pd.read_csv(cfg.data[''] + '/mobidb_result.tsv', sep='\t')
+    # # NDD , could also specify index_col= ..., and pass a list for multiple idxs
+    # ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
+    # ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
+    # ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins  => these are all, not the selected phens
+    # ## brain
+    # brain_prot_lst = bd.brain_pr_lst_generator()  # n: 8297
+    # brain_subdf = DataFrame(brain_prot_lst, columns=['acc'])
+    # # mutual_brain_ndd_prs_lst = [i for i in brain_prot_lst if i in ndd_pr_lst]  # 455
+    #
+    # # new mobidb with one column for phens of NDD, human, and brain
+    # mobidb = mobi_phens_col_maker(mobidb, brain_subdf, ndd_subdf)
+    # mobi_feature_df = mobidb[mobidb.feature.isin(features_lst)]
+    # # multi-idx-dfs
+    # mobi_disorder_df, mobi_cont_count_df, mobi_length_df = multidx_df_maker(
+    #     [mobi_feature_df, mobidb], ['acc', 'feature', 'phenotype'])
+    # # filtering data
+    # # TODO maybe different filtering per each feature
+    # mobi_disorder_df = mobi_disorder_df[mobi_disorder_df < (0.9 * mobi_disorder_df.max())] * 100
+    # # mobi_disorder_df = mobi_disorder_df * 100
+    # mobi_cont_count_df = mobi_cont_count_df[mobi_cont_count_df <= 1000]
+    # mobi_length_df = mobi_length_df[mobi_length_df < 6000]
 
-    # new mobidb with one column for phens of NDD, human, and brain
-    mobidb = mobi_phens_col_maker(mobidb, brain_subdf, ndd_subdf)
-    mobi_feature_df = mobidb[mobidb.feature.isin(features_lst)]
-    # multi-idx-dfs
-    mobi_disorder_df, mobi_cont_count_df, mobi_length_df = multidx_df_maker(
-        [mobi_feature_df, mobidb], ['acc', 'feature', 'phenotype'])
-    # filtering data
-    # TODO maybe different filtering per each feature
-    mobi_disorder_df = mobi_disorder_df[mobi_disorder_df < (0.9 * mobi_disorder_df.max())] * 100
-    # mobi_disorder_df = mobi_disorder_df * 100
-    mobi_cont_count_df = mobi_cont_count_df[mobi_cont_count_df <= 1000]
-    mobi_length_df = mobi_length_df[mobi_length_df < 6000]
+    # # box plots for disorder_content, content_count and length
+    # # disorder content
+    # for (feature, title) in zip(features_lst, titles_lst):
+    #     box_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
+    #                 save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf90' + '.png'),
+    #                 title=title, ylabel='Content (%)')
+    # for (feature, title) in zip(features_lst, titles_lst):
+    #     box_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
+    #                 save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc1000' + '.png'),
+    #                 title=title, ylabel='Content (residues)')
+    # # length
+    # box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
+    #             save_route=(cfg.plots['box-len'] + '/length<6000' + '.png'),
+    #             title='Protein sequence length', ylabel='Residues')
 
-    # box plots for disorder_content, content_count and length
-    several_plotter('box-cf')
-    several_plotter('box-cc')
-    several_plotter('box-len')
-    # violin plots for disorder_content, content_count and length
-    several_plotter('viol-cf')
-    several_plotter('viol-cc')
-    several_plotter('viol-len')
+    #    # violin plots for disorder_content, content_count and length
+    # # disorder content
+#        for (feature, title) in zip(features_lst, titles_lst):
+#            violin_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
+#                           save_route=(cfg.plots['vio-cf'] + '/' + feature + '-cf-90' + '.png'),
+#                           title=title, ylabel='Content (%)')
+#        # content count
+#        for (feature, title) in zip(features_lst, titles_lst):
+#            violin_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
+#                           save_route=(cfg.plots['vio-cc'] + '/' + feature + '-cc-1000' + '.png'),
+#                           title=title, ylabel='Residues')
+#        ## Length
+#        violin_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
+#                       save_route=(cfg.plots['vio-len'] + '/length-below6000' + '.png'),
+#                       title='Protein sequence length', ylabel='Residues')
 
-    # writing data statistics to CSV
-    pd.set_option('display.max_columns', None)
-    pd.set_option('display.max_rows', None)
-    for each_f in features_lst:
-        mobi_disorder_df.loc[(slice(None), each_f), phens_lst].describe().T. \
-            to_csv(cfg.data['phens'] + '/' + each_f + '-cf.csv')
-        mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
-            to_csv(cfg.data['phens'] + '/' + each_f + '-cc.csv')
-    mobi_length_df.loc[slice(None), phens_lst].describe().T.to_csv(cfg.data['phens'] + '/length-stats.csv')
+# # writing data statistics to CSV
+# pd.set_option('display.max_columns', None)
+# pd.set_option('display.max_rows', None)
+# for each_f in features_lst:
+#     mobi_disorder_df.loc[(slice(None), each_f), phens_lst].describe().T. \
+#         to_csv(cfg.data['phens'] + '/' + each_f + '-cf.csv')
+#     mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
+#         to_csv(cfg.data['phens'] + '/' + each_f + '-cc.csv')
+# mobi_length_df.loc[slice(None), phens_lst].describe().T.to_csv(cfg.data['phens'] + '/length-stats.csv')
