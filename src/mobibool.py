@@ -34,6 +34,7 @@ def multidx_df_maker(input_dfs_lst, idx_lst):
     # mobi_disorder_df = mobi_feature_df.groupby(
     # ['acc', 'feature', 'phenotype']).content_fraction.mean().unstack().sort_index()
     cf_multidx_df = input_dfs_lst[0].groupby(idx_lst).content_fraction.mean().unstack().sort_index()
+    cf_multidx_df = cf_multidx_df * 100  # converting cf to percentage
     cc_multidx_df = input_dfs_lst[0].groupby(idx_lst).content_count.mean().unstack().sort_index()
     len_multidx_df = input_dfs_lst[1].groupby(idx_lst).length.mean().unstack().sort_index()
     return cf_multidx_df, cc_multidx_df, len_multidx_df
@@ -82,8 +83,13 @@ if __name__ == '__main__':
     titles_lst = [[i] for i in titles_lst]
     # this is a dict with feature names as key and their plot titles as value (then dfs for cc will be added as values)
     feature_dict = dict(zip(features_lst, titles_lst))
-    # TODO now add the cc specific dfs for each feature, same for cf low complexity(?) or fpr that one maybe ylim!
-    ## selected phenotypes
+    cc_lim_lst = [1000, 800, 1000, 1200, 70, 600, 700, 250, 100, 500, 1200]
+    cc_lim_feature_dict = dict(zip(features_lst, cc_lim_lst))
+    # now add content_count limit of each feature to your dict as second value (idx=1)
+    for feature in features_lst:
+        feature_dict[feature].append(cc_lim_feature_dict[feature])
+
+    # in the end use decorator thing with the @
     phens_lst = ['Human', 'Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'NDDs', 'Mix', 'Control']
     ## import dfs # (mobidb)
     mobidb = pd.read_csv(cfg.data[''] + '/mobidb_result.tsv', sep='\t')
@@ -102,32 +108,32 @@ if __name__ == '__main__':
     # multi-idx-dfs
     mobi_disorder_df, mobi_cont_count_df, mobi_length_df = multidx_df_maker(
         [mobi_feature_df, mobidb], ['acc', 'feature', 'phenotype'])
-    # filtering data
-    # TODO maybe different filtering per each feature
-    mobi_disorder_df = mobi_disorder_df[mobi_disorder_df < (0.9 * mobi_disorder_df.max())] * 100
-    # mobi_disorder_df = mobi_disorder_df * 100
-    mobi_cont_count_df = mobi_cont_count_df[mobi_cont_count_df <= 1000]
-    mobi_length_df = mobi_length_df[mobi_length_df < 6000]
-    def cc_feature_filterer(cf_df, *cf_lim, cc_df, *cc_lim, len_df, *len_lim):
-        for i in cf_df:
-            cf_df = cf_df[cf_df < (cf_lim * cf_df.max())]
-        for i in cc_lim:
-            cc_df = cc_df[cc_df <= cc_lim]
 
-    # # box plots for disorder_content, content_count and length
-    # # disorder content
-    # for (feature, title) in zip(features_lst, titles_lst):
-    #     box_plotter(data=mobi_disorder_df.loc[(slice(None), feature), phens_lst],
-    #                 save_route=(cfg.plots['box-cf'] + '/' + feature + '-cf90' + '.png'),
-    #                 title=title, ylabel='Content (%)')
-    # for (feature, title) in zip(features_lst, titles_lst):
-    #     box_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
-    #                 save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc1000' + '.png'),
-    #                 title=title, ylabel='Content (residues)')
-    # # length
-    # box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-    #             save_route=(cfg.plots['box-len'] + '/length<6000' + '.png'),
-    #             title='Protein sequence length', ylabel='Residues')
+
+    # filtering data
+    def cc_feature_filterer(cc_org_df, lim):
+        cc_new_df = cc_org_df[cc_org_df <= lim]
+        return cc_new_df
+    mobi_disorder_df = mobi_disorder_df[mobi_disorder_df < (0.9 * mobi_disorder_df.max())]
+
+    mobi_length_df = mobi_length_df[mobi_length_df < 6000]
+
+
+
+    # box plots for disorder_content, content_count and length
+    # disorder content
+    for key, value in feature_dict:
+        box_plotter(data=mobi_disorder_df.loc[(slice(None), key), phens_lst],
+                    save_route=(cfg.plots['box-cf'] + '/' + key + '-cf90' + '.png'),
+                    title=feature_dict[key](0), ylabel='Content (%)')
+    for (feature, title) in zip(features_lst, titles_lst):
+        box_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
+                    save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc1000' + '.png'),
+                    title=title, ylabel='Content (residues)')
+    # length
+    box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
+                save_route=(cfg.plots['box-len'] + '/length<6000' + '.png'),
+                title='Protein sequence length', ylabel='Residues')
 
     #    # violin plots for disorder_content, content_count and length
     # # disorder content
