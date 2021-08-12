@@ -40,16 +40,32 @@ def multidx_df_maker(input_dfs_lst, idx_lst):
     return cf_multidx_df, cc_multidx_df, len_multidx_df
 
 
-def box_plotter(data, title, ylabel, save_route):
-    plt.figure(figsize=(60, 60))  # bigger figsize to have xticklabels shown
-    g = sns.catplot(data=data, kind="box").set(title=title, xlabel='Phenotypes', ylabel=ylabel)
-    sns.set_style("ticks")
-    # dict[dict_key] = data.describe().T
-    g.set_xticklabels(rotation=45, va="center", position=(0, -0.02))
-    # plt.yscale('log')
-    plt.tight_layout()
-    plt.savefig(save_route)
-    plt.close('all')
+def box_plotter(input_type, data, title, ylabel, save_route):
+    def cc_feature_filterer(cc_org_df, lim, selected_features):
+        cc_new_df = cc_org_df[cc_org_df <= lim]
+        cc_new_df = cc_new_df.loc[(slice(None), selected_features), phens_lst]
+        return cc_new_df
+    if input_type == 'cc':
+        for feat in features_lst:
+            plt.figure(figsize=(60, 60))  # bigger figsize to have xticklabels shown
+            g = sns.catplot(data=cc_feature_filterer(data, feature_dict[feat][1], feat), kind="box").set(title=title, xlabel='Phenotypes', ylabel=ylabel)
+            sns.set_style("ticks")
+            # dict[dict_key] = data.describe().T
+            g.set_xticklabels(rotation=45, va="center", position=(0, -0.02))
+            # plt.yscale('log')
+            plt.tight_layout()
+            plt.savefig(save_route)
+            plt.close('all')
+    elif input_type == 'cf' or input_type == 'len':
+        plt.figure(figsize=(60, 60))  # bigger figsize to have xticklabels shown
+        g = sns.catplot(data=data, kind="box").set(title=title, xlabel='Phenotypes', ylabel=ylabel)
+        sns.set_style("ticks")
+        # dict[dict_key] = data.describe().T
+        g.set_xticklabels(rotation=45, va="center", position=(0, -0.02))
+        # plt.yscale('log')
+        plt.tight_layout()
+        plt.savefig(save_route)
+        plt.close('all')
     return
 
 
@@ -111,29 +127,32 @@ if __name__ == '__main__':
 
 
     # filtering data
-    def cc_feature_filterer(cc_org_df, lim):
-        cc_new_df = cc_org_df[cc_org_df <= lim]
-        return cc_new_df
+    # def cc_feature_filterer(cc_org_df, lim):
+    #     cc_new_df = cc_org_df[cc_org_df <= lim]
+    #     return cc_new_df
+
+
+
+
+
     mobi_disorder_df = mobi_disorder_df[mobi_disorder_df < (0.9 * mobi_disorder_df.max())]
 
     mobi_length_df = mobi_length_df[mobi_length_df < 6000]
 
-
-
     # box plots for disorder_content, content_count and length
     # disorder content
-    for key, value in feature_dict:
-        box_plotter(data=mobi_disorder_df.loc[(slice(None), key), phens_lst],
-                    save_route=(cfg.plots['box-cf'] + '/' + key + '-cf90' + '.png'),
-                    title=feature_dict[key](0), ylabel='Content (%)')
-    for (feature, title) in zip(features_lst, titles_lst):
-        box_plotter(data=mobi_cont_count_df.loc[(slice(None), feature), phens_lst],
-                    save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc1000' + '.png'),
-                    title=title, ylabel='Content (residues)')
-    # length
-    box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-                save_route=(cfg.plots['box-len'] + '/length<6000' + '.png'),
-                title='Protein sequence length', ylabel='Residues')
+    # for key, value in feature_dict:
+    #     box_plotter(data=mobi_disorder_df.loc[(slice(None), key), phens_lst],
+    #                 save_route=(cfg.plots['box-cf'] + '/' + key + '-cf90' + '.png'),
+    #                 title=feature_dict[key](0), ylabel='Content (%)')
+    for feature in features_lst:
+        box_plotter(input_type='cc', data=mobi_cont_count_df,
+                    save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc-test' + '.png'),
+                    title=feature_dict[feature][0], ylabel='Content (residues)')
+    # # length
+    # box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
+    #             save_route=(cfg.plots['box-len'] + '/length<6000' + '.png'),
+    #             title='Protein sequence length', ylabel='Residues')
 
     #    # violin plots for disorder_content, content_count and length
     # # disorder content
