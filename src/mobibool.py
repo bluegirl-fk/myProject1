@@ -40,33 +40,34 @@ def multidx_df_maker(input_dfs_lst, idx_lst):
     return cf_multidx_df, cc_multidx_df, len_multidx_df
 
 
-def box_plotter(input_type, data, title, ylabel, save_route):
-    def cc_feature_filterer(cc_org_df, lim, selected_features):
-        cc_new_df = cc_org_df[cc_org_df <= lim]
-        cc_new_df = cc_new_df.loc[(slice(None), selected_features), phens_lst]
-        return cc_new_df
-    if input_type == 'cc':
-        for feat in features_lst:
-            plt.figure(figsize=(60, 60))  # bigger figsize to have xticklabels shown
-            g = sns.catplot(data=cc_feature_filterer(data, feature_dict[feat][1], feat), kind="box").set(title=title, xlabel='Phenotypes', ylabel=ylabel)
-            sns.set_style("ticks")
-            # dict[dict_key] = data.describe().T
-            g.set_xticklabels(rotation=45, va="center", position=(0, -0.02))
-            # plt.yscale('log')
-            plt.tight_layout()
-            plt.savefig(save_route)
-            plt.close('all')
-    elif input_type == 'cf' or input_type == 'len':
-        plt.figure(figsize=(60, 60))  # bigger figsize to have xticklabels shown
-        g = sns.catplot(data=data, kind="box").set(title=title, xlabel='Phenotypes', ylabel=ylabel)
-        sns.set_style("ticks")
-        # dict[dict_key] = data.describe().T
-        g.set_xticklabels(rotation=45, va="center", position=(0, -0.02))
-        # plt.yscale('log')
-        plt.tight_layout()
-        plt.savefig(save_route)
-        plt.close('all')
+def cc_feature_filterer(cc_org_df, lim, selected_features):  # what if I take this out
+    cc_new_df = cc_org_df[cc_org_df <= lim]
+    cc_new_df = cc_new_df.loc[(slice(None), selected_features), phens_lst]
+    return cc_new_df
+
+
+def box_plotter(data, title, ylabel, save_route):
+    plt.figure(figsize=(60, 60))  # bigger figsize to have xticklabels shown
+    g = sns.catplot(data=data, kind="box").set(title=title, xlabel='Phenotypes', ylabel=ylabel)
+    sns.set_style("ticks")
+    # dict[dict_key] = data.describe().T
+    g.set_xticklabels(rotation=45, va="center", position=(0, -0.02))
+    # plt.yscale('log')
+    plt.tight_layout()
+    plt.savefig(save_route)
+    plt.close('all')
     return
+
+
+def plot_distinguisher(input_type, input_plot_func, input_filterer_func):
+    def inner_plotter(data, title, ylabel, save_route, feat_lst, lim, selected_features, func):
+        if input_type == 'cc':
+            def inner_filterer(cc_org_df, lim, selected_features):
+                return input_filterer_func
+            data = input_filterer_func
+        return input_plot_func(data=input_filterer_func, title=title, ylabel=ylabel, save_route=save_route)
+
+    return inner_plotter
 
 
 def violin_plotter(data, title, save_route, ylabel):
@@ -125,19 +126,32 @@ if __name__ == '__main__':
     mobi_disorder_df, mobi_cont_count_df, mobi_length_df = multidx_df_maker(
         [mobi_feature_df, mobidb], ['acc', 'feature', 'phenotype'])
 
-
     # filtering data
     # def cc_feature_filterer(cc_org_df, lim):
     #     cc_new_df = cc_org_df[cc_org_df <= lim]
     #     return cc_new_df
 
-
-
-
-
     mobi_disorder_df = mobi_disorder_df[mobi_disorder_df < (0.9 * mobi_disorder_df.max())]
 
     mobi_length_df = mobi_length_df[mobi_length_df < 6000]
+
+    # def plot_distinguisher(input_plot_func, input_filterer_func):
+    #     def inner_plotter(input_type, data, title, ylabel, save_route, feat_lst, lim, selected_features, func):
+    #         if input_type == 'cc':
+    #             def inner_filterer(cc_org_df, lim, selected_features):
+    #                 return inner_filterer
+    #         return input_plot_func(input_type, inner_filterer, title, ylabel, save_route, feat_lst, lim,
+    #                                selected_features, func)
+    #
+    #     return inner_plotter
+
+    for key in feature_dict:
+        plot_distinguisher(input_type='cc', input_plot_func=box_plotter(data=mobi_cont_count_df,
+                                                                        save_route=(cfg.plots[
+                                                                                        'box-cc'] + '/' + feature + 'cc-decorator' + '.png'),
+                                                                        title=feature_dict[key][0],
+                                                                        ylabel='Content (residues)'),
+                           input_filterer_func=cc_feature_filterer(mobi_cont_count_df, feature_dict[key][1], key))
 
     # box plots for disorder_content, content_count and length
     # disorder content
@@ -145,10 +159,10 @@ if __name__ == '__main__':
     #     box_plotter(data=mobi_disorder_df.loc[(slice(None), key), phens_lst],
     #                 save_route=(cfg.plots['box-cf'] + '/' + key + '-cf90' + '.png'),
     #                 title=feature_dict[key](0), ylabel='Content (%)')
-    for feature in features_lst:
-        box_plotter(input_type='cc', data=mobi_cont_count_df,
-                    save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc-test' + '.png'),
-                    title=feature_dict[feature][0], ylabel='Content (residues)')
+    # for feature in features_lst:
+    #     box_plotter(input_type='cc', data=mobi_cont_count_df,
+    #                 save_route=(cfg.plots['box-cc'] + '/' + feature + '-cc-test' + '.png'),
+    #                 title=feature_dict[feature][0], ylabel='Content (residues)')
     # # length
     # box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
     #             save_route=(cfg.plots['box-len'] + '/length<6000' + '.png'),
