@@ -63,7 +63,7 @@ def plot_distinguisher(input_type, input_plot_func, input_filterer_func):
     def inner_plotter(data, title, ylabel, save_route, feat_lst, lim, selected_features, func):
         if input_type == 'cc':
             def inner_filterer(cc_org_df, lim, selected_features):
-                return input_filterer_func
+                input_filterer_func(inner_filterer())
             data = input_filterer_func
         return input_plot_func(data=input_filterer_func, title=title, ylabel=ylabel, save_route=save_route)
 
