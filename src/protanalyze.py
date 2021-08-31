@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 import config as cfg
 import brain as brn
-import
 
 
 def phens_acc_dict_maker(phen_lst, phens_df):  # TODO: later try to use these two methods inside eachother
@@ -42,7 +41,9 @@ if __name__ == '__main__':
     ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
     # Dictionary with phen as key and their corresponding  list of ACCs as value
     phens_acc_dict = human_brain_acc_adder(phens_acc_dict_maker(phens_lst, ndd_subdf))
-    phens_inters_df = phens_intersect_df_maker(phens_acc_dict)
+    phens_inters_df = phens_intersect_df_maker(phens_acc_dict)  #TODO: hold the actual intersecting lists as df values instead of nubers
+
+    phens_inters_df.style.bar(subset=["ASD"], color='#FFA07A')
 
 
 
