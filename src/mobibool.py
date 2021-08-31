@@ -3,6 +3,7 @@
 # *index (mutual idx of mut_acc_merged_df and mutinfo subdf which is useful to merge mobidb & g4dn_mutinfo_acc,
 # could be useless now :/ not sure
 ## this description will be changed! (August 4th)
+import sys
 
 import pandas as pd
 import numpy as np
@@ -167,21 +168,21 @@ if __name__ == '__main__':
     #     cc_new_df = cc_org_df[cc_org_df <= lim]
     #     return cc_new_df
 
-    # box plots for disorder_content, content_count and length
-    several_plotter('box-cf', mobi_disorder_df)
-    several_plotter('box-cc', mobi_cont_count_df)  # this still needs to be filtered
-    several_plotter('box-len', mobi_length_df)
-    # violin plots for disorder_content, content_count and length
-    several_plotter('viol-cf', mobi_disorder_df)
-    several_plotter('viol-cc', mobi_cont_count_df)  # needs filteration
-    several_plotter('viol-len', mobi_length_df)
-
-    ## writing data statistics to CSV
-    pd.set_option('display.max_columns', None)
-    pd.set_option('display.max_rows', None)
-    for each_f in features_lst:
-        mobi_disorder_df.loc[(slice(None), each_f), phens_lst].describe().T. \
-            to_csv(cfg.data['phens'] + '/' + each_f + '-cf.csv')
-        mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
-            to_csv(cfg.data['phens'] + '/' + each_f + '-cc.csv')
-    mobi_length_df.loc[slice(None), phens_lst].describe().T.to_csv(cfg.data['phens'] + '/length-stats.csv')
+    # # box plots for disorder_content, content_count and length
+    # several_plotter('box-cf', mobi_disorder_df)
+    # several_plotter('box-cc', mobi_cont_count_df)  # this still needs to be filtered
+    # several_plotter('box-len', mobi_length_df)
+    # # violin plots for disorder_content, content_count and length
+    # several_plotter('viol-cf', mobi_disorder_df)
+    # several_plotter('viol-cc', mobi_cont_count_df)  # needs filteration
+    # several_plotter('viol-len', mobi_length_df)
+    #
+    # ## writing data statistics to CSV
+    # pd.set_option('display.max_columns', None)
+    # pd.set_option('display.max_rows', None)
+    # for each_f in features_lst:
+    #     mobi_disorder_df.loc[(slice(None), each_f), phens_lst].describe().T. \
+    #         to_csv(cfg.data['phens'] + '/' + each_f + '-cf.csv')
+    #     mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
+    #         to_csv(cfg.data['phens'] + '/' + each_f + '-cc.csv')
+    # mobi_length_df.loc[slice(None), phens_lst].describe().T.to_csv(cfg.data['phens'] + '/length-stats.csv')
