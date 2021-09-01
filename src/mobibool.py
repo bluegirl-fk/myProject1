@@ -4,7 +4,6 @@
 # could be useless now :/ not sure
 ## this description will be changed! (August 4th)
 import sys
-
 import pandas as pd
 import numpy as np
 from pandas import DataFrame
@@ -37,7 +36,7 @@ def multidx_df_maker(input_dfs_lst, idx_lst):
     cf_multidx_df = input_dfs_lst[0].groupby(idx_lst).content_fraction.mean().unstack().sort_index()
     cf_multidx_df = cf_multidx_df * 100  # converting cf to percentage
     cc_multidx_df = input_dfs_lst[0].groupby(idx_lst).content_count.mean().unstack().sort_index()
-    len_multidx_df = input_dfs_lst[1].groupby(['acc','phenotype']).length.mean().unstack().sort_index() # this is to
+    len_multidx_df = input_dfs_lst[1].groupby(['acc', 'phenotype']).length.mean().unstack().sort_index()  # this is to
     # avoid duplications cuz length is the same and does not differ with mobidb features,
     # so the features should not be taken into account
     return cf_multidx_df, cc_multidx_df, len_multidx_df
@@ -64,6 +63,20 @@ def violin_plotter(data, title, save_route, ylabel, ylim):
     plt.tight_layout()
     plt.savefig(save_route)
     plt.close('all')
+    return
+
+
+def draw_barplot(x, y, data, xticklabel, yscale, save_rout):  # input is DF, not list
+    plt.figure(figsize=(12, 6))  # bigger figsize to have xticklabels shown
+    sns.set_style("ticks")
+    g = sns.barplot(x=x, y=y, data=data)
+    # sns.despine(trim=True, offset=2)
+    g.set_xticklabels(xticklabel, rotation=0, va="center", position=(0, -0.02))
+    sns.color_palette("pastel")
+    plt.yscale(yscale)
+    plt.tight_layout()
+    plt.savefig(save_rout)
+    plt.show()
     return
 
 
@@ -113,44 +126,68 @@ if __name__ == '__main__':
     mobi_disorder_df, mobi_cont_count_df, mobi_length_df = multidx_df_maker(
         [mobi_feature_df, mobidb], ['acc', 'feature', 'phenotype'])
 
-    ## Boxplots
-    # content count
-    for key in feature_dict.keys():
-        box_plotter(data=mobi_cont_count_df.loc[(slice(None), key), phens_lst],
-                    save_route=(cfg.plots['box-cc'] + '/' + key + '-cc' + '.png'),
-                    title=feature_dict[key][0], ylabel='Residues count', ylim=feature_dict[key][1])
-    # content fraction
-    for key in feature_dict.keys():
-        box_plotter(data=mobi_disorder_df.loc[(slice(None), key), phens_lst],
-                    save_route=(cfg.plots['box-cf'] + '/' + key + '-cf' + '.png'),
-                    title=feature_dict[key][0], ylabel='Content (%)', ylim=feature_dict[key][2])
-    # Length
-    box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-                save_route=(cfg.plots['box-len'] + '/' + 'len4200' + '.png'),
-                title='Protein sequence length', ylabel='Residues count', ylim=4200)
-    ## Violin plots
-    # content count
-    for key in feature_dict.keys():
-        violin_plotter(data=mobi_cont_count_df.loc[(slice(None), key), phens_lst],
-                       save_route=(cfg.plots['vio-cc'] + '/' + key + '-cc-ylim' + '.png'),
-                       title=feature_dict[key][0], ylabel='Residues count', ylim=feature_dict[key][1])
-    # content fraction
-    for key in feature_dict.keys():
-        violin_plotter(data=mobi_disorder_df.loc[(slice(None), key), phens_lst],
-                    save_route=(cfg.plots['vio-cf'] + '/' + key + '-cf-ylim' + '.png'),
-                    title=feature_dict[key][0], ylabel='Content (%)', ylim=feature_dict[key][2])
-    # Length
-    violin_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-                save_route=(cfg.plots['vio-len'] + '/' + 'len4200-new' + '.png'),
-                title='Protein sequence length', ylabel='Residues count', ylim=4200)
+    # ## Boxplots
+    # # content count
+    # for key in feature_dict.keys():
+    #     box_plotter(data=mobi_cont_count_df.loc[(slice(None), key), phens_lst],
+    #                 save_route=(cfg.plots['box-cc'] + '/' + key + '-cc' + '.png'),
+    #                 title=feature_dict[key][0], ylabel='Residues count', ylim=feature_dict[key][1])
+    # # content fraction
+    # for key in feature_dict.keys():
+    #     box_plotter(data=mobi_disorder_df.loc[(slice(None), key), phens_lst],
+    #                 save_route=(cfg.plots['box-cf'] + '/' + key + '-cf' + '.png'),
+    #                 title=feature_dict[key][0], ylabel='Content (%)', ylim=feature_dict[key][2])
+    # # Length
+    # box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
+    #             save_route=(cfg.plots['box-len'] + '/' + 'len4200' + '.png'),
+    #             title='Protein sequence length', ylabel='Residues count', ylim=4200)
+    # ## Violin plots
+    # # content count
+    # for key in feature_dict.keys():
+    #     violin_plotter(data=mobi_cont_count_df.loc[(slice(None), key), phens_lst],
+    #                    save_route=(cfg.plots['vio-cc'] + '/' + key + '-cc-ylim' + '.png'),
+    #                    title=feature_dict[key][0], ylabel='Residues count', ylim=feature_dict[key][1])
+    # # content fraction
+    # for key in feature_dict.keys():
+    #     violin_plotter(data=mobi_disorder_df.loc[(slice(None), key), phens_lst],
+    #                 save_route=(cfg.plots['vio-cf'] + '/' + key + '-cf-ylim' + '.png'),
+    #                 title=feature_dict[key][0], ylabel='Content (%)', ylim=feature_dict[key][2])
+    # # Length
+    # violin_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
+    #             save_route=(cfg.plots['vio-len'] + '/' + 'len4200-new' + '.png'),
+    #             title='Protein sequence length', ylabel='Residues count', ylim=4200)
+
+    # ## writing data statistics to CSV
+    # pd.set_option('display.max_columns', None)
+    # pd.set_option('display.max_rows', None)
+    # for each_f in features_lst:
+    #     mobi_disorder_df.loc[(slice(None), each_f), phens_lst].describe().T. \
+    #         to_csv(cfg.data['phens'] + '/' + each_f + '-cf.csv')
+    #     mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
+    #         to_csv(cfg.data['phens'] + '/' + each_f + '-cc.csv')
+    # mobi_length_df.loc[slice(None), phens_lst].describe().T.to_csv(cfg.data['phens'] + '/length-stats-new.csv')
+    ## calculation of signal peptide percentage of each phenotype
+    sig_peptide_subdf = pd.read_csv(
+        cfg.data['phens'] + '/content_count-each feature/prediction-signal_peptide-uniprot-cc.csv',
+        usecols=['phenotype', 'count'])
+    all_phens_prot_count_subdf = pd.read_csv(cfg.data['phens'] + '/length-stats-new.csv',
+                                             usecols=['phenotype', 'count'])
+    sig_pep_mrged_df = pd.merge(sig_peptide_subdf, all_phens_prot_count_subdf, on='phenotype')
+    sig_pep_mrged_df = sig_pep_mrged_df.rename(columns={'count_x': 'sigpep_count', 'count_y': 'count_all'})
+    sig_pep_mrged_df['percentage'] = (sig_pep_mrged_df['sigpep_count'] * 100) / sig_pep_mrged_df['count_all']
+    ## same for
+    transmemb_subdf = pd.read_csv(
+        cfg.data['phens'] + '/content_count-each feature/prediction-transmembrane-uniprot-cc.csv',
+        usecols=['phenotype', 'count'])
+    transmem_mrg_df = pd.merge(transmemb_subdf, all_phens_prot_count_subdf, on='phenotype')
+    transmem_mrg_df = transmem_mrg_df.rename(
+        columns={'phenotype': 'Phenotypes', 'count_x': 'Transmembrane protein count', 'count_y': 'count_all'})
+    transmem_mrg_df['Transmembrane protein percentage'] = (transmem_mrg_df['Transmembrane protein count'] * 100) / transmem_mrg_df[
+        'count_all']
 
 
-    ## writing data statistics to CSV
-    pd.set_option('display.max_columns', None)
-    pd.set_option('display.max_rows', None)
-    for each_f in features_lst:
-        mobi_disorder_df.loc[(slice(None), each_f), phens_lst].describe().T. \
-            to_csv(cfg.data['phens'] + '/' + each_f + '-cf.csv')
-        mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
-            to_csv(cfg.data['phens'] + '/' + each_f + '-cc.csv')
-    mobi_length_df.loc[slice(None), phens_lst].describe().T.to_csv(cfg.data['phens'] + '/length-stats-new.csv')
+    draw_barplot(x='Phenotypes', y='Transmembrane protein percentage', data=transmem_mrg_df, xticklabel=phens_lst,
+                 yscale='linear', save_rout=cfg.plots['bar'] + '/transmemb-prots-percent.png')
+    draw_barplot(x='Phenotypes', y='Transmembrane protein count', data=transmem_mrg_df, xticklabel=phens_lst,
+                 yscale='log', save_rout=cfg.plots['bar'] + '/transmemb-prots-count.png')
+

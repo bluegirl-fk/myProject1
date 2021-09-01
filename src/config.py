@@ -14,6 +14,8 @@ data = {
 
 }
 plots = {
+    '': absolute + 'plots',
+    'bar': absolute + 'plots/g4dn/barplot',
     'box': absolute + 'plots/g4dn/boxplot',
     'box-cf': absolute + 'plots/g4dn/boxplot/cf',
     'box-cc': absolute + 'plots/g4dn/boxplot/cc',
