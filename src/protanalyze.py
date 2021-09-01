@@ -28,7 +28,7 @@ def phens_intersect_df_maker(phen_acc_dic):
     for key1 in phens_acc_dict.keys():
         intersection_count_lst = []
         for key2 in phens_acc_dict.keys():
-            count_tmp = len(list(set(phens_acc_dict[key1]) & set(phens_acc_dict[key2])))
+            count_tmp = len(list(set(phens_acc_dict[key1]) & set(phens_acc_dict[key2])))  # this lst contains the ACCs
             intersection_count_lst.append(count_tmp)
         intersection_df[key1] = intersection_count_lst
     return intersection_df
@@ -52,12 +52,12 @@ if __name__ == '__main__':
     ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
     # Dictionary with phen as key and their corresponding  list of ACCs as value
     phens_acc_dict = human_brain_acc_adder(phens_acc_dict_maker(phens_lst, ndd_subdf))
-    phens_inters_df = phens_intersect_df_maker(phens_acc_dict)  #TODO: hold the actual intersecting lists as df values instead of nubers
-
+    ## Intersection and Union
+    phens_inters_df = phens_intersect_df_maker(phens_acc_dict)
     # phens_inters_df.style.bar(subset=["ASD"], color='#FFA07A')
-    # https://github.com/dexplo/dataframe_image very useful for saving pandas styler figures
-
+    # https://github.com/dexplo/dataframe_image very useful for saving pandas styler figures or jupyterlab to pdf
     phens_union_df = phens_union_df_maker(phens_acc_dict)
+
 
 
 
