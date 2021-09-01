@@ -44,7 +44,6 @@ def multidx_df_maker(input_dfs_lst, idx_lst):
 def box_plotter(data, title, ylabel, ylim, save_route):
     plt.figure(figsize=(60, 60))  # bigger figsize to have xticklabels shown
     g = sns.catplot(data=data, kind="box").set(title=title, xlabel='Phenotypes', ylabel=ylabel, ylim=(-5, ylim))
-    print(ylim)
     sns.set_style("ticks")
     # dict[dict_key] = data.describe().T
     g.set_xticklabels(rotation=45, va="center", position=(0, -0.02))
@@ -128,8 +127,8 @@ if __name__ == '__main__':
                     title=feature_dict[key][0], ylabel='Content (%)', ylim=feature_dict[key][2])
     # Length
     box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-                save_route=(cfg.plots['box-len'] + '/' + 'len4500' + '.png'),
-                title='Protein sequence length', ylabel='Residues count', ylim=4500)
+                save_route=(cfg.plots['box-len'] + '/' + 'len4200' + '.png'),
+                title='Protein sequence length', ylabel='Residues count', ylim=4200)
 
 
 
