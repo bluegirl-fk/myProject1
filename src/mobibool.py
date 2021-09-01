@@ -85,7 +85,7 @@ if __name__ == '__main__':
     titles_lst = [[i] for i in titles_lst]
     # this is a dict with feature names as key and their plot titles as value (then dfs for cc will be added as values)
     feature_dict = dict(zip(features_lst, titles_lst))
-    cc_lim_lst = [1000, 800, 1000, 1200, 70, 600, 700, 250, 100, 500, 1200]
+    cc_lim_lst = [1010, 810, 1010, 1210, 75, 610, 710, 260, 105, 510, 1210]
     cc_lim_feature_dict = dict(zip(features_lst, cc_lim_lst))
     cf_lim_lst = [105, 65, 105, 105, 105, 105, 105, 105, 105, 105, 105]
     cf_lim_feature_dict = dict(zip(features_lst, cf_lim_lst))
@@ -115,10 +115,24 @@ if __name__ == '__main__':
     mobi_disorder_df, mobi_cont_count_df, mobi_length_df = multidx_df_maker(
         [mobi_feature_df, mobidb], ['acc', 'feature', 'phenotype'])
 
+    ## Boxplots
+    # content count
+    for key in feature_dict.keys():
+        box_plotter(data=mobi_cont_count_df.loc[(slice(None), key), phens_lst],
+                    save_route=(cfg.plots['box-cc'] + '/' + key + '-cc' + '.png'),
+                    title=feature_dict[key][0], ylabel='Residues count', ylim=feature_dict[key][1])
+    # content fraction
     for key in feature_dict.keys():
         box_plotter(data=mobi_disorder_df.loc[(slice(None), key), phens_lst],
                     save_route=(cfg.plots['box-cf'] + '/' + key + '-cf' + '.png'),
                     title=feature_dict[key][0], ylabel='Content (%)', ylim=feature_dict[key][2])
+    # Length
+    box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
+                save_route=(cfg.plots['box-len'] + '/' + 'len4500' + '.png'),
+                title='Protein sequence length', ylabel='Residues count', ylim=4500)
+
+
+
 
 
 
