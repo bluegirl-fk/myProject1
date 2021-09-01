@@ -139,9 +139,13 @@ if __name__ == '__main__':
     feature_dict = dict(zip(features_lst, titles_lst))
     cc_lim_lst = [1000, 800, 1000, 1200, 70, 600, 700, 250, 100, 500, 1200]
     cc_lim_feature_dict = dict(zip(features_lst, cc_lim_lst))
+    cf_lim_lst = [100, 60, 100, 100, 100, 100, 100, 100, 100, 100, 100]
     # now add content_count limit of each feature to your dict as second value (idx=1)
+    # and content fraction limit as idx=2
     for feature in features_lst:
-        feature_dict[feature].append(cc_lim_feature_dict[feature])
+        for cf_lim in cf_lim_lst:
+            feature_dict[feature].append(cc_lim_feature_dict[feature])
+            feature_dict[feature].append(cf_lim)
 
     # in the end use decorator thing with the @
     phens_lst = ['Human', 'Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'NDDs', 'Mix', 'Control']
