@@ -34,6 +34,17 @@ def phens_intersect_df_maker(phen_acc_dic):
     return intersection_df
 
 
+def phens_union_df_maker(phen_acc_dic):
+    union_df = pd.DataFrame(index=phen_acc_dic.keys(), columns=phen_acc_dic.keys())
+    for key1 in phens_acc_dict.keys():
+        union_count_lst = []
+        for key2 in phens_acc_dict.keys():
+            count_tmp = len(list(set(phens_acc_dict[key1]) | set(phens_acc_dict[key2])))
+            union_count_lst.append(count_tmp)
+        union_df[key1] = union_count_lst
+    return union_df
+
+
 if __name__ == '__main__':
 
     phens_lst = ['Human', 'Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'NDDs', 'Mix', 'Control']
@@ -43,8 +54,10 @@ if __name__ == '__main__':
     phens_acc_dict = human_brain_acc_adder(phens_acc_dict_maker(phens_lst, ndd_subdf))
     phens_inters_df = phens_intersect_df_maker(phens_acc_dict)  #TODO: hold the actual intersecting lists as df values instead of nubers
 
-    phens_inters_df.style.bar(subset=["ASD"], color='#FFA07A')
+    # phens_inters_df.style.bar(subset=["ASD"], color='#FFA07A')
+    # https://github.com/dexplo/dataframe_image very useful for saving pandas styler figures
 
+    phens_union_df = phens_union_df_maker(phens_acc_dict)
 
 
 
