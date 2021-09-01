@@ -70,46 +70,6 @@ def violin_plotter(data, title, save_route, ylabel):
     return
 
 
-# def several_plotter(plot_type, inputdf):  # TODO better (shorter) way to write this
-#     # disorder content
-#     if plot_type == 'box-cf':
-#         inputdf = inputdf[inputdf < (0.9 * inputdf.max())]
-#         for key in feature_dict:
-#             box_plotter(data=inputdf.loc[(slice(None), key), phens_lst],
-#                         save_route=(cfg.plots['box-cf'] + '/' + key + '-cf90-x' + '.png'),
-#                         title=feature_dict[key][0], ylabel='Content (%)')
-#     # content count
-#     elif plot_type == 'box-cc':
-#         for key in feature_dict:
-#             box_plotter(data=mobi_cont_count_df.loc[(slice(None), key), phens_lst],
-#                         save_route=(cfg.plots['box-cc'] + '/' + key + '-cc1000-x' + '.png'),
-#                         title=feature_dict[key][0], ylabel='Content (residues)')
-#     elif plot_type == 'box-len':
-#         # length
-#         inputdf = inputdf[inputdf < 6000]
-#         box_plotter(data=inputdf.loc[(slice(None)), phens_lst],
-#                     save_route=(cfg.plots['box-len'] + '/length<6000-x' + '.png'),
-#                     title='Protein sequence length', ylabel='Residues')
-    # elif plot_type == 'viol-cf':
-    #     # disorder content
-    #     for key in feature_dict:
-    #         violin_plotter(data=inputdf.loc[(slice(None), key), phens_lst],
-    #                        save_route=(cfg.plots['vio-cf'] + '/' + key + '-cf-90-x' + '.png'),
-    #                        title=feature_dict[key][0], ylabel='Content (%)')
-    # elif plot_type == 'viol-cc':
-    #     # content count
-    #     for key in feature_dict:
-    #         violin_plotter(data=mobi_cont_count_df.loc[(slice(None), key), phens_lst],
-    #                        save_route=(cfg.plots['vio-cc'] + '/' + key + '-cc-1000-x' + '.png'),
-    #                        title=feature_dict[key][0], ylabel='Content (residues)')
-    # elif plot_type == 'viol-len':
-    #     ## Length
-    #     inputdf = inputdf[inputdf < 6000]
-    #     violin_plotter(data=inputdf.loc[(slice(None)), phens_lst],
-    #                    save_route=(cfg.plots['vio-len'] + '/length-below6000-x' + '.png'),
-    #                    title='Protein sequence length', ylabel='Residues')
-
-
 if __name__ == '__main__':
     ## selected features  (10)
     features_lst = ['prediction-disorder-mobidb_lite', 'prediction-low_complexity-merge',
