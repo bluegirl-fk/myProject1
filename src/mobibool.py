@@ -109,19 +109,6 @@ def several_plotter(plot_type, inputdf):  # TODO better (shorter) way to write t
                        title='Protein sequence length', ylabel='Residues')
 
 
-# def cc_feature_filterer(cc_org_df, lim, selected_features):  # what if I take this out
-#     cc_new_df = cc_org_df[cc_org_df <= lim]
-#     cc_new_df = cc_new_df.loc[(slice(None), selected_features), phens_lst]
-#     return cc_new_df
-
-
-# # def plot_distinguisher(input_plot_func, input_filterer_func):
-# #     def inner_plotter(data, title, ylabel, save_route):
-# #         def filtere(data, lim, feats):
-# #
-# #     return inner_plotter()
-
-
 if __name__ == '__main__':
     ## selected features  (10)
     features_lst = ['prediction-disorder-mobidb_lite', 'prediction-low_complexity-merge',
@@ -167,26 +154,21 @@ if __name__ == '__main__':
     mobi_disorder_df, mobi_cont_count_df, mobi_length_df = multidx_df_maker(
         [mobi_feature_df, mobidb], ['acc', 'feature', 'phenotype'])
 
-    # filtering data
-    # def cc_feature_filterer(cc_org_df, lim):
-    #     cc_new_df = cc_org_df[cc_org_df <= lim]
-    #     return cc_new_df
+    # box plots for disorder_content, content_count and length
+    several_plotter('box-cf', mobi_disorder_df)
+    several_plotter('box-cc', mobi_cont_count_df)  # this still needs to be filtered
+    several_plotter('box-len', mobi_length_df)
+    # violin plots for disorder_content, content_count and length
+    several_plotter('viol-cf', mobi_disorder_df)
+    several_plotter('viol-cc', mobi_cont_count_df)  # needs filteration
+    several_plotter('viol-len', mobi_length_df)
 
-    # # box plots for disorder_content, content_count and length
-    # several_plotter('box-cf', mobi_disorder_df)
-    # several_plotter('box-cc', mobi_cont_count_df)  # this still needs to be filtered
-    # several_plotter('box-len', mobi_length_df)
-    # # violin plots for disorder_content, content_count and length
-    # several_plotter('viol-cf', mobi_disorder_df)
-    # several_plotter('viol-cc', mobi_cont_count_df)  # needs filteration
-    # several_plotter('viol-len', mobi_length_df)
-    #
-    # ## writing data statistics to CSV
-    # pd.set_option('display.max_columns', None)
-    # pd.set_option('display.max_rows', None)
-    # for each_f in features_lst:
-    #     mobi_disorder_df.loc[(slice(None), each_f), phens_lst].describe().T. \
-    #         to_csv(cfg.data['phens'] + '/' + each_f + '-cf.csv')
-    #     mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
-    #         to_csv(cfg.data['phens'] + '/' + each_f + '-cc.csv')
-    # mobi_length_df.loc[slice(None), phens_lst].describe().T.to_csv(cfg.data['phens'] + '/length-stats.csv')
+    ## writing data statistics to CSV
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.max_rows', None)
+    for each_f in features_lst:
+        mobi_disorder_df.loc[(slice(None), each_f), phens_lst].describe().T. \
+            to_csv(cfg.data['phens'] + '/' + each_f + '-cf.csv')
+        mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
+            to_csv(cfg.data['phens'] + '/' + each_f + '-cc.csv')
+    mobi_length_df.loc[slice(None), phens_lst].describe().T.to_csv(cfg.data['phens'] + '/length-stats.csv')
