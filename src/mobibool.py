@@ -45,24 +45,20 @@ def box_plotter(data, title, ylabel, ylim, save_route):
     plt.figure(figsize=(60, 60))  # bigger figsize to have xticklabels shown
     g = sns.catplot(data=data, kind="box").set(title=title, xlabel='Phenotypes', ylabel=ylabel, ylim=(-5, ylim))
     sns.set_style("ticks")
-    # dict[dict_key] = data.describe().T
     g.set_xticklabels(rotation=45, va="center", position=(0, -0.02))
-    # plt.yscale('log')
     plt.tight_layout()
     plt.savefig(save_route)
     plt.close('all')
     return
 
 
-def violin_plotter(data, title, save_route, ylabel):
+def violin_plotter(data, title, save_route, ylabel, ylim):
     plt.figure(figsize=(12, 6))
     sns.set_theme(style="whitegrid")
     g = sns.violinplot(data=data, split=True, bw=.1).set(title=title, xlabel='Phenotypes', ylabel=ylabel)
     sns.set_style("ticks")
-    # g.set_xticklabels(labels=df['Phenotype'].unique().tolist(),rotation=45, va="center", position=(0, -0.02))
-    # plt.yscale('log')
-    # g.yaxis.set_major_formatter(mticker.StrMethodFormatter("$10^{{{x:.0f}}}$"))
-    # g.yaxis.set_ticks([np.log10(x) for p in range(-4, 5) for x in np.linspace(10 ** p, 10 ** (p + 1), 10)],minor=True)
+    # g.set_xticklabels(rotation=45, va="center", position=(0, -0.02))
+    plt.ylim(-5, ylim)
     plt.tight_layout()
     plt.savefig(save_route)
     plt.close('all')
@@ -86,7 +82,8 @@ if __name__ == '__main__':
     feature_dict = dict(zip(features_lst, titles_lst))
     cc_lim_lst = [1010, 810, 1210, 1810, 75, 610, 900, 360, 105, 510, 1810]
     cc_lim_feature_dict = dict(zip(features_lst, cc_lim_lst))
-    cf_lim_lst = [105, 65, 105, 105, 105, 105, 105, 105, 105, 105, 105]
+    # cf_lim_lst = [105, 65, 105, 105, 105, 105, 105, 105, 105, 105, 105]  # for violins I used 110 instead of 105
+    cf_lim_lst = [110, 65, 110, 110, 110, 110, 110, 110, 110, 110, 110]
     cf_lim_feature_dict = dict(zip(features_lst, cf_lim_lst))
     # now add content_count limit of each feature to your dict as second value (idx=1)
     # and content fraction limit as idx=2
@@ -114,25 +111,36 @@ if __name__ == '__main__':
     mobi_disorder_df, mobi_cont_count_df, mobi_length_df = multidx_df_maker(
         [mobi_feature_df, mobidb], ['acc', 'feature', 'phenotype'])
 
-    ## Boxplots
+    # ## Boxplots
+    # # content count
+    # for key in feature_dict.keys():
+    #     box_plotter(data=mobi_cont_count_df.loc[(slice(None), key), phens_lst],
+    #                 save_route=(cfg.plots['box-cc'] + '/' + key + '-cc' + '.png'),
+    #                 title=feature_dict[key][0], ylabel='Residues count', ylim=feature_dict[key][1])
+    # # content fraction
+    # for key in feature_dict.keys():
+    #     box_plotter(data=mobi_disorder_df.loc[(slice(None), key), phens_lst],
+    #                 save_route=(cfg.plots['box-cf'] + '/' + key + '-cf' + '.png'),
+    #                 title=feature_dict[key][0], ylabel='Content (%)', ylim=feature_dict[key][2])
+    # # Length
+    # box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
+    #             save_route=(cfg.plots['box-len'] + '/' + 'len4200' + '.png'),
+    #             title='Protein sequence length', ylabel='Residues count', ylim=4200)
+    ## Violin plots
     # content count
     for key in feature_dict.keys():
-        box_plotter(data=mobi_cont_count_df.loc[(slice(None), key), phens_lst],
-                    save_route=(cfg.plots['box-cc'] + '/' + key + '-cc' + '.png'),
-                    title=feature_dict[key][0], ylabel='Residues count', ylim=feature_dict[key][1])
+        violin_plotter(data=mobi_cont_count_df.loc[(slice(None), key), phens_lst],
+                       save_route=(cfg.plots['vio-cc'] + '/' + key + '-cc-ylim' + '.png'),
+                       title=feature_dict[key][0], ylabel='Residues count', ylim=feature_dict[key][1])
     # content fraction
     for key in feature_dict.keys():
-        box_plotter(data=mobi_disorder_df.loc[(slice(None), key), phens_lst],
-                    save_route=(cfg.plots['box-cf'] + '/' + key + '-cf' + '.png'),
+        violin_plotter(data=mobi_disorder_df.loc[(slice(None), key), phens_lst],
+                    save_route=(cfg.plots['vio-cf'] + '/' + key + '-cf-ylim' + '.png'),
                     title=feature_dict[key][0], ylabel='Content (%)', ylim=feature_dict[key][2])
     # Length
-    box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-                save_route=(cfg.plots['box-len'] + '/' + 'len4200' + '.png'),
+    violin_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
+                save_route=(cfg.plots['vio-len'] + '/' + 'len4200-ylim' + '.png'),
                 title='Protein sequence length', ylabel='Residues count', ylim=4200)
-
-
-
-
 
 
     # ## writing data statistics to CSV
