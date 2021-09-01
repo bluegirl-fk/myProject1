@@ -84,7 +84,7 @@ if __name__ == '__main__':
     titles_lst = [[i] for i in titles_lst]
     # this is a dict with feature names as key and their plot titles as value (then dfs for cc will be added as values)
     feature_dict = dict(zip(features_lst, titles_lst))
-    cc_lim_lst = [1010, 810, 1010, 1210, 75, 610, 710, 260, 105, 510, 1210]
+    cc_lim_lst = [1010, 810, 1210, 1810, 75, 610, 900, 360, 105, 510, 1810]
     cc_lim_feature_dict = dict(zip(features_lst, cc_lim_lst))
     cf_lim_lst = [105, 65, 105, 105, 105, 105, 105, 105, 105, 105, 105]
     cf_lim_feature_dict = dict(zip(features_lst, cf_lim_lst))
