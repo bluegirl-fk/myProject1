@@ -115,14 +115,6 @@ if __name__ == '__main__':
     mobi_disorder_df, mobi_cont_count_df, mobi_length_df = multidx_df_maker(
         [mobi_feature_df, mobidb], ['acc', 'feature', 'phenotype'])
 
-    # # box plots for disorder_content, content_count and length
-    # several_plotter('box-cf', mobi_disorder_df)
-    # several_plotter('box-cc', mobi_cont_count_df)  # this still needs to be filtered
-    # several_plotter('box-len', mobi_length_df)
-    # # violin plots for disorder_content, content_count and length
-    # # several_plotter('viol-cf', mobi_disorder_df)
-    # # several_plotter('viol-cc', mobi_cont_count_df)  # needs filteration
-    # # several_plotter('viol-len', mobi_length_df)
     for key in feature_dict.keys():
         box_plotter(data=mobi_disorder_df.loc[(slice(None), key), phens_lst],
                     save_route=(cfg.plots['box-cf'] + '/' + key + '-cf' + '.png'),
