@@ -29,6 +29,7 @@ def phens_intersect_df_maker(phen_acc_dic):
         intersection_count_lst = []
         for key2 in phens_acc_dict.keys():
             count_tmp = len(list(set(phens_acc_dict[key1]) & set(phens_acc_dict[key2])))  # this lst contains the ACCs
+            # can achieve the mutual ACCs by storing the list in the upper line in a dict of dics or df cell
             intersection_count_lst.append(count_tmp)
         intersection_df[key1] = intersection_count_lst
     return intersection_df
