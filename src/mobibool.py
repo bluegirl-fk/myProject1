@@ -134,7 +134,7 @@ if __name__ == '__main__':
         feature_dict[feature].append(cf_lim_feature_dict[feature])
 
     # in the end use decorator thing with the @
-    phens_lst = ['Human', 'Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'NDDs', 'Mix', 'Control']
+    phens_lst = ['Human', 'Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'NDDs', 'Control']
     ## import dfs # (mobidb)
     mobidb = pd.read_csv(cfg.data[''] + '/mobidb_result.tsv', sep='\t')
     # NDD , could also specify index_col= ..., and pass a list for multiple idxs
