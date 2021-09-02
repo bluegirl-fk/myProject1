@@ -80,6 +80,33 @@ def draw_barplot(x, y, data, xticklabel, yscale, save_rout):  # input is DF, not
     return
 
 
+def sig_pep_percent_df_maker():
+    # this gets a df with the selected peptides count and then divides them by all proteins of that phenotype or
+    # brn, human, ... and creates percentage, all Prs count is taken from length_df cuz it does not have redundancy
+    sig_peptide_subdf = pd.read_csv(
+        cfg.data['phens'] + '/content_count-each feature/prediction-signal_peptide-uniprot-cc.csv',
+        usecols=['phenotype', 'count'])
+    all_phen_pr_count_df = pd.read_csv(cfg.data['phens'] + '/length-stats-new.csv', usecols=['phenotype', 'count'])
+    sig_pep_mrged_df = pd.merge(sig_peptide_subdf, all_phen_pr_count_df, on='phenotype')
+    sig_pep_mrged_df = sig_pep_mrged_df.rename(
+        columns={'phenotype': 'Phenotypes', 'count_x': 'Signal peptide count', 'count_y': 'count_all'})
+    sig_pep_mrged_df['Signal peptide percentage'] = (sig_pep_mrged_df['Signal peptide count'] * 100) / \
+                                                    sig_pep_mrged_df['count_all']
+    return sig_pep_mrged_df
+
+
+def transmem_pr_percent_df_maker():
+    all_phen_pr_count_df = pd.read_csv(cfg.data['phens'] + '/length-stats-new.csv', usecols=['phenotype', 'count'])
+    transmemb_subdf = pd.read_csv(
+        cfg.data['phens'] + '/content_count-each feature/prediction-transmembrane-uniprot-cc.csv',
+        usecols=['phenotype', 'count'])
+    transmem_mrg_df = pd.merge(transmemb_subdf, all_phen_pr_count_df, on='phenotype')
+    transmem_mrg_df = transmem_mrg_df.rename(
+        columns={'phenotype': 'Phenotypes', 'count_x': 'Transmembrane protein count', 'count_y': 'count_all'})
+    transmem_mrg_df['Transmembrane protein percentage'] = (transmem_mrg_df['Transmembrane protein count'] * 100) /transmem_mrg_df['count_all']
+    return transmem_mrg_df
+
+
 if __name__ == '__main__':
     ## selected features  (10)
     features_lst = ['prediction-disorder-mobidb_lite', 'prediction-low_complexity-merge',
@@ -166,28 +193,18 @@ if __name__ == '__main__':
     #     mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
     #         to_csv(cfg.data['phens'] + '/' + each_f + '-cc.csv')
     # mobi_length_df.loc[slice(None), phens_lst].describe().T.to_csv(cfg.data['phens'] + '/length-stats-new.csv')
-    ## calculation of signal peptide percentage of each phenotype
-    sig_peptide_subdf = pd.read_csv(
-        cfg.data['phens'] + '/content_count-each feature/prediction-signal_peptide-uniprot-cc.csv',
-        usecols=['phenotype', 'count'])
-    all_phens_prot_count_subdf = pd.read_csv(cfg.data['phens'] + '/length-stats-new.csv',
-                                             usecols=['phenotype', 'count'])
-    sig_pep_mrged_df = pd.merge(sig_peptide_subdf, all_phens_prot_count_subdf, on='phenotype')
-    sig_pep_mrged_df = sig_pep_mrged_df.rename(columns={'count_x': 'sigpep_count', 'count_y': 'count_all'})
-    sig_pep_mrged_df['percentage'] = (sig_pep_mrged_df['sigpep_count'] * 100) / sig_pep_mrged_df['count_all']
-    ## same for
-    transmemb_subdf = pd.read_csv(
-        cfg.data['phens'] + '/content_count-each feature/prediction-transmembrane-uniprot-cc.csv',
-        usecols=['phenotype', 'count'])
-    transmem_mrg_df = pd.merge(transmemb_subdf, all_phens_prot_count_subdf, on='phenotype')
-    transmem_mrg_df = transmem_mrg_df.rename(
-        columns={'phenotype': 'Phenotypes', 'count_x': 'Transmembrane protein count', 'count_y': 'count_all'})
-    transmem_mrg_df['Transmembrane protein percentage'] = (transmem_mrg_df['Transmembrane protein count'] * 100) / transmem_mrg_df[
-        'count_all']
 
+    sig_pep_percent_df = sig_pep_percent_df_maker()
+    transmem_pr_percent_df = transmem_pr_percent_df_maker()
 
-    draw_barplot(x='Phenotypes', y='Transmembrane protein percentage', data=transmem_mrg_df, xticklabel=phens_lst,
+    ## Barplots
+    # Signal peptide
+    draw_barplot(x='Phenotypes', y='Signal peptide percentage', data=sig_pep_percent_df, xticklabel=phens_lst,
+                 yscale='linear', save_rout=cfg.plots['bar'] + '/sig-peptide-percent.png')
+    draw_barplot(x='Phenotypes', y='Signal peptide count', data=sig_pep_percent_df, xticklabel=phens_lst,
+                 yscale='log', save_rout=cfg.plots['bar'] + '/sig-peptide-count.png')
+    # Transmembrane protein
+    draw_barplot(x='Phenotypes', y='Transmembrane protein percentage', data=transmem_pr_percent_df, xticklabel=phens_lst,
                  yscale='linear', save_rout=cfg.plots['bar'] + '/transmemb-prots-percent.png')
-    draw_barplot(x='Phenotypes', y='Transmembrane protein count', data=transmem_mrg_df, xticklabel=phens_lst,
+    draw_barplot(x='Phenotypes', y='Transmembrane protein count', data=transmem_pr_percent_df, xticklabel=phens_lst,
                  yscale='log', save_rout=cfg.plots['bar'] + '/transmemb-prots-count.png')
-
