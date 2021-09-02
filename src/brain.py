@@ -49,9 +49,10 @@ def brain_pr_lst_generator():
     return brain_uniprot_lst
 
 
-if __name__ == '__main__':
+#if __name__ == '__main__':
     # if this number is not enough, you can try to include other brain dataframes as well, e.g: Brainspan
     # brain_pr_lst = brain_pr_lst_generator()  # 8428
     ## method that returns brains proteins list
 
-    sys.exit()
+
+
