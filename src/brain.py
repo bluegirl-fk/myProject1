@@ -4,11 +4,13 @@
 import pandas as pd
 import config as cfg
 import sys
+import re
 
 
 def main():
     print("Bizzzz!!!")
     return
+
 
 def brain_pr_lst_generator():
     # Data from the Human Protein Atlas in tab-separated format
@@ -46,13 +48,28 @@ def brain_pr_lst_generator():
     brain_uniprot_lst = subdf_toget_acc['Uniprot'].tolist()
     # drop redundancies
     brain_uniprot_lst = list(set(brain_uniprot_lst))
+    brain_uniprot_lst = [x for x in brain_uniprot_lst if str(x) != 'nan']
+
     return brain_uniprot_lst
 
 
-#if __name__ == '__main__':
+if __name__ == '__main__':
     # if this number is not enough, you can try to include other brain dataframes as well, e.g: Brainspan
-    # brain_pr_lst = brain_pr_lst_generator()  # 8428
-    ## method that returns brains proteins list
+    brain_pr_lst = brain_pr_lst_generator()
+    new_lst = []
+    for i in brain_pr_lst:
+        if ', ' in i:
+            new_lst.extend(i.split(', '))
+        elif ', ' not in i:
+            new_lst.append(i)
 
 
-
+def delimiter_split(delimiter, list):
+    new_lst = []
+    for i in list:
+        if delimiter in i:
+            new_lst.extend(i.split(delimiter))
+        elif delimiter not in i:
+            new_lst.extend(i)
+    return new_lst
+# TODO : erase the comma from your list
