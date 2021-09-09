@@ -30,6 +30,8 @@ with open(cfg.data['phens'] + '/ndd-not-in-mobidb.txt', 'w') as f:
 with open(cfg.data['phens'] + '/brain-not-in-mobidb.txt', 'w') as f:
     for acc in brain_not_in_mobi_cleaned:
         f.write("%s\n" % acc)
+new_df = mobidb.head(10)
+new_df.to_csv(cfg.data[''] + '/mobidb-head-10rows.csv')
 
 # my_proteins_acc_lst = ['Q14204', 'P14867']
 # proteins_dict = {}

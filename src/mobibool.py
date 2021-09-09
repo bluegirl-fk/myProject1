@@ -142,7 +142,7 @@ if __name__ == '__main__':
     ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
     ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins  => these are all, not the selected phens
     ## brain
-    brain_prot_lst = bd.brain_pr_lst_generator()  # n: 8297
+    brain_prot_lst = bd.brain_pr_lst_generator()  # n: 8320
     brain_subdf = DataFrame(brain_prot_lst, columns=['acc'])
     # mutual_brain_ndd_prs_lst = [i for i in brain_prot_lst if i in ndd_pr_lst]  # 455
 
