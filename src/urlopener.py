@@ -5,10 +5,11 @@ import re
 import pandas as pd
 import config as cfg
 
-my_proteins_acc_df = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv', usecols=['acc'])
-my_proteins_acc_lst = set(my_proteins_acc_df['acc'].tolist())  # 1308
-my_proteins_acc_lst = list(dict.fromkeys(my_proteins_acc_lst))
-my_proteins_acc_lst = my_proteins_acc_lst[:3]
+# my_proteins_acc_df = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv', usecols=['acc'])
+# my_proteins_acc_lst = set(my_proteins_acc_df['acc'].tolist())  # 1308
+# my_proteins_acc_lst = list(dict.fromkeys(my_proteins_acc_lst))
+# my_proteins_acc_lst = my_proteins_acc_lst[:3]
+my_proteins_acc_lst = ['Q14204', 'P14867']
 proteins_dict = {}
 par_list = []
 
@@ -31,20 +32,20 @@ for acc in my_proteins_acc_lst:
             disease_par_lst[-1] += line
 
     for par in disease_par_lst:
+        print('Starting paragraph: ')
         # Extract subsequence
         par = re.sub(r'[\n\r]+', ' ', par)
-        print(par)
         par = re.split(r'^CC\s+-!- DISEASE: ', par, 1)
-        print(par)
-        par = re.split(r'\[MIM:\d{6}\]', par[0], 1)[0]
-        print('org: '+par)
-        # par = par[0]
-        #print(par)
+        # par = re.split( r'\[MIM:\d{6}\]\s+CC', par[1], 1)
+        par = re.split(r'\[MIM:\d{6}\]', par[1], 1)
+        print('org: '+par[0])
+        par = par[0]
+        #print(par) TODO: delete CC as well and replace with space
         # Retrieve list
         par_list = proteins_dict.setdefault(acc, [])
         # Store paragraph
         par_list.append(par)
 
-
+# TODO: debug
 print(proteins_dict)
 print(par_list)
