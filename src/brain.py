@@ -12,6 +12,16 @@ def main():
     return
 
 
+def delimiter_split(delimiter, list):
+    new_lst = []
+    for i in list:
+        if delimiter in i:
+            new_lst.extend(i.split(delimiter))
+        elif delimiter not in i:
+            new_lst.append(i)
+    return new_lst
+
+
 def brain_pr_lst_generator():
     # Data from the Human Protein Atlas in tab-separated format
     # This file contains a subset of the data in the Human Protein Atlas version 20.1
@@ -49,6 +59,7 @@ def brain_pr_lst_generator():
     # drop redundancies
     brain_uniprot_lst = list(set(brain_uniprot_lst))
     brain_uniprot_lst = [x for x in brain_uniprot_lst if str(x) != 'nan']
+    brain_uniprot_lst = delimiter_split(', ', brain_uniprot_lst)
 
     return brain_uniprot_lst
 
@@ -56,20 +67,10 @@ def brain_pr_lst_generator():
 if __name__ == '__main__':
     # if this number is not enough, you can try to include other brain dataframes as well, e.g: Brainspan
     brain_pr_lst = brain_pr_lst_generator()
-    new_lst = []
     for i in brain_pr_lst:
-        if ', ' in i:
-            new_lst.extend(i.split(', '))
-        elif ', ' not in i:
-            new_lst.append(i)
+        print(i)
 
 
-def delimiter_split(delimiter, list):
-    new_lst = []
-    for i in list:
-        if delimiter in i:
-            new_lst.extend(i.split(delimiter))
-        elif delimiter not in i:
-            new_lst.extend(i)
-    return new_lst
-# TODO : erase the comma from your list
+
+
+# TODO : do things based on new brain !
