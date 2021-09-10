@@ -48,7 +48,7 @@ def phens_union_df_maker(phen_acc_dic):
 
 if __name__ == '__main__':
 
-    phens_lst = ['Human', 'Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'NDDs', 'Mix', 'Control']
+    phens_lst = ['Human', 'Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'NDDs', 'Control']
     ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
     ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
     # Dictionary with phen as key and their corresponding  list of ACCs as value
