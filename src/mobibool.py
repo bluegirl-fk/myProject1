@@ -189,9 +189,9 @@ if __name__ == '__main__':
     pd.set_option('display.max_rows', None)
     for each_f in features_lst:
         mobi_disorder_df.loc[(slice(None), each_f), phens_lst].describe().T. \
-            to_csv(cfg.data['phens'] + '/' + each_f + '-cf.csv')
+            to_csv(cfg.data['phens'] + '/content_fraction-each feature/' + each_f + '-cf.csv')
         mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
-            to_csv(cfg.data['phens'] + '/' + each_f + '-cc.csv')
+            to_csv(cfg.data['phens'] + '/content_count-each feature/' + each_f + '-cc.csv')
     mobi_length_df.loc[slice(None), phens_lst].describe().T.to_csv(cfg.data['phens'] + '/length-stats-new.csv')
 
     sig_pep_percent_df = sig_pep_percent_df_maker()
