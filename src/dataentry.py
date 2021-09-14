@@ -10,6 +10,8 @@ import brain as brn
 # probably should use refrence list in the beginning, and explain your exclution and limitation criteria
 # e.g for ndds there was 95% fdr, for human, brain and ndd only kept the ones existing in mobidb using the new mobidb
 # (confirm from Damiano)
+# should I delete brain proteins that are not in mobidb? and same for 11 ndds? I think yes, refer to intersection chart
+# because still dif phens not all included in human, except for NDDs column
 mobidb1 = pd.read_csv(cfg.data[''] + '/mobidb_result.tsv', sep='\t')
 # new tsv that Damiano sent based on NDDs that were not in mobidb and now they are gonna be added!
 mobidb2 = pd.read_csv(cfg.data['phens'] + '/ndd-not-in-mobidb-byDamiano.tsv', sep='\t')
