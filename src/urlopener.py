@@ -6,6 +6,7 @@ import pandas as pd
 import config as cfg
 import brain as bd
 
+## example link: https://www.uniprot.org/uniprot/Q14204.txt
 # my_proteins_acc_df = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv', usecols=['acc'])
 # my_proteins_acc_lst = set(my_proteins_acc_df['acc'].tolist())  # 1308
 # my_proteins_acc_lst = list(dict.fromkeys(my_proteins_acc_lst))
