@@ -14,7 +14,7 @@ def phens_acc_dict_maker(phen_lst, phens_df):  # TODO: later try to use these tw
 
 
 def human_brain_acc_adder(phens_dict):
-    mobidb = pd.read_csv(cfg.data[''] + '/mobidb_result.tsv', sep='\t', usecols=['acc'])
+    mobidb = pd.read_csv(cfg.data['phens'] + '/mobidb-results+ndd-tsv-damiano-shared.tsv', usecols=['acc'])
     human_lst = list(set(mobidb['acc'].tolist()))
     brain_lst = brn.brain_pr_lst_generator()
     phens_dict['Human'] = human_lst

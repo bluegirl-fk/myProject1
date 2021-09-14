@@ -6,7 +6,10 @@ import pandas as pd
 import re
 import brain as brn
 
-
+# TODO: check with Damiano what he meant by taking the numbers into account for stats although not in mobidb
+# probably should use refrence list in the beginning, and explain your exclution and limitation criteria
+# e.g for ndds there was 95% fdr, for human, brain and ndd only kept the ones existing in mobidb using the new mobidb
+# (confirm from Damiano)
 mobidb1 = pd.read_csv(cfg.data[''] + '/mobidb_result.tsv', sep='\t')
 # new tsv that Damiano sent based on NDDs that were not in mobidb and now they are gonna be added!
 mobidb2 = pd.read_csv(cfg.data['phens'] + '/ndd-not-in-mobidb-byDamiano.tsv', sep='\t')
