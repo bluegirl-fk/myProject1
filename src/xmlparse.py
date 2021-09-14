@@ -15,16 +15,16 @@ features = root.findall('uniprot:entry/uniprot:feature', NS)
 # maybe should use var id as keys of child dicts
 # data to be stored in the dictionary will be:
 # {acc: {var_id: {description: xxxx, evidence:xxxxx, position:x, orig_aa:x, var_aa:x}}}
+# (find a solution for entries without variant sequence data to be skipped)
 for entry in entries:
-    var_positions_lst = []
     acc = (entry.find('uniprot:accession', NS)).text
     acc_protinfo_dic[acc] = {}  # this will be changes later
     for feature in features:
         if feature.attrib['type'] == 'sequence variant':
             acc_protinfo_dic[acc] = feature.attrib
             for pos in feature.findall('uniprot:location/uniprot:position', NS):
-                var_positions_lst.append(pos.attrib['position'])
-            feature.attrib['var_position'] = var_positions_lst
+
+                # feature.attrib['var_position'] = var_position
 
 print(acc_protinfo_dic)
 
