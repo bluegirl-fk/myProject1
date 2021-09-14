@@ -136,7 +136,7 @@ if __name__ == '__main__':
     # in the end use decorator thing with the @
     phens_lst = ['Human', 'Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'NDDs', 'Control']
     ## import dfs # (mobidb)
-    mobidb = pd.read_csv(cfg.data[''] + '/mobidb_result.tsv', sep='\t')
+    mobidb = pd.read_csv(cfg.data['phens'] + '/mobidb-results+ndd-tsv-damiano-shared.tsv')
     # NDD , could also specify index_col= ..., and pass a list for multiple idxs
     ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
     ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)

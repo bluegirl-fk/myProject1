@@ -6,18 +6,20 @@ import pandas as pd
 import re
 import brain as brn
 
+
 mobidb1 = pd.read_csv(cfg.data[''] + '/mobidb_result.tsv', sep='\t')
 # new tsv that Damiano sent based on NDDs that were not in mobidb and now they are gonna be added!
 mobidb2 = pd.read_csv(cfg.data['phens'] + '/ndd-not-in-mobidb-byDamiano.tsv', sep='\t')
 mobidb = mobidb1.append(mobidb2, ignore_index=True)
 mobidb.to_csv(cfg.data['phens'] + '/mobidb-results+ndd-tsv-damiano-shared.tsv')
 mobidb_pr_lst = mobidb['acc'].unique().tolist()
-new_mobidb_list = []
+
+reference_lst = []
 with open(cfg.data['phens']+'/uniprot-organism__homo+sapiens_-filtered-proteome_UP000005640+AND+organi--.list', 'r') as f:
     for line in f:
         # add item to the list
         line = re.sub(r'\n', '', line)
-        new_mobidb_list.append(line)
+        reference_lst.append(line)
 
 # NDD
 ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
@@ -26,7 +28,14 @@ ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins  => these are a
 ## brain
 brain_prot_lst = brn.brain_pr_lst_generator()  # n: 8320
 ## lists
-ndd_not_in_mobidb = list(set(ndd_pr_lst).difference(mobidb_pr_lst))
-brain_not_in_mobidb = list(set(brain_prot_lst).difference(mobidb_pr_lst))
+ndd_not_in_mobidb = list(set(ndd_pr_lst).difference(mobidb_pr_lst))  # n = 11
+brain_not_in_mobidb = list(set(brain_prot_lst).difference(mobidb_pr_lst))  # n = 26
+##
+reference_lst = reference_lst + ndd_pr_lst + brain_prot_lst
+reference_lst = list(set(reference_lst))
+l50 = list(set(mobidb_pr_lst).difference(reference_lst))  # mobidb has 573 proteins which is not even in reflist
+# (the one damiano sent plus ndd plus brain!)
+reference_lst = reference_lst + list(set(mobidb_pr_lst).difference(reference_lst))
 
-# checklist = list(set().difference(l1))
+
+
