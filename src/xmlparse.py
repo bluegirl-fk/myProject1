@@ -11,25 +11,33 @@ sequence_length = int(root.find("uniprot:entry/uniprot:sequence", NS).attrib["le
 entries = root.findall('uniprot:entry', NS)
 features = root.findall('uniprot:entry/uniprot:feature', NS)
 
-# TODO: this code is not correct cuz it needs to append several seq variant data to rach acc which is dict key, and in the end the mut position will be added to the dict
 # maybe should use var id as keys of child dicts
 # data to be stored in the dictionary will be:
 # {acc: {var_id: {description: xxxx, evidence:xxxxx, position:x, orig_aa:x, var_aa:x}}}
 # (find a solution for entries without variant sequence data to be skipped) , in the end do it in terminal not pycharm
+
+var_tmp_dict = {}
 for entry in entries:
     acc = (entry.find('uniprot:accession', NS)).text
     acc_protinfo_dic[acc] = {}  # this will be changes later
     for feature in features:
         if feature.attrib['type'] == 'sequence variant':
-            acc_protinfo_dic[acc] = feature.attrib
+            feature_tmp_dic = {}  # stores vars of a Pr, this child dict will be added to acc_protinfo parent dict
+            var_id = feature.attrib['id']
+            feature_tmp_dic[var_id] = {}
+            description = feature.attrib['description']
+            feature_tmp_dic[var_id].append(description)
+            # acc_protinfo_dic[acc] = feature.attrib
+            aa_orig = feature.find('uniprot:original', NS).text
+            feature_tmp_dic[var_id].append(aa_orig)
+            aa_var = feature.find('uniprot:variation', NS).text
+            feature_tmp_dic[var_id].append(aa_var)
             for pos in feature.findall('uniprot:location/uniprot:position', NS):
-
-# feature.attrib['var_position'] = var_position
+                position = pos.attrib['position']
+                feature_tmp_dic[var_id].append(position)  # check int/str based on expand regions method and mobidb data
+    acc_protinfo_dic[acc] = feature_tmp_dic
 
 print(acc_protinfo_dic)
-
-# for ele in root.findall('uniprot:entry/uniprot:feature', NS):
-#     if ele.attrib['type'] == 'sequence variant':
-#         print(ele.attrib)
-#         for ele2 in ele.findall('uniprot:location/uniprot:position', NS):
-#             print(ele2.attrib)
+print(len(acc_protinfo_dic))
+print(acc_protinfo_dic.keys())
+# add disease, then turn into a dataframe
