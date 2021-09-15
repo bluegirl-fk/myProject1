@@ -15,7 +15,7 @@ features = root.findall('uniprot:entry/uniprot:feature', NS)
 # maybe should use var id as keys of child dicts
 # data to be stored in the dictionary will be:
 # {acc: {var_id: {description: xxxx, evidence:xxxxx, position:x, orig_aa:x, var_aa:x}}}
-# (find a solution for entries without variant sequence data to be skipped)
+# (find a solution for entries without variant sequence data to be skipped) , in the end do it in terminal not pycharm
 for entry in entries:
     acc = (entry.find('uniprot:accession', NS)).text
     acc_protinfo_dic[acc] = {}  # this will be changes later
