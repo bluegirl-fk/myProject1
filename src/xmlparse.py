@@ -37,18 +37,18 @@ for entry in entries:
             print(len(feature_tmp_dic))
 
         elif feature.attrib['type'] != 'sequence variant' and len(feature_tmp_dic) > 0:
-            break
-    acc_protinfo_dic[acc] = feature_tmp_dic
-    print(acc_protinfo_dic)
+            print('End!')
+            acc_protinfo_dic[acc] = feature_tmp_dic
+            print(len(feature_tmp_dic), ' ==length')
+            feature_tmp_dic = {}
 
 
 
-    print(len(feature_tmp_dic))
-    feature_tmp_dic = {}
 
-# print(acc_protinfo_dic)
-# print(len(acc_protinfo_dic))
-# print(acc_protinfo_dic.keys())
-print(acc_protinfo_dic['P01911'])
-print(acc_protinfo_dic['P04439'])
+
+print(acc_protinfo_dic)
+print(len(acc_protinfo_dic))
+print(acc_protinfo_dic.keys())
+print(len(acc_protinfo_dic['P01911'].keys()))
+print(len(acc_protinfo_dic['P04439'].keys()))
 # # add disease, then turn into a dataframe
