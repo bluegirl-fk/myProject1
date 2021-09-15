@@ -26,12 +26,25 @@ for entry in entries:
                 var_tmp_dict['position'] = pos.attrib[
                     'position']  # check int/str based on expand regions method and mobidb data
                 feature_tmp_dic[var_id] = var_tmp_dict
-            print(len(feature_tmp_dic))
         elif feature.attrib['type'] != 'sequence variant' and len(feature_tmp_dic) > 0:
             acc_protinfo_dic[acc] = feature_tmp_dic
             feature_tmp_dic = {}
 
 print(acc_protinfo_dic)
+acc_pos_d = {}
+acc_lst = list(acc_protinfo_dic.keys())
+for acc in acc_lst:
+    vars_per_each_acc_lst = list(acc_protinfo_dic[acc].keys())
+    muts_pos_per_each_acc_lst = []
+    for id in vars_per_each_acc_lst:
+        mut_position = acc_protinfo_dic[acc][id]['position']
+        muts_pos_per_each_acc_lst.append(mut_position)
+    acc_pos_d[acc] = muts_pos_per_each_acc_lst
 
-# # add disease, then turn into a dataframe
-#  in the end do it in terminal not pycharm
+
+
+
+
+# TODO: make dict of acc and corresponding diseases, for the ones not having that section, put None.
+#  then do the mut in IDR analysis again
+# in the end do it in terminal not pycharm
