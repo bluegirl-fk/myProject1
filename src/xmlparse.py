@@ -24,7 +24,7 @@ for entry in entries:
             acc_protinfo_dic[acc] = feature.attrib
             for pos in feature.findall('uniprot:location/uniprot:position', NS):
 
-                # feature.attrib['var_position'] = var_position
+# feature.attrib['var_position'] = var_position
 
 print(acc_protinfo_dic)
 
