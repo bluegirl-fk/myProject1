@@ -1,6 +1,8 @@
 # This file is created to parse uniprot xml data file to get mut locations and other useful info (sep 14th)
 import xml.etree.ElementTree as ET
 import config as cfg
+import pandas as pd
+import dateutil
 
 NS = {'uniprot': 'http://uniprot.org/uniprot'}
 tree = ET.parse(cfg.data['xml'] + '/uniprot_example.xml')
@@ -39,10 +41,11 @@ for acc in acc_lst:
     for id in vars_per_each_acc_lst:
         mut_position = acc_protinfo_dic[acc][id]['position']
         muts_pos_per_each_acc_lst.append(mut_position)
-    acc_pos_d[acc] = muts_pos_per_each_acc_lst
+    acc_pos_d[acc] = [list(set(muts_pos_per_each_acc_lst))]
 
-
-
+print(acc_pos_d)
+mutpos_df = pd.DataFrame(data=acc_pos_d)
+mutpos_df = mutpos_df.T
 
 
 # TODO: make dict of acc and corresponding diseases, for the ones not having that section, put None.

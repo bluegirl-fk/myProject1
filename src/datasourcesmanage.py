@@ -41,6 +41,11 @@ reference_lst = list(set(reference_lst))
 l50 = list(set(mobidb_pr_lst).difference(reference_lst))  # mobidb has 573 proteins which is not even in reflist
 # (the one damiano sent plus ndd plus brain!)
 reference_lst = reference_lst + list(set(mobidb_pr_lst).difference(reference_lst))
+reference_lst = list(set(reference_lst))
+
+with open(cfg.data['phens']+'/ref-lst.txt', 'w') as f:
+    for item in reference_lst:
+        f.write("%s\n" % item)
 
 
 
