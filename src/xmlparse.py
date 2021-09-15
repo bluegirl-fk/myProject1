@@ -9,7 +9,7 @@ root = tree.getroot()
 sequence_length = int(root.find("uniprot:entry/uniprot:sequence", NS).attrib["length"])
 entries = root.findall('uniprot:entry', NS)
 features = root.findall('uniprot:entry/uniprot:feature', NS)
-print(len(features)) #TODO check this length to see if includes both entries or what
+
 # maybe should use var id as keys of child dicts
 # data to be stored in the dictionary will be:
 # {acc: {var_id: {description: xxxx, evidence:xxxxx, position:x, orig_aa:x, var_aa:x}}}
@@ -18,27 +18,37 @@ acc_protinfo_dic = {}
 feature_tmp_dic = {}
 var_tmp_dict = {}
 for entry in entries:
+    print(entry)
     acc = (entry.find('uniprot:accession', NS)).text
-    feature_tmp_dic = {}
+    acc_protinfo_dic[acc] = {}
+    print('start!')
+    print(acc)
     for feature in features:
         if feature.attrib['type'] == 'sequence variant':
             var_tmp_dict = {}
             var_id = feature.attrib['id']
-            feature_tmp_dic[var_id] = {}
+            print(var_id)
             var_tmp_dict['description'] = feature.attrib['description']
-            # acc_protinfo_dic[acc] = feature.attrib
             var_tmp_dict['aa_orig'] = feature.find('uniprot:original', NS).text
             var_tmp_dict['aa_var'] = feature.find('uniprot:variation', NS).text
             for pos in feature.findall('uniprot:location/uniprot:position', NS):
                 var_tmp_dict['position'] = pos.attrib['position']  # check int/str based on expand regions method and mobidb data
                 feature_tmp_dic[var_id] = var_tmp_dict
+            print(len(feature_tmp_dic))
 
-        acc_protinfo_dic[acc] = feature_tmp_dic
-    # print(acc_protinfo_dic)
+        elif feature.attrib['type'] != 'sequence variant' and len(feature_tmp_dic) > 0:
+            break
+    acc_protinfo_dic[acc] = feature_tmp_dic
+    print(acc_protinfo_dic)
 
-# print(acc_protinfo_dic)  # TODO: debug, shows all variant for all accs, does not separate each ACC vars
+
+
+    print(len(feature_tmp_dic))
+    feature_tmp_dic = {}
+
+# print(acc_protinfo_dic)
 # print(len(acc_protinfo_dic))
 # print(acc_protinfo_dic.keys())
-# print(acc_protinfo_dic['P01911'])
-# print(acc_protinfo_dic['P04439'])
+print(acc_protinfo_dic['P01911'])
+print(acc_protinfo_dic['P04439'])
 # # add disease, then turn into a dataframe
