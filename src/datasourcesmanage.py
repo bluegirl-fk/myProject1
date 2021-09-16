@@ -44,7 +44,11 @@ l50 = list(set(mobidb_pr_lst).difference(reference_lst))  # mobidb has 573 prote
 reference_lst = reference_lst + list(set(mobidb_pr_lst).difference(reference_lst))
 reference_lst = list(set(reference_lst))
 
-
 with open(cfg.data['phens'] + '/ref-lst.txt', 'w') as f:
     for item in reference_lst:
         f.write("%s\n" % item)
+## check if the parsed variants include are proteins from my reference list:
+var_prs_df = pd.read_csv(cfg.data['xml-p'] + '/protein-vars.csv')
+var_pr_lst = var_prs_df['acc'].unique().tolist()
+
+refpr_not_in_var_lst = list(set(reference_lst).difference(var_pr_lst))

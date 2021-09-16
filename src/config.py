@@ -12,6 +12,7 @@ data = {
     'phens': absolute + 'data/mobibool-phens',
     'phens-fdr': absolute + 'data/mobibool-phens/acc-phens-FDR',
     'xml': absolute + 'data/xml',
+    'xml-p': absolute + 'data/xml/parsed',
 
 }
 plots = {
