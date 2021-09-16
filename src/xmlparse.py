@@ -5,8 +5,8 @@ import pandas as pd
 import dateutil
 
 NS = {'uniprot': 'http://uniprot.org/uniprot'}
-# tree = ET.parse(cfg.data['xml'] + '/uniprot_example.xml')
-tree = ET.parse(cfg.data['xml'] + '/uniprot-reflst-20001to40000.xml')
+tree = ET.parse(cfg.data['xml'] + '/uniprot_example.xml')
+# tree = ET.parse(cfg.data['xml'] + '/uniprot-reflst-20001to40000.xml')
 root = tree.getroot()
 # sequence_length = int(root.find("uniprot:entry/uniprot:sequence", NS).attrib["length"])
 entries = root.findall('uniprot:entry', NS)
@@ -20,8 +20,8 @@ for entry in entries:
                 if 'description' in feature.attrib:
                     print('inside the if')
                     acc_protinfo.append([acc, feature.attrib['id'], feature.attrib['description'],
-                                         feature.get('original'),
-                                         feature.find('./variation'),
+                                         (feature.find('uniprot:original', NS)).text,
+                                         (feature.find('uniprot:variation', NS)).text,
                                          pos.attrib['position']])
                 else:
                     acc_protinfo.append([acc, feature.attrib['id'], None,
