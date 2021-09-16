@@ -6,25 +6,33 @@ import dateutil
 
 NS = {'uniprot': 'http://uniprot.org/uniprot'}
 # tree = ET.parse(cfg.data['xml'] + '/uniprot_example.xml')
-tree = ET.parse(cfg.data['xml'] + '/uniprot-yourlist_M202109156320BA52A5CE8FCD097CB85A53697A351DD636U.xml')
+tree = ET.parse(cfg.data['xml'] + '/uniprot-reflst-20001to40000.xml')
 root = tree.getroot()
 # sequence_length = int(root.find("uniprot:entry/uniprot:sequence", NS).attrib["length"])
 entries = root.findall('uniprot:entry', NS)
 # {acc: {var_id: {description: xxxx, evidence:xxxxx, position:x, orig_aa:x, var_aa:x}}}
-# (find a solution for entries without variant sequence data to be skipped)
 acc_protinfo = []
 for entry in entries:
     acc = (entry.find('uniprot:accession', NS)).text
     for feature in entry.findall('uniprot:feature', NS):
         if feature.attrib['type'] == 'sequence variant':
             for pos in feature.findall('uniprot:location/uniprot:position', NS):
-                acc_protinfo.append([acc, feature.attrib['id'], feature.attrib['description'],
-                             feature.find('uniprot:original', NS).text,
-                             feature.find('uniprot:variation', NS).text,
-                             pos.attrib['position']])
+                if 'description' in feature.attrib:
+                    print('inside the if')
+                    acc_protinfo.append([acc, feature.attrib['id'], feature.attrib['description'],
+                                         feature.get('original'),
+                                         feature.find('./variation'),
+                                         pos.attrib['position']])
+                else:
+                    acc_protinfo.append([acc, feature.attrib['id'], None,
+                                         feature.get('original'), feature.find('./variation'), pos.attrib['position']])
+
+# with open(cfg.data['phens']+'/xml-parsed.txt', 'w') as f:
+#     for item in acc_protinfo:
+#         f.write("%s\n" % item)
+
 df = pd.DataFrame(acc_protinfo, columns=['acc', 'id', 'description', 'aa', 'variation', 'pos'])
 df.to_csv(cfg.data['phens'] + '/uniprot_variants.csv')
-
 
 #
 # print(acc_protinfo_dic)

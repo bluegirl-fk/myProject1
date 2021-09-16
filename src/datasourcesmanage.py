@@ -20,7 +20,8 @@ mobidb.to_csv(cfg.data['phens'] + '/mobidb-results+ndd-tsv-damiano-shared.tsv')
 mobidb_pr_lst = mobidb['acc'].unique().tolist()
 
 reference_lst = []
-with open(cfg.data['phens']+'/uniprot-organism__homo+sapiens_-filtered-proteome_UP000005640+AND+organi--.list', 'r') as f:
+with open(cfg.data['phens'] + '/uniprot-organism__homo+sapiens_-filtered-proteome_UP000005640+AND+organi--.list',
+          'r') as f:
     for line in f:
         # add item to the list
         line = re.sub(r'\n', '', line)
@@ -43,9 +44,7 @@ l50 = list(set(mobidb_pr_lst).difference(reference_lst))  # mobidb has 573 prote
 reference_lst = reference_lst + list(set(mobidb_pr_lst).difference(reference_lst))
 reference_lst = list(set(reference_lst))
 
-with open(cfg.data['phens']+'/ref-lst.txt', 'w') as f:
+
+with open(cfg.data['phens'] + '/ref-lst.txt', 'w') as f:
     for item in reference_lst:
         f.write("%s\n" % item)
-
-
-
