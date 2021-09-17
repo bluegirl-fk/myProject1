@@ -61,4 +61,6 @@ del disorder_majority_mrg['Unnamed: 0']
 [mobidb_lite_mrg, disorder_majority_mrg] = isin_idr_col_adder([mobidb_lite_mrg, disorder_majority_mrg])
 
 lite_mut_in_df = mobidb_lite_mrg.loc[mobidb_lite_mrg['isin_idr'] == '1']
+del lite_mut_in_df['isin_idr']
 dismaj_mut_in_df = disorder_majority_mrg.loc[disorder_majority_mrg['isin_idr'] == '1']
+del dismaj_mut_in_df['isin_idr']
