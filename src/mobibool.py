@@ -195,17 +195,17 @@ if __name__ == '__main__':
             to_csv(cfg.data['phens'] + '/content_count-each feature/' + each_f + '-cc.csv')
     mobi_length_df.loc[slice(None), phens_lst].describe().T.to_csv(cfg.data['phens'] + '/length-stats-new.csv')
 
-    sig_pep_percent_df = sig_pep_percent_df_maker()
-    transmem_pr_percent_df = transmem_pr_percent_df_maker()
-
-    ## Barplots
-    # Signal peptide
-    draw_barplot(x='Phenotypes', y='Signal peptide percentage', data=sig_pep_percent_df, xticklabel=phens_lst,
-                 yscale='linear', save_rout=cfg.plots['bar'] + '/sig-peptide-percent.png')
-    draw_barplot(x='Phenotypes', y='Signal peptide count', data=sig_pep_percent_df, xticklabel=phens_lst,
-                 yscale='log', save_rout=cfg.plots['bar'] + '/sig-peptide-count.png')
-    # Transmembrane protein
-    draw_barplot(x='Phenotypes', y='Transmembrane protein percentage', data=transmem_pr_percent_df, xticklabel=phens_lst,
-                 yscale='linear', save_rout=cfg.plots['bar'] + '/transmemb-prots-percent.png')
-    draw_barplot(x='Phenotypes', y='Transmembrane protein count', data=transmem_pr_percent_df, xticklabel=phens_lst,
-                 yscale='log', save_rout=cfg.plots['bar'] + '/transmemb-prots-count.png')
+    # sig_pep_percent_df = sig_pep_percent_df_maker()
+    # transmem_pr_percent_df = transmem_pr_percent_df_maker()
+    #
+    # ## Barplots
+    # # Signal peptide
+    # draw_barplot(x='Phenotypes', y='Signal peptide percentage', data=sig_pep_percent_df, xticklabel=phens_lst,
+    #              yscale='linear', save_rout=cfg.plots['bar'] + '/sig-peptide-percent.png')
+    # draw_barplot(x='Phenotypes', y='Signal peptide count', data=sig_pep_percent_df, xticklabel=phens_lst,
+    #              yscale='log', save_rout=cfg.plots['bar'] + '/sig-peptide-count.png')
+    # # Transmembrane protein
+    # draw_barplot(x='Phenotypes', y='Transmembrane protein percentage', data=transmem_pr_percent_df, xticklabel=phens_lst,
+    #              yscale='linear', save_rout=cfg.plots['bar'] + '/transmemb-prots-percent.png')
+    # draw_barplot(x='Phenotypes', y='Transmembrane protein count', data=transmem_pr_percent_df, xticklabel=phens_lst,
+    #              yscale='log', save_rout=cfg.plots['bar'] + '/transmemb-prots-count.png')

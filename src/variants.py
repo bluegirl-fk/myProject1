@@ -40,6 +40,16 @@ def isin_idr_col_adder(dfs_lst):
     return dfs_lst
 
 
+def in_idr_df_generator(dfs_lst):
+    # generates df with proteins that have variant in IDR, can get as input list of df(s)
+    df_only_muinIDR_lst = []
+    for df in dfs_lst:
+        new_df = df.loc[df['isin_idr'] == '1']
+        new_df = new_df.drop(columns=['Unnamed: 0_x', 'Unnamed: 0_y', 'isin_idr'])
+        df_only_muinIDR_lst.append(new_df)
+    return df_only_muinIDR_lst
+
+
 ## mobidb, filtered based on mobidblite and disorder majority
 mobidb = pd.read_csv(cfg.data['phens'] + '/mobidb-results+ndd-tsv-damiano-shared.tsv')
 mobidb = mobidb.rename(columns={'start..end': 'startend'})
@@ -54,11 +64,11 @@ mobidb_lite_mrg = pd.merge(mobidb_lite, var_prs_df, on='acc')
 disorder_majority_mrg = pd.merge(disorder_majority, var_prs_df, on='acc')
 ## adding isin_idr bool array
 [mobidb_lite_mrg, disorder_majority_mrg] = isin_idr_col_adder([mobidb_lite_mrg, disorder_majority_mrg])
-
-lite_mut_in_df = mobidb_lite_mrg.loc[mobidb_lite_mrg['isin_idr'] == '1']
-lite_mut_in_df = lite_mut_in_df.drop(columns=['Unnamed: 0_x', 'Unnamed: 0_y', 'isin_idr'])
-dismaj_mut_in_df = disorder_majority_mrg.loc[disorder_majority_mrg['isin_idr'] == '1']
-dismaj_mut_in_df = dismaj_mut_in_df.drop(columns=['Unnamed: 0_x', 'Unnamed: 0_y', 'isin_idr'])
+## DFs with muts only inside IDR
+lite_mut_in_df, dismaj_mut_in_df = in_idr_df_generator([mobidb_lite_mrg, disorder_majority_mrg])
 ## to CSV
 lite_mut_in_df.to_csv(cfg.data['vars'] + '/muts-in-IDR-mobidb_lite.csv')
 dismaj_mut_in_df.to_csv(cfg.data['vars'] + '/muts-in-IDR-disorder_majority.csv')
+
+# TODO: insert each of this in mobibool instead of mobidb, but you need to also delete ndd and brain that are not in
+#  this list maybe use left merge!
