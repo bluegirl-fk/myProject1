@@ -16,7 +16,7 @@ import seaborn as sns
 
 def mobi_phens_col_maker(df1_mobi, df2, df3):
     # mobidb
-    df1_mobi = df1_mobi.drop(columns='start..end')
+    # df1_mobi = df1_mobi.drop(columns='start..end')
     subdf1 = df1_mobi[['acc']]
     subdf1['phenotype'] = 'Human'
     # brain
@@ -148,11 +148,12 @@ if __name__ == '__main__':
 
     # new mobidb with one column for phens of NDD, human, and brain
     mobidb = mobi_phens_col_maker(mobidb, brain_subdf, ndd_subdf)
+    mobidb.to_csv(cfg.data['phens'] + '/mobidb-plus-phenotype-column.csv')
+
     mobi_feature_df = mobidb[mobidb.feature.isin(features_lst)]
     # multi-idx-dfs
     mobi_disorder_df, mobi_cont_count_df, mobi_length_df = multidx_df_maker(
         [mobi_feature_df, mobidb], ['acc', 'feature', 'phenotype'])
-
     ## Boxplots
     # content count
     for key in feature_dict.keys():

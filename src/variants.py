@@ -41,26 +41,24 @@ def isin_idr_col_adder(dfs_lst):
 
 
 ## mobidb, filtered based on mobidblite and disorder majority
-mobidb = pd.read_csv(cfg.data['phens'] + '/mobidb-results+ndd-tsv-damiano-shared.tsv',
-                     usecols=['acc', 'feature', 'start..end'])
+mobidb = pd.read_csv(cfg.data['phens'] + '/mobidb-results+ndd-tsv-damiano-shared.tsv')
 mobidb = mobidb.rename(columns={'start..end': 'startend'})
 mobidb_lite = mobidb.loc[mobidb['feature'] == 'prediction-disorder-mobidb_lite']
-del mobidb_lite['feature']
 disorder_majority = mobidb.loc[mobidb['feature'] == 'prediction-disorder-th_50']
-del disorder_majority['feature']
 ## Variants df, (12 proteins not in mobidb)
 var_prs_df = pd.read_csv(cfg.data['xml-p'] + '/protein-vars.csv')
 ## Merged DFs
 # mobidb_lite
 mobidb_lite_mrg = pd.merge(mobidb_lite, var_prs_df, on='acc')
-del mobidb_lite_mrg['Unnamed: 0']
 # Disorder_majority
 disorder_majority_mrg = pd.merge(disorder_majority, var_prs_df, on='acc')
-del disorder_majority_mrg['Unnamed: 0']
 ## adding isin_idr bool array
 [mobidb_lite_mrg, disorder_majority_mrg] = isin_idr_col_adder([mobidb_lite_mrg, disorder_majority_mrg])
 
 lite_mut_in_df = mobidb_lite_mrg.loc[mobidb_lite_mrg['isin_idr'] == '1']
-del lite_mut_in_df['isin_idr']
+lite_mut_in_df = lite_mut_in_df.drop(columns=['Unnamed: 0_x', 'Unnamed: 0_y', 'isin_idr'])
 dismaj_mut_in_df = disorder_majority_mrg.loc[disorder_majority_mrg['isin_idr'] == '1']
-del dismaj_mut_in_df['isin_idr']
+dismaj_mut_in_df = dismaj_mut_in_df.drop(columns=['Unnamed: 0_x', 'Unnamed: 0_y', 'isin_idr'])
+## to CSV
+lite_mut_in_df.to_csv(cfg.data['vars'] + '/muts-in-IDR-mobidb_lite.csv')
+dismaj_mut_in_df.to_csv(cfg.data['vars'] + '/muts-in-IDR-disorder_majority.csv')
