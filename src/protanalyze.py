@@ -14,8 +14,8 @@ def phens_acc_dict_maker(phen_lst, phens_df):  # TODO: later try to use these tw
     return phen_dict
 
 
-def human_brain_acc_adder(phens_dict):
-    mobidb, brain, _ = var.var_in_idr_df_generator()
+def human_brain_acc_adder(phens_dict, vartype):
+    mobidb, brain, _ = var.all_vars_or_vars_inidr(vartype)
     human_lst = list(set(mobidb['acc'].tolist()))
     brain_lst = list(set(brain['acc'].tolist()))
     phens_dict['Human'] = human_lst
@@ -48,25 +48,16 @@ def phens_union_df_maker(phen_acc_dic):
 
 
 if __name__ == '__main__':
-
     phens_lst = ['Human', 'Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'NDDs', 'Control']
-    _, _, ndd_subdf = var.var_in_idr_df_generator()
+    _, _, ndd_subdf = var.all_vars_or_vars_inidr('all')
     ndd_subdf = ndd_subdf.drop_duplicates()  #
     # Dictionary with phen as key and their corresponding  list of ACCs as value
-    phens_acc_dict = human_brain_acc_adder(phens_acc_dict_maker(phens_lst, ndd_subdf))
+    phens_acc_dict = human_brain_acc_adder(phens_acc_dict_maker(phens_lst, ndd_subdf), 'all')
+    phens_acc_dict2 = human_brain_acc_adder(phens_acc_dict_maker(phens_lst, ndd_subdf), 'idr')
+    # todo: change this class's code to have all and idr vars at the same time, purpose = to be divided by each other
+
     ## Intersection and Union
     phens_inters_df = phens_intersect_df_maker(phens_acc_dict)
     # phens_inters_df.style.bar(subset=["ASD"], color='#FFA07A')
     # https://github.com/dexplo/dataframe_image very useful for saving pandas styler figures or jupyterlab to pdf
     phens_union_df = phens_union_df_maker(phens_acc_dict)
-
-
-
-
-
-
-
-
-
-
-
