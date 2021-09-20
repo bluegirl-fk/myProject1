@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import config as cfg
 import brain as brn
-
+## trying to use this class for variants inside IDRs
 
 def phens_acc_dict_maker(phen_lst, phens_df):  # TODO: later try to use these two methods inside eachother
     phen_dict = dict.fromkeys(phen_lst)  # this dict has phen_name as key and lst of corresponding ACCs as values
