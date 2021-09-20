@@ -13,11 +13,11 @@ data = {
     'phens-fdr': absolute + 'data/mobibool-phens/acc-phens-FDR',
     'xml': absolute + 'data/xml',
     'xml-p': absolute + 'data/xml/parsed',
-    'vars' : absolute + 'data/variants',
+    'vars': absolute + 'data/variants',
     'var-desc': absolute + 'data/variants/descriptions',
     'var-desc-cf': absolute + 'data/variants/descriptions/cf',
     'var-desc-cc': absolute + 'data/variants/descriptions/cc',
-    'var-desc-len': absolute + 'data/variants/descriptions/length',
+    'var-desc-len': absolute + 'data/variants/descriptions/length'
 
 }
 plots = {

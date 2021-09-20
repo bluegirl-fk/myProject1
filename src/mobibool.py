@@ -85,9 +85,9 @@ def sig_pep_percent_df_maker():
     # this gets a df with the selected peptides count and then divides them by all proteins of that phenotype or
     # brn, human, ... and creates percentage, all Prs count is taken from length_df cuz it does not have redundancy
     sig_peptide_subdf = pd.read_csv(
-        cfg.data['phens'] + '/content_count-each feature/prediction-signal_peptide-uniprot-cc.csv',
+        cfg.data['var-desc-cc'] + '/prediction-signal_peptide-uniprot-cc.csv',
         usecols=['phenotype', 'count'])
-    all_phen_pr_count_df = pd.read_csv(cfg.data['phens'] + '/length-stats-new.csv', usecols=['phenotype', 'count'])
+    all_phen_pr_count_df = pd.read_csv(cfg.data['var-desc-len'] + '/length-stats.csv', usecols=['phenotype', 'count'])
     sig_pep_mrged_df = pd.merge(sig_peptide_subdf, all_phen_pr_count_df, on='phenotype')
     sig_pep_mrged_df = sig_pep_mrged_df.rename(
         columns={'phenotype': 'Phenotypes', 'count_x': 'Signal peptide count', 'count_y': 'count_all'})
@@ -97,9 +97,9 @@ def sig_pep_percent_df_maker():
 
 
 def transmem_pr_percent_df_maker():
-    all_phen_pr_count_df = pd.read_csv(cfg.data['phens'] + '/length-stats-new.csv', usecols=['phenotype', 'count'])
+    all_phen_pr_count_df = pd.read_csv(cfg.data['var-desc-len'] + '/length-stats-new.csv', usecols=['phenotype', 'count'])
     transmemb_subdf = pd.read_csv(
-        cfg.data['phens'] + '/content_count-each feature/prediction-transmembrane-uniprot-cc.csv',
+        cfg.data['var-desc-cc'] + '/prediction-transmembrane-uniprot-cc.csv',
         usecols=['phenotype', 'count'])
     transmem_mrg_df = pd.merge(transmemb_subdf, all_phen_pr_count_df, on='phenotype')
     transmem_mrg_df = transmem_mrg_df.rename(
@@ -159,7 +159,7 @@ if __name__ == '__main__':
     # multi-idx-dfs
     mobi_disorder_df, mobi_cont_count_df, mobi_length_df = multidx_df_maker(
         [mobi_feature_df, mobidb], ['acc', 'feature', 'phenotype'])
-    ## Boxplots #todo : figure out why it's not working for the NDDs, compare with previous ones if necessary, or refactor the code
+    ## Boxplots
     # content count
     for key in feature_dict.keys():
         box_plotter(data=mobi_cont_count_df.loc[(slice(None), key), phens_lst],
@@ -195,9 +195,9 @@ if __name__ == '__main__':
     pd.set_option('display.max_rows', None)
     for each_f in features_lst:
         mobi_disorder_df.loc[(slice(None), each_f), phens_lst].describe().T. \
-            to_csv(cfg.data['var-desc-cf'] + each_f + '-cf.csv')
+            to_csv(cfg.data['var-desc-cf'] + '/' + each_f + '-cf.csv')
         mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
-            to_csv(cfg.data['var-desc-cc'] + each_f + '-cc.csv')
+            to_csv(cfg.data['var-desc-cc'] + '/' + each_f + '-cc.csv')
     mobi_length_df.loc[slice(None), phens_lst].describe().T.to_csv(cfg.data['var-desc-len'] + '/length-stats.csv')
 
     # sig_pep_percent_df = sig_pep_percent_df_maker()
