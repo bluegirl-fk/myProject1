@@ -97,7 +97,7 @@ def sig_pep_percent_df_maker():
 
 
 def transmem_pr_percent_df_maker():
-    all_phen_pr_count_df = pd.read_csv(cfg.data['var-desc-len'] + '/length-stats-new.csv', usecols=['phenotype', 'count'])
+    all_phen_pr_count_df = pd.read_csv(cfg.data['var-desc-len'] + '/length-stats.csv', usecols=['phenotype', 'count'])
     transmemb_subdf = pd.read_csv(
         cfg.data['var-desc-cc'] + '/prediction-transmembrane-uniprot-cc.csv',
         usecols=['phenotype', 'count'])
