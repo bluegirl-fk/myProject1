@@ -9,15 +9,21 @@ import brain as brn
 
 
 vars_in_idr_df = pd.read_csv(cfg.data['vars'] + '/all-vars-all-features.csv')
+vars_in_idr_lst = vars_in_idr_df['acc'].unique().tolist()
 ## NDD
 ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
 ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
 ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
 ## ndds in variants
-ndd_in_idr = list(set(ndd_pr_lst).intersection(vars_in_idr_df))
+ndd_in_idr = list(set(ndd_pr_lst).intersection(vars_in_idr_lst))
+ndd_in_idr_subdf = ndd_subdf[ndd_subdf.acc.isin(ndd_in_idr)]
 ## Brain
 brain_prot_lst = brn.brain_pr_lst_generator()  # n: 8320
-brn_in_idr = list(set(brain_prot_lst).intersection(vars_in_idr_df))
+brn_in_idr_lst = list(set(brain_prot_lst).intersection(vars_in_idr_lst))
+brain_inidr_subdf = DataFrame(brn_in_idr_lst, columns=['acc'])
 
 
+def var_in_idr_df_generator():
+
+    return ndd_in_idr_subdf, brain_inidr_subdf
 
