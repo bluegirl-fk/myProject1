@@ -20,14 +20,15 @@ ndd_notin_vars_lst = list(set(ndd_pr_lst).difference(variants_lst))
 ## ndd prs (not) in mobidblite_inidr: (ndds that are in IDR = 189 , not in IDR = 1119)
 # (to be used to make new ndd_subdf based on these proteins only)
 mobidblite_inidr_pr_lst = mobidblite_inidr_df['acc'].unique().tolist()
-ndd_notin_mobilite_idr = list(set(ndd_pr_lst).difference(mobidblite_inidr_pr_lst))  # n: 1119
 ndds_inidr_mobilite_lst = list(set(ndd_pr_lst).intersection(mobidblite_inidr_pr_lst))  # n: 189
+# ndd_notin_mobilite_idr = list(set(ndd_pr_lst).difference(mobidblite_inidr_pr_lst))  # n: 1119
 ## ndd prs (not) in dismajority_inidr:
 dismajority_inidr_pr_lst = dismajority_inidr_df['acc'].unique().tolist()
-ndd_notin_dismajority_idr = list(set(ndd_pr_lst).difference(dismajority_inidr_pr_lst))  # n: 1024
 ndds_inidr_dismaj_lst = list(set(ndd_pr_lst).intersection(dismajority_inidr_pr_lst))  # n: 284
+# ndd_notin_dismajority_idr = list(set(ndd_pr_lst).difference(dismajority_inidr_pr_lst))  # n: 1024
 ## Brain
 brain_prot_lst = brn.brain_pr_lst_generator()  # n: 8320
-brain_subdf = DataFrame(brain_prot_lst, columns=['acc'])
+
+
 
 
