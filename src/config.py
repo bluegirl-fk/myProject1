@@ -38,6 +38,7 @@ plots = {
     'vv-cf': absolute + 'plots/variants/violinplot/cf',
     'vv-cc': absolute + 'plots/variants/violinplot/cc',
     'vv-len': absolute + 'plots/variants/violinplot/length',
+    'var-bar': absolute + 'plots/variants/barplot',
 
 
 }
