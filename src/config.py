@@ -27,6 +27,10 @@ plots = {
     'vio-cf': absolute + 'plots/g4dn/violinplot/cf',
     'vio-cc': absolute + 'plots/g4dn/violinplot/cc',
     'vio-len': absolute + 'plots/g4dn/violinplot/length',
+    'vars': absolute + 'plots/variants',
+    'var-cf': absolute + 'plots/variants/cf',
+    'var-cc': absolute + 'plots/variants/cc',
+    'var-len': absolute + 'plots/variants/length',
 
 
 }

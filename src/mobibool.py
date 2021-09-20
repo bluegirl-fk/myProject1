@@ -146,8 +146,9 @@ if __name__ == '__main__':
     # brain_prot_lst = bd.brain_pr_lst_generator()  # n: 8320
     # brain_subdf = DataFrame(brain_prot_lst, columns=['acc'])
     # # mutual_brain_ndd_prs_lst = [i for i in brain_prot_lst if i in ndd_pr_lst]  # 455
-    ## Mobidb, Brain and Ndd dfs with variations in IDR
 
+    ## Mobidb, Brain and Ndd dfs with variations in IDR
+    mobidb, brain_subdf, ndd_subdf = var.var_in_idr_df_generator()
 
     # new mobidb with one column for phens of NDD, human, and brain
     mobidb = mobi_phens_col_maker(mobidb, brain_subdf, ndd_subdf)
