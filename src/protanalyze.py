@@ -3,7 +3,8 @@ import numpy as np
 import pandas as pd
 import config as cfg
 import brain as brn
-## trying to use this class for variants inside IDRs
+import varAnalysis as var
+
 
 def phens_acc_dict_maker(phen_lst, phens_df):  # TODO: later try to use these two methods inside eachother
     phen_dict = dict.fromkeys(phen_lst)  # this dict has phen_name as key and lst of corresponding ACCs as values
@@ -14,9 +15,9 @@ def phens_acc_dict_maker(phen_lst, phens_df):  # TODO: later try to use these tw
 
 
 def human_brain_acc_adder(phens_dict):
-    mobidb = pd.read_csv(cfg.data['phens'] + '/mobidb-results+ndd-tsv-damiano-shared.tsv', usecols=['acc'])
+    mobidb, brain, _ = var.var_in_idr_df_generator()
     human_lst = list(set(mobidb['acc'].tolist()))
-    brain_lst = brn.brain_pr_lst_generator()
+    brain_lst = list(set(brain['acc'].tolist()))
     phens_dict['Human'] = human_lst
     phens_dict['Brain'] = brain_lst
     return phens_dict
@@ -49,8 +50,8 @@ def phens_union_df_maker(phen_acc_dic):
 if __name__ == '__main__':
 
     phens_lst = ['Human', 'Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'NDDs', 'Control']
-    ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
-    ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
+    _, _, ndd_subdf = var.var_in_idr_df_generator()
+    ndd_subdf = ndd_subdf.drop_duplicates()  #
     # Dictionary with phen as key and their corresponding  list of ACCs as value
     phens_acc_dict = human_brain_acc_adder(phens_acc_dict_maker(phens_lst, ndd_subdf))
     ## Intersection and Union
