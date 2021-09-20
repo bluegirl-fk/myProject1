@@ -12,6 +12,7 @@ import brain as bd
 import matplotlib.pyplot as plt
 from matplotlib import ticker as mticker
 import seaborn as sns
+import varAnalysis as var
 
 
 def mobi_phens_col_maker(df1_mobi, df2, df3):
@@ -136,15 +137,17 @@ if __name__ == '__main__':
     # in the end use decorator thing with the @
     phens_lst = ['Human', 'Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'NDDs', 'Control']
     ## import dfs # (mobidb)
-    mobidb = pd.read_csv(cfg.data['phens'] + '/mobidb-results+ndd-tsv-damiano-shared.tsv')
-    # NDD , could also specify index_col= ..., and pass a list for multiple idxs
-    ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
-    ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
-    ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins  => these are all, not the selected phens
-    ## brain
-    brain_prot_lst = bd.brain_pr_lst_generator()  # n: 8320
-    brain_subdf = DataFrame(brain_prot_lst, columns=['acc'])
-    # mutual_brain_ndd_prs_lst = [i for i in brain_prot_lst if i in ndd_pr_lst]  # 455
+    # mobidb = pd.read_csv(cfg.data['phens'] + '/mobidb-results+ndd-tsv-damiano-shared.tsv')
+    # # NDD , could also specify index_col= ..., and pass a list for multiple idxs
+    # ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
+    # ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
+    # ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins  => these are all, not the selected phens
+    # ## brain
+    # brain_prot_lst = bd.brain_pr_lst_generator()  # n: 8320
+    # brain_subdf = DataFrame(brain_prot_lst, columns=['acc'])
+    # # mutual_brain_ndd_prs_lst = [i for i in brain_prot_lst if i in ndd_pr_lst]  # 455
+    ## Mobidb, Brain and Ndd dfs with variations in IDR
+
 
     # new mobidb with one column for phens of NDD, human, and brain
     mobidb = mobi_phens_col_maker(mobidb, brain_subdf, ndd_subdf)
