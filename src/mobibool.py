@@ -149,7 +149,7 @@ if __name__ == '__main__':
     # # mutual_brain_ndd_prs_lst = [i for i in brain_prot_lst if i in ndd_pr_lst]  # 455
 
     ## Mobidb, Brain and Ndd dfs with all variations (in/out of IDR)
-    mobidb, brain_subdf, ndd_subdf = var.var_in_idr_df_generator()
+    mobidb, brain_subdf, ndd_subdf = var.all_vars_or_vars_inidr('all')
 
     # new mobidb with one column for phens of NDD, human, and brain
     mobidb = mobi_phens_col_maker(mobidb, brain_subdf, ndd_subdf)
