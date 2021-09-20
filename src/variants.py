@@ -57,17 +57,19 @@ mobidb_lite = mobidb.loc[mobidb['feature'] == 'prediction-disorder-mobidb_lite']
 disorder_majority = mobidb.loc[mobidb['feature'] == 'prediction-disorder-th_50']
 ## Variants df, (12 proteins not in mobidb)
 var_prs_df = pd.read_csv(cfg.data['xml-p'] + '/protein-vars.csv')
+vars_mrg = pd.merge(mobidb, var_prs_df, on='acc')  # all vars without mobidb feature filtration
 ## Merged DFs
 # mobidb_lite
 mobidb_lite_mrg = pd.merge(mobidb_lite, var_prs_df, on='acc')
 # Disorder_majority
 disorder_majority_mrg = pd.merge(disorder_majority, var_prs_df, on='acc')
 ## adding isin_idr bool array
-[mobidb_lite_mrg, disorder_majority_mrg] = isin_idr_col_adder([mobidb_lite_mrg, disorder_majority_mrg])
+[mobidb_lite_mrg, disorder_majority_mrg, vars_mrg] = isin_idr_col_adder([mobidb_lite_mrg, disorder_majority_mrg, vars_mrg])
 ## DFs with muts only inside IDR
-lite_mut_in_df, dismaj_mut_in_df = in_idr_df_generator([mobidb_lite_mrg, disorder_majority_mrg])
+lite_mut_in_df, dismaj_mut_in_df, vars_in_df = in_idr_df_generator([mobidb_lite_mrg, disorder_majority_mrg, vars_mrg])
 ## to CSV
 lite_mut_in_df.to_csv(cfg.data['vars'] + '/muts-in-IDR-mobidb_lite.csv')
 dismaj_mut_in_df.to_csv(cfg.data['vars'] + '/muts-in-IDR-disorder_majority.csv')
+vars_in_df.to_csv(cfg.data['vars'] + '/all-vars-all-features.csv')
 
 
