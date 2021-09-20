@@ -7,6 +7,9 @@ import brain as brn
 
 
 def vars_df_generator(input_df):
+    # gets df as input (either merged mobidb with all variants or the variants in IDR), then creates ndd and brain subdf
+    # based on proteins in the var dataset, basically deletes ACCs from ndd and brain that don't exist in the human var
+    # list, then these dfs will be used in mobibool or protanalysis
     var_pr_lst = input_df['acc'].unique().tolist()
     ## ndds in variants
     ndd_in_idr = list(set(ndd_pr_lst).intersection(var_pr_lst))
@@ -20,6 +23,7 @@ def vars_df_generator(input_df):
 
 
 def all_vars_or_vars_inidr(input):
+    # input "all" all vars are needed and input 'idr' when only variants inside idr are needed
     vars_in_idr_df = pd.read_csv(cfg.data['vars'] + '/all-vars-all-features.csv')
     all_vars = pd.read_csv(cfg.data['vars'] + '/all-variants-mobidb-merged.csv')
     del all_vars['Unnamed: 0_x']
