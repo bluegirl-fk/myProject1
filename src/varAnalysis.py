@@ -8,24 +8,26 @@ import brain as brn
 #  this list maybe use left merge!
 
 
-vars_in_idr_df = pd.read_csv(cfg.data['vars'] + '/all-vars-all-features.csv')
-del vars_in_idr_df['Unnamed: 0']
-vars_in_idr_lst = vars_in_idr_df['acc'].unique().tolist()
+# vars_in_idr_df = pd.read_csv(cfg.data['vars'] + '/all-vars-all-features.csv')
+all_vars = pd.read_csv(cfg.data['vars'] + '/all-variants-mobidb-merged.csv')
+del all_vars['Unnamed: 0_x']
+del all_vars['Unnamed: 0_y']
+all_vars_lst = all_vars['acc'].unique().tolist()
 ## NDD
 ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
 ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
 ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
 ## ndds in variants
-ndd_in_idr = list(set(ndd_pr_lst).intersection(vars_in_idr_lst))
+ndd_in_idr = list(set(ndd_pr_lst).intersection(all_vars_lst))
 ndd_in_idr_subdf = ndd_subdf[ndd_subdf.acc.isin(ndd_in_idr)]
 del ndd_in_idr_subdf['Unnamed: 0']
 ## Brain
 brain_prot_lst = brn.brain_pr_lst_generator()  # n: 8320
-brn_in_idr_lst = list(set(brain_prot_lst).intersection(vars_in_idr_lst))
+brn_in_idr_lst = list(set(brain_prot_lst).intersection(all_vars_lst))
 brain_inidr_subdf = DataFrame(brn_in_idr_lst, columns=['acc'])
 
 
 def var_in_idr_df_generator():
 
-    return vars_in_idr_df, brain_inidr_subdf, ndd_in_idr_subdf
+    return all_vars_lst, brain_inidr_subdf, ndd_in_idr_subdf
 

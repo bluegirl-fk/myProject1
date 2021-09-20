@@ -58,6 +58,7 @@ disorder_majority = mobidb.loc[mobidb['feature'] == 'prediction-disorder-th_50']
 ## Variants df, (12 proteins not in mobidb)
 var_prs_df = pd.read_csv(cfg.data['xml-p'] + '/protein-vars.csv')
 vars_mrg = pd.merge(mobidb, var_prs_df, on='acc')  # all vars without mobidb feature filtration
+vars_mrg.to_csv(cfg.data['vars'] + '/all-variants-mobidb-merged.csv')
 ## Merged DFs
 # mobidb_lite
 mobidb_lite_mrg = pd.merge(mobidb_lite, var_prs_df, on='acc')
