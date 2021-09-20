@@ -162,31 +162,31 @@ if __name__ == '__main__':
     # content count
     for key in feature_dict.keys():
         box_plotter(data=mobi_cont_count_df.loc[(slice(None), key), phens_lst],
-                    save_route=(cfg.plots['var-cc'] + '/' + key + '-cc' + '.png'),
+                    save_route=(cfg.plots['vb-cc'] + '/' + key + '-cc' + '.png'),
                     title=feature_dict[key][0], ylabel='Residues count', ylim=feature_dict[key][1])
     # content fraction
     for key in feature_dict.keys():
         box_plotter(data=mobi_disorder_df.loc[(slice(None), key), phens_lst],
-                    save_route=(cfg.plots['var-cf'] + '/' + key + '-cf' + '.png'),
+                    save_route=(cfg.plots['vb-cf'] + '/' + key + '-cf' + '.png'),
                     title=feature_dict[key][0], ylabel='Content (%)', ylim=feature_dict[key][2])
     # Length
     box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-                save_route=(cfg.plots['var-len'] + '/' + 'len4200' + '.png'),
+                save_route=(cfg.plots['vb-len'] + '/' + 'len4200' + '.png'),
                 title='Protein sequence length', ylabel='Residues count', ylim=4200)
     ## Violin plots
     # content count
     for key in feature_dict.keys():
         violin_plotter(data=mobi_cont_count_df.loc[(slice(None), key), phens_lst],
-                       save_route=(cfg.plots['vio-cc'] + '/' + key + '-cc-ylim' + '.png'),
+                       save_route=(cfg.plots['vv-cc'] + '/' + key + '-cc' + '.png'),
                        title=feature_dict[key][0], ylabel='Residues count', ylim=feature_dict[key][1])
     # content fraction
     for key in feature_dict.keys():
         violin_plotter(data=mobi_disorder_df.loc[(slice(None), key), phens_lst],
-                    save_route=(cfg.plots['vio-cf'] + '/' + key + '-cf-ylim' + '.png'),
+                    save_route=(cfg.plots['vv-cf'] + '/' + key + '-cf' + '.png'),
                     title=feature_dict[key][0], ylabel='Content (%)', ylim=feature_dict[key][2])
     # Length
     violin_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-                save_route=(cfg.plots['vio-len'] + '/' + 'len4200-new' + '.png'),
+                save_route=(cfg.plots['vv-len'] + '/' + 'len4200' + '.png'),
                 title='Protein sequence length', ylabel='Residues count', ylim=4200)
 
     ## writing data statistics to CSV
