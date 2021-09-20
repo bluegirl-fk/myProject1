@@ -25,5 +25,5 @@ brain_inidr_subdf = DataFrame(brn_in_idr_lst, columns=['acc'])
 
 def var_in_idr_df_generator():
 
-    return ndd_in_idr_subdf, brain_inidr_subdf
+    return brain_inidr_subdf, vars_in_idr_df, ndd_in_idr_subdf
 
