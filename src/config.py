@@ -28,9 +28,12 @@ plots = {
     'vio-cc': absolute + 'plots/g4dn/violinplot/cc',
     'vio-len': absolute + 'plots/g4dn/violinplot/length',
     'vars': absolute + 'plots/variants',
-    'var-cf': absolute + 'plots/variants/cf',
-    'var-cc': absolute + 'plots/variants/cc',
-    'var-len': absolute + 'plots/variants/length',
+    'vb-cf': absolute + 'plots/variants/boxplot/cf',
+    'vb-cc': absolute + 'plots/variants/boxplot/cc',
+    'vb-len': absolute + 'plots/variants/boxplot/length',
+    'vv-cf': absolute + 'plots/variants/violinplot/cf',
+    'vv-cc': absolute + 'plots/variants/violinplot/cc',
+    'vv-len': absolute + 'plots/variants/violinplot/length',
 
 
 }

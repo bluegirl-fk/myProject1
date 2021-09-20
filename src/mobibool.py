@@ -162,16 +162,16 @@ if __name__ == '__main__':
     # content count
     for key in feature_dict.keys():
         box_plotter(data=mobi_cont_count_df.loc[(slice(None), key), phens_lst],
-                    save_route=(cfg.plots['box-cc'] + '/' + key + '-cc' + '.png'),
+                    save_route=(cfg.plots['var-cc'] + '/' + key + '-cc' + '.png'),
                     title=feature_dict[key][0], ylabel='Residues count', ylim=feature_dict[key][1])
     # content fraction
     for key in feature_dict.keys():
         box_plotter(data=mobi_disorder_df.loc[(slice(None), key), phens_lst],
-                    save_route=(cfg.plots['box-cf'] + '/' + key + '-cf' + '.png'),
+                    save_route=(cfg.plots['var-cf'] + '/' + key + '-cf' + '.png'),
                     title=feature_dict[key][0], ylabel='Content (%)', ylim=feature_dict[key][2])
     # Length
     box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-                save_route=(cfg.plots['box-len'] + '/' + 'len4200' + '.png'),
+                save_route=(cfg.plots['var-len'] + '/' + 'len4200' + '.png'),
                 title='Protein sequence length', ylabel='Residues count', ylim=4200)
     ## Violin plots
     # content count
