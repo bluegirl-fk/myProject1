@@ -104,7 +104,8 @@ def transmem_pr_percent_df_maker():
     transmem_mrg_df = pd.merge(transmemb_subdf, all_phen_pr_count_df, on='phenotype')
     transmem_mrg_df = transmem_mrg_df.rename(
         columns={'phenotype': 'Phenotypes', 'count_x': 'Transmembrane protein count', 'count_y': 'count_all'})
-    transmem_mrg_df['Transmembrane protein percentage'] = (transmem_mrg_df['Transmembrane protein count'] * 100) /transmem_mrg_df['count_all']
+    transmem_mrg_df['Transmembrane protein percentage'] = (transmem_mrg_df['Transmembrane protein count'] * 100) / \
+                                                          transmem_mrg_df['count_all']
     return transmem_mrg_df
 
 
@@ -158,7 +159,7 @@ if __name__ == '__main__':
     # multi-idx-dfs
     mobi_disorder_df, mobi_cont_count_df, mobi_length_df = multidx_df_maker(
         [mobi_feature_df, mobidb], ['acc', 'feature', 'phenotype'])
-    ## Boxplots
+    ## Boxplots #todo : figure out why it's not working for the NDDs, compare with previous ones if necessary, or refactor the code
     # content count
     for key in feature_dict.keys():
         box_plotter(data=mobi_cont_count_df.loc[(slice(None), key), phens_lst],
@@ -182,22 +183,22 @@ if __name__ == '__main__':
     # content fraction
     for key in feature_dict.keys():
         violin_plotter(data=mobi_disorder_df.loc[(slice(None), key), phens_lst],
-                    save_route=(cfg.plots['vv-cf'] + '/' + key + '-cf' + '.png'),
-                    title=feature_dict[key][0], ylabel='Content (%)', ylim=feature_dict[key][2])
+                       save_route=(cfg.plots['vv-cf'] + '/' + key + '-cf' + '.png'),
+                       title=feature_dict[key][0], ylabel='Content (%)', ylim=feature_dict[key][2])
     # Length
     violin_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-                save_route=(cfg.plots['vv-len'] + '/' + 'len4200' + '.png'),
-                title='Protein sequence length', ylabel='Residues count', ylim=4200)
+                   save_route=(cfg.plots['vv-len'] + '/' + 'len4200' + '.png'),
+                   title='Protein sequence length', ylabel='Residues count', ylim=4200)
 
     ## writing data statistics to CSV
     pd.set_option('display.max_columns', None)
     pd.set_option('display.max_rows', None)
     for each_f in features_lst:
         mobi_disorder_df.loc[(slice(None), each_f), phens_lst].describe().T. \
-            to_csv(cfg.data['phens'] + '/content_fraction-each feature/' + each_f + '-cf.csv')
+            to_csv(cfg.data['var-desc-cf'] + each_f + '-cf.csv')
         mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
-            to_csv(cfg.data['phens'] + '/content_count-each feature/' + each_f + '-cc.csv')
-    mobi_length_df.loc[slice(None), phens_lst].describe().T.to_csv(cfg.data['phens'] + '/length-stats-new.csv')
+            to_csv(cfg.data['var-desc-cc'] + each_f + '-cc.csv')
+    mobi_length_df.loc[slice(None), phens_lst].describe().T.to_csv(cfg.data['var-desc-len'] + '/length-stats.csv')
 
     # sig_pep_percent_df = sig_pep_percent_df_maker()
     # transmem_pr_percent_df = transmem_pr_percent_df_maker()
