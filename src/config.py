@@ -14,10 +14,13 @@ data = {
     'xml': absolute + 'data/xml',
     'xml-p': absolute + 'data/xml/parsed',
     'vars': absolute + 'data/variants',
-    'var-desc': absolute + 'data/variants/descriptions',
-    'var-desc-cf': absolute + 'data/variants/descriptions/cf',
-    'var-desc-cc': absolute + 'data/variants/descriptions/cc',
-    'var-desc-len': absolute + 'data/variants/descriptions/length'
+    'var-desc-cf': absolute + 'data/variants/desc-idrvars/cf',
+    'var-desc-cc': absolute + 'data/variants/desc-idrvars/cc',
+    'var-desc-len': absolute + 'data/variants/desc-idrvars/length',
+    'all-var-desc-cf': absolute + 'data/variants/desc-allvariant/cf',
+    'all-var-desc-cc': absolute + 'data/variants/desc-allvariant/cc',
+    'all-var-desc-len': absolute + 'data/variants/desc-allvariant/length',
+
 
 }
 plots = {
@@ -32,13 +35,20 @@ plots = {
     'vio-cc': absolute + 'plots/g4dn/violinplot/cc',
     'vio-len': absolute + 'plots/g4dn/violinplot/length',
     'vars': absolute + 'plots/variants',
-    'vb-cf': absolute + 'plots/variants/boxplot/cf',
-    'vb-cc': absolute + 'plots/variants/boxplot/cc',
-    'vb-len': absolute + 'plots/variants/boxplot/length',
-    'vv-cf': absolute + 'plots/variants/violinplot/cf',
-    'vv-cc': absolute + 'plots/variants/violinplot/cc',
-    'vv-len': absolute + 'plots/variants/violinplot/length',
-    'var-bar': absolute + 'plots/variants/barplot',
+    'vb-cf': absolute + 'plots/variants/inIDR/boxplot/cf',
+    'vb-cc': absolute + 'plots/variants/inIDR/boxplot/cc',
+    'vb-len': absolute + 'plots/variants/inIDR/boxplot/length',
+    'vv-cf': absolute + 'plots/variants/inIDR/violinplot/cf',
+    'vv-cc': absolute + 'plots/variants/inIDR/violinplot/cc',
+    'vv-len': absolute + 'plots/variants/inIDR/violinplot/length',
+    'var-bar': absolute + 'plots/variants/inIDR/barplot',
+    'avb-cf': absolute + 'plots/variants/allVars/boxplot/cf',
+    'avb-cc': absolute + 'plots/variants/allVars/boxplot/cc',
+    'avb-len': absolute + 'plots/variants/allVars/boxplot/length',
+    'avv-cf': absolute + 'plots/variants/allVars/violinplot/cf',
+    'avv-cc': absolute + 'plots/variants/allVars/violinplot/cc',
+    'avv-len': absolute + 'plots/variants/allVars/violinplot/length',
+    'avar-bar': absolute + 'plots/variants/allVars/barplot',
 
 
 }

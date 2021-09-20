@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from matplotlib import ticker as mticker
 import seaborn as sns
 import varAnalysis as var
-## trying mobibool for all vars
+
 
 def mobi_phens_col_maker(df1_mobi, df2, df3):
     # mobidb
