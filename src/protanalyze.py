@@ -50,11 +50,13 @@ def phens_union_df_maker(phen_acc_dic):
 
 if __name__ == '__main__':
     phens_lst = ['Human', 'Brain', 'ASD', 'EE', 'ID', 'DD', 'SCZ', 'NDDs', 'Control']
-    _, _, ndd_subdf = var.all_vars_or_vars_inidr('all')
-    ndd_subdf = ndd_subdf.drop_duplicates()  #
+    _, _, ndd_allvar_subdf = var.all_vars_or_vars_inidr('all')
+    ndd_allvar_subdf = ndd_allvar_subdf.drop_duplicates()
+    _, _, ndd_idrvar_subdf = var.all_vars_or_vars_inidr('idr')
+    ndd_idrvar_subdf = ndd_idrvar_subdf.drop_duplicates()
     # Dictionary with phen as key and their corresponding  list of ACCs as value
-    phens_acc_dict_all = human_brain_acc_adder(phens_acc_dict_maker(phens_lst, ndd_subdf), 'all')
-    phens_acc_dict_idr = human_brain_acc_adder(phens_acc_dict_maker(phens_lst, ndd_subdf), 'idr')
+    phens_acc_dict_all = human_brain_acc_adder(phens_acc_dict_maker(phens_lst, ndd_allvar_subdf), 'all')
+    phens_acc_dict_idr = human_brain_acc_adder(phens_acc_dict_maker(phens_lst, ndd_idrvar_subdf), 'idr')
     # todo: change this class's code to have all and idr vars at the same time, purpose = to be divided by each other
 
     ## Intersection and Union

@@ -29,10 +29,9 @@ def all_vars_or_vars_inidr(input):
     del all_vars['Unnamed: 0_x']
     del all_vars['Unnamed: 0_y']
     ## filtering only the disorder features mobidb lite and majority
-    vars_in_idr_df = vars_in_idr_df.loc[vars_in_idr_df.feature == 'prediction-disorder-mobidb_lite'
-                                        | vars_in_idr_df.feature == 'prediction-disorder-th_50']
-    all_vars = all_vars.loc[all_vars.feature == 'prediction-disorder-mobidb_lite'
-                                        | all_vars.feature == 'prediction-disorder-th_50']
+    feaures_lst = ['prediction-disorder-mobidb_lite', 'prediction-disorder-th_50']
+    vars_in_idr_df = vars_in_idr_df[vars_in_idr_df.feature.isin(feaures_lst)]
+    all_vars = all_vars[all_vars.feature.isin(feaures_lst)]
     if input == 'all':
         return vars_df_generator(all_vars)
     elif input == 'idr':
