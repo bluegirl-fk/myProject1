@@ -28,6 +28,11 @@ def all_vars_or_vars_inidr(input):
     all_vars = pd.read_csv(cfg.data['vars'] + '/all-variants-mobidb-merged.csv')
     del all_vars['Unnamed: 0_x']
     del all_vars['Unnamed: 0_y']
+    ## filtering only the disorder features mobidb lite and majority
+    vars_in_idr_df = vars_in_idr_df.loc[vars_in_idr_df.feature == 'prediction-disorder-mobidb_lite'
+                                        | vars_in_idr_df.feature == 'prediction-disorder-th_50']
+    all_vars = all_vars.loc[all_vars.feature == 'prediction-disorder-mobidb_lite'
+                                        | all_vars.feature == 'prediction-disorder-th_50']
     if input == 'all':
         return vars_df_generator(all_vars)
     elif input == 'idr':

@@ -64,3 +64,6 @@ if __name__ == '__main__':
     # https://github.com/dexplo/dataframe_image very useful for saving pandas styler figures or jupyterlab to pdf
     phens_union_all_df = phens_union_df_maker(phens_acc_dict_all)
     phens_union_idr_df = phens_union_df_maker(phens_acc_dict_idr)
+
+    ## percentage of vars that are occuring in IDR regions
+    # divided and * 100
