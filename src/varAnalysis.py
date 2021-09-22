@@ -1,5 +1,8 @@
 # this is to perform previous analysis which was done in mobibool and protanalyse but for 'variants in IDR' dataset
 # Sep 17th
+from itertools import count
+
+import numpy as np
 import pandas as pd
 from pandas import DataFrame
 import config as cfg
@@ -47,7 +50,17 @@ brain_prot_lst = brn.brain_pr_lst_generator()  # n: 8320
 
 vars_all_majority = pd.read_csv(cfg.data['vars'] + '/dismajority-vars-with-isin-column.csv')
 # print(vars_in_idr_majority['acc'].value_counts(dropna=False))
-ndf = vars_all_majority[vars_all_majority.duplicated(subset=['acc'], keep=False)]
+# ndf = vars_all_majority[vars_all_majority.duplicated(subset=['acc'], keep=False)]
+acc_count_dict = (vars_all_majority.pivot_table(columns=['acc'], aggfunc='size')).to_dict()
+# dict values to list so that I could append other data to dict values
+for key, value in acc_count_dict.items():
+    acc_count_dict[key] = [value]
+for k in acc_count_dict: # adds the count of each acc var being in idr
+    each_acc_vars_in_idr_count = vars_all_majority.loc[vars_all_majority['acc'] == k, 'isin_idr'].sum()
+    acc_count_dict[k].append(each_acc_vars_in_idr_count)
+# dict to df
+acc_counts_df = pd.DataFrame.from_dict(acc_count_dict, orient='index', columns=['total_vars', 'in_idr_vars'])
+acc_counts_df['percentage'] = (acc_counts_df['in_idr_vars']*100)/acc_counts_df['total_vars']
 
 
 
