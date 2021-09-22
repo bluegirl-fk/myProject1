@@ -15,7 +15,8 @@ def phens_acc_dict_maker(phen_lst, phens_df):  # TODO: later try to use these tw
 
 
 def human_brain_acc_adder(phens_dict, vartype):
-    mobidb, brain, _ = var.all_vars_or_vars_inidr(vartype)
+    mobidb, brain, _ = var.all_vars_or_vars_inidr(vartype)  # this creates dfs from varanalysis class
+    # (all vars or only vars that are in IDR)
     human_lst = list(set(mobidb['acc'].tolist()))
     brain_lst = list(set(brain['acc'].tolist()))
     phens_dict['Human'] = human_lst
@@ -26,10 +27,10 @@ def human_brain_acc_adder(phens_dict, vartype):
 def phens_intersect_df_maker(phen_acc_dic):
     # gets dictionary with phen as key and their uniprot IDs as values,
     intersection_df = pd.DataFrame(index=phen_acc_dic.keys(), columns=phen_acc_dic.keys())
-    for key1 in phens_acc_dict.keys():
+    for key1 in phen_acc_dic.keys():
         intersection_count_lst = []
-        for key2 in phens_acc_dict.keys():
-            count_tmp = len(list(set(phens_acc_dict[key1]) & set(phens_acc_dict[key2])))  # this lst contains the ACCs
+        for key2 in phen_acc_dic.keys():
+            count_tmp = len(list(set(phen_acc_dic[key1]) & set(phen_acc_dic[key2])))  # this lst contains the ACCs
             # can achieve the mutual ACCs by storing the list in the upper line in a dict of dics or df cell
             intersection_count_lst.append(count_tmp)
         intersection_df[key1] = intersection_count_lst
@@ -38,10 +39,10 @@ def phens_intersect_df_maker(phen_acc_dic):
 
 def phens_union_df_maker(phen_acc_dic):
     union_df = pd.DataFrame(index=phen_acc_dic.keys(), columns=phen_acc_dic.keys())
-    for key1 in phens_acc_dict.keys():
+    for key1 in phen_acc_dic.keys():
         union_count_lst = []
-        for key2 in phens_acc_dict.keys():
-            count_tmp = len(list(set(phens_acc_dict[key1]) | set(phens_acc_dict[key2])))
+        for key2 in phen_acc_dic.keys():
+            count_tmp = len(list(set(phen_acc_dic[key1]) | set(phen_acc_dic[key2])))
             union_count_lst.append(count_tmp)
         union_df[key1] = union_count_lst
     return union_df
@@ -52,12 +53,14 @@ if __name__ == '__main__':
     _, _, ndd_subdf = var.all_vars_or_vars_inidr('all')
     ndd_subdf = ndd_subdf.drop_duplicates()  #
     # Dictionary with phen as key and their corresponding  list of ACCs as value
-    phens_acc_dict = human_brain_acc_adder(phens_acc_dict_maker(phens_lst, ndd_subdf), 'all')
-    phens_acc_dict2 = human_brain_acc_adder(phens_acc_dict_maker(phens_lst, ndd_subdf), 'idr')
+    phens_acc_dict_all = human_brain_acc_adder(phens_acc_dict_maker(phens_lst, ndd_subdf), 'all')
+    phens_acc_dict_idr = human_brain_acc_adder(phens_acc_dict_maker(phens_lst, ndd_subdf), 'idr')
     # todo: change this class's code to have all and idr vars at the same time, purpose = to be divided by each other
 
     ## Intersection and Union
-    phens_inters_df = phens_intersect_df_maker(phens_acc_dict)
+    phens_inters_all_df = phens_intersect_df_maker(phens_acc_dict_all)
+    phens_inters_idr_df = phens_intersect_df_maker(phens_acc_dict_idr)
     # phens_inters_df.style.bar(subset=["ASD"], color='#FFA07A')
     # https://github.com/dexplo/dataframe_image very useful for saving pandas styler figures or jupyterlab to pdf
-    phens_union_df = phens_union_df_maker(phens_acc_dict)
+    phens_union_all_df = phens_union_df_maker(phens_acc_dict_all)
+    phens_union_idr_df = phens_union_df_maker(phens_acc_dict_idr)
