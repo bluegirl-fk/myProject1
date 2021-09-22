@@ -44,11 +44,10 @@ ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
 ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
 brain_prot_lst = brn.brain_pr_lst_generator()  # n: 8320
 
-vars_all, _, _ = all_vars_or_vars_inidr('all')
-vars_all_majority = vars_all[vars_all.feature == 'prediction-disorder-th_50']
+
+vars_all_majority = pd.read_csv(cfg.data['vars'] + '/dismajority-vars-with-isin-column.csv')
 # print(vars_in_idr_majority['acc'].value_counts(dropna=False))
 ndf = vars_all_majority[vars_all_majority.duplicated(subset=['acc'], keep=False)]
-# TODO from variants class, write the dis majority var all df to csv and use it here.
 
 
 
