@@ -27,8 +27,11 @@ def vars_multiple_df_generator(input_df):
 
 def all_vars_or_vars_inidr(input):
     # input "all" all vars are needed and input 'idr' when only variants inside idr are needed
-    vars_in_idr_df = pd.read_csv(cfg.data['vars'] + '/all-vars-all-features.csv')
-    all_vars = pd.read_csv(cfg.data['vars'] + '/all-vars-mrg-mobidb-with-isin_idr-column.csv')
+    # vars_in_idr_df = pd.read_csv(cfg.data['vars'] + '/all-vars-all-features.csv')
+    # all_vars = pd.read_csv(cfg.data['vars'] + '/all-vars-mrg-mobidb-with-isin_idr-column.csv')
+    ## mobidb_lite
+    vars_in_idr_df = pd.read_csv(cfg.data['vars'] + '/mobidblite-vars-with-isin-column.csv')
+    all_vars = pd.read_csv(cfg.data['vars'] + '/mobidb-lite-idrvars-percentage.csv')
     del all_vars['Unnamed: 0_x']
     del all_vars['Unnamed: 0_y']
     ## filtering only the disorder features mobidb lite and majority
@@ -82,4 +85,5 @@ mobidb_lite_var_count_df = var_idr_percentage_creator(df_feature_filterer('predi
 mobidb_lite_var_count_df.to_csv(cfg.data['vars'] + '/mobidb-lite-idrvars-percentage.csv')
 # creating dfs of human, brain and ndd with only proteins that have more than 50% of total vars in idr region
 mobilite_var, brn_var, ndd_var = vars_multiple_df_generator(var_in_idr_percent_df_maker(mobidb_lite_var_count_df, 50))
-ndd_var_lst = ndd_var['acc'].unique().tolist()
+ndd_var_lst = ndd_var['acc'].unique().tolist()  # n: 56
+# now I'm gonna see if this proteins mostly belong to NDDs or no !
