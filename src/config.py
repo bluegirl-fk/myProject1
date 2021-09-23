@@ -20,6 +20,7 @@ data = {
     'all-var-desc-cf': absolute + 'data/variants/desc-allvariant/cf',
     'all-var-desc-cc': absolute + 'data/variants/desc-allvariant/cc',
     'all-var-desc-len': absolute + 'data/variants/desc-allvariant/length',
+    'dis': absolute + 'data/Disprot',
 
 
 }
