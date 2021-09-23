@@ -30,8 +30,10 @@ def all_vars_or_vars_inidr(input):
     # vars_in_idr_df = pd.read_csv(cfg.data['vars'] + '/all-vars-all-features.csv')
     # all_vars = pd.read_csv(cfg.data['vars'] + '/all-vars-mrg-mobidb-with-isin_idr-column.csv')
     ## mobidb_lite
-    vars_in_idr_df = pd.read_csv(cfg.data['vars'] + '/mobidblite-vars-with-isin-column.csv')
+    vars_in_idr_df = mobilite_idr_vars_count_df
+    vars_in_idr_df = idrvar_treshold_df_maker(vars_in_idr_df, 50)
     all_vars = pd.read_csv(cfg.data['vars'] + '/mobidb-lite-idrvars-percentage.csv')
+    all_vars = idrvar_treshold_df_maker(all_vars, 50)
     del all_vars['Unnamed: 0_x']
     del all_vars['Unnamed: 0_y']
     ## filtering only the disorder features mobidb lite and majority
@@ -70,7 +72,7 @@ def var_idr_percentage_creator(df):  # a percentage column for variants in IDR /
     return mrg_var_and_percentage_df
 
 
-def var_in_idr_percent_df_maker(inpt_df, in_idr_treshhold):
+def idrvar_treshold_df_maker(inpt_df, in_idr_treshhold):
     df = inpt_df.loc[inpt_df['percentage'] > in_idr_treshhold]
     return df
 
@@ -83,7 +85,11 @@ brain_prot_lst = brn.brain_pr_lst_generator()  # n: 8320
 
 mobidb_lite_var_count_df = var_idr_percentage_creator(df_feature_filterer('prediction-disorder-mobidb_lite'))
 mobidb_lite_var_count_df.to_csv(cfg.data['vars'] + '/mobidb-lite-idrvars-percentage.csv')
+mobilite_inidr_var_df = pd.read_csv(cfg.data['vars'] + '/muts-in-IDR-mobidb_lite.csv')
+mobilite_inidr_lst = mobilite_inidr_var_df['acc'].unique().tolist()
+mobilite_idr_vars_count_df = mobidb_lite_var_count_df.loc[mobidb_lite_var_count_df.acc.isin(mobilite_inidr_lst)]
+
 # creating dfs of human, brain and ndd with only proteins that have more than 50% of total vars in idr region
-mobilite_var, brn_var, ndd_var = vars_multiple_df_generator(var_in_idr_percent_df_maker(mobidb_lite_var_count_df, 50))
+mobilite_var, brn_var, ndd_var = vars_multiple_df_generator(idrvar_treshold_df_maker(mobidb_lite_var_count_df, 50))
 ndd_var_lst = ndd_var['acc'].unique().tolist()  # n: 56
 # now I'm gonna see if this proteins mostly belong to NDDs or no !
