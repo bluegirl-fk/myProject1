@@ -9,7 +9,7 @@ import config as cfg
 import brain as brn
 
 
-def vars_df_generator(input_df):
+def vars_multiple_df_generator(input_df):
     # gets df as input (either merged mobidb with all variants or the variants in IDR), then creates ndd and brain subdf
     # based on proteins in the var dataset, basically deletes ACCs from ndd and brain that don't exist in the human var
     # list, then these dfs will be used in mobibool or protanalysis
@@ -36,9 +36,9 @@ def all_vars_or_vars_inidr(input):
     vars_in_idr_df = vars_in_idr_df[vars_in_idr_df.feature.isin(feaures_lst)]
     all_vars = all_vars[all_vars.feature.isin(feaures_lst)]
     if input == 'all':
-        return vars_df_generator(all_vars)
+        return vars_multiple_df_generator(all_vars)
     elif input == 'idr':
-        return vars_df_generator(vars_in_idr_df)
+        return vars_multiple_df_generator(vars_in_idr_df)
 
 
 def df_feature_filterer(feature):  # this generates a filtered df with the desired mobidb feature filtered then it will
@@ -67,6 +67,11 @@ def var_idr_percentage_creator(df):  # a percentage column for variants in IDR /
     return mrg_var_and_percentage_df
 
 
+def var_in_idr_percent_df_maker(inpt_df, in_idr_treshhold):
+    df = inpt_df.loc[inpt_df['percentage'] > in_idr_treshhold]
+    return df
+
+
 ## NDD and brain original import
 ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
 ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
@@ -75,3 +80,6 @@ brain_prot_lst = brn.brain_pr_lst_generator()  # n: 8320
 
 mobidb_lite_var_count_df = var_idr_percentage_creator(df_feature_filterer('prediction-disorder-mobidb_lite'))
 mobidb_lite_var_count_df.to_csv(cfg.data['vars'] + '/mobidb-lite-idrvars-percentage.csv')
+# creating dfs of human, brain and ndd with only proteins that have more than 50% of total vars in idr region
+mobilite_var, brn_var, ndd_var = vars_multiple_df_generator(var_in_idr_percent_df_maker(mobidb_lite_var_count_df, 50))
+ndd_var_lst = ndd_var['acc'].unique().tolist()
