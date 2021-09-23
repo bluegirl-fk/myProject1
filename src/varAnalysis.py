@@ -17,7 +17,7 @@ def vars_multiple_df_generator(input_df):
     ## ndds in variants
     ndd_in_var = list(set(ndd_pr_lst).intersection(var_pr_lst))
     ndd_in_var_subdf = ndd_subdf[ndd_subdf.acc.isin(ndd_in_var)]
-    del ndd_in_var_subdf['Unnamed: 0']
+    # del ndd_in_var_subdf['Unnamed: 0']
     ## Brain
     brain_var_lst = list(set(brain_prot_lst).intersection(var_pr_lst))
     brain_var_subdf = DataFrame(brain_var_lst, columns=['acc'])
@@ -31,15 +31,13 @@ def all_vars_or_vars_inidr(input):
     # all_vars = pd.read_csv(cfg.data['vars'] + '/all-vars-mrg-mobidb-with-isin_idr-column.csv')
     ## mobidb_lite
     vars_in_idr_df = mobilite_idr_vars_count_df
-    vars_in_idr_df = idrvar_treshold_df_maker(vars_in_idr_df, 50)
+    vars_in_idr_df = idrvar_treshold_df_maker(vars_in_idr_df, 20)
     all_vars = pd.read_csv(cfg.data['vars'] + '/mobidb-lite-idrvars-percentage.csv')
-    all_vars = idrvar_treshold_df_maker(all_vars, 50)
-    del all_vars['Unnamed: 0_x']
-    del all_vars['Unnamed: 0_y']
+    # all_vars = idrvar_treshold_df_maker(all_vars, 50)
     ## filtering only the disorder features mobidb lite and majority
-    feaures_lst = ['prediction-disorder-mobidb_lite', 'prediction-disorder-th_50']
-    vars_in_idr_df = vars_in_idr_df[vars_in_idr_df.feature.isin(feaures_lst)]
-    all_vars = all_vars[all_vars.feature.isin(feaures_lst)]
+    # feaures_lst = ['prediction-disorder-mobidb_lite', 'prediction-disorder-th_50']
+    # vars_in_idr_df = vars_in_idr_df[vars_in_idr_df.feature.isin(feaures_lst)]
+    # all_vars = all_vars[all_vars.feature.isin(feaures_lst)]
     if input == 'all':
         return vars_multiple_df_generator(all_vars)
     elif input == 'idr':
@@ -93,3 +91,4 @@ mobilite_idr_vars_count_df = mobidb_lite_var_count_df.loc[mobidb_lite_var_count_
 mobilite_var, brn_var, ndd_var = vars_multiple_df_generator(idrvar_treshold_df_maker(mobidb_lite_var_count_df, 50))
 ndd_var_lst = ndd_var['acc'].unique().tolist()  # n: 56
 # now I'm gonna see if this proteins mostly belong to NDDs or no !
+df = all_vars_or_vars_inidr('all')
