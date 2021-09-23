@@ -2,5 +2,9 @@
 import pandas as pd
 import config as cfg
 
+disprot = pd.read_csv(cfg.data['dis'] + '/DisProt release_2021_08 with_ambiguous_evidences.tsv', sep='\t')
+variant_count = pd.read_csv(cfg.data['vars'] + '/variants-count-and-hotspots.csv')
+variant_count = variant_count.loc[variant_count['percentage'] > 50]
+variant_count = variant_count.rename(columns={'Unnamed: 0': 'acc'})
 
-Disprot = pd.read_csv()
+var_disprot = pd.merge(disprot, variant_count, on='acc')

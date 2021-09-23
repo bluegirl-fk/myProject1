@@ -69,8 +69,10 @@ disorder_majority_mrg = pd.merge(disorder_majority, var_prs_df, on='acc')
 ## DFs with muts only inside IDR
 lite_mut_in_df, dismaj_mut_in_df, vars_in_df = in_idr_df_generator([mobidb_lite_mrg, disorder_majority_mrg, vars_mrg])
 ## to CSV
+##isin_idr column
 disorder_majority_mrg.to_csv(cfg.data['vars'] + '/dismajority-vars-with-isin-column.csv')
-
+vars_mrg.to_csv(cfg.data['vars'] + '/all-vars-mrg-mobidb-with-isin_idr-column.csv')
+# inIDR
 lite_mut_in_df.to_csv(cfg.data['vars'] + '/muts-in-IDR-mobidb_lite.csv')
 dismaj_mut_in_df.to_csv(cfg.data['vars'] + '/muts-in-IDR-disorder_majority.csv')
 vars_in_df.to_csv(cfg.data['vars'] + '/all-vars-all-features.csv')

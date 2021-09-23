@@ -28,7 +28,7 @@ def vars_df_generator(input_df):
 def all_vars_or_vars_inidr(input):
     # input "all" all vars are needed and input 'idr' when only variants inside idr are needed
     vars_in_idr_df = pd.read_csv(cfg.data['vars'] + '/all-vars-all-features.csv')
-    all_vars = pd.read_csv(cfg.data['vars'] + '/all-variants-mobidb-merged.csv')
+    all_vars = pd.read_csv(cfg.data['vars'] + '/all-vars-mrg-mobidb-with-isin_idr-column.csv')
     del all_vars['Unnamed: 0_x']
     del all_vars['Unnamed: 0_y']
     ## filtering only the disorder features mobidb lite and majority
@@ -47,7 +47,7 @@ ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
 ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
 brain_prot_lst = brn.brain_pr_lst_generator()  # n: 8320
 
-
+vars_all_features = pd.read_csv(cfg.data['vars'] + '/all-vars-mrg-mobidb-with-isin_idr-column.csv')
 vars_all_majority = pd.read_csv(cfg.data['vars'] + '/dismajority-vars-with-isin-column.csv')
 # print(vars_in_idr_majority['acc'].value_counts(dropna=False))
 # ndf = vars_all_majority[vars_all_majority.duplicated(subset=['acc'], keep=False)]
@@ -61,7 +61,7 @@ for k in acc_count_dict: # adds the count of each acc var being in idr
 # dict to df
 acc_counts_df = pd.DataFrame.from_dict(acc_count_dict, orient='index', columns=['total_vars', 'in_idr_vars'])
 acc_counts_df['percentage'] = (acc_counts_df['in_idr_vars']*100)/acc_counts_df['total_vars']
-
+acc_counts_df.to_csv(cfg.data['vars'] + '/variants-count-and-hotspots.csv')
 
 
 
