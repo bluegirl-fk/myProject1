@@ -31,7 +31,7 @@ def all_vars_or_vars_inidr(input):
     # all_vars = pd.read_csv(cfg.data['vars'] + '/all-vars-mrg-mobidb-with-isin_idr-column.csv')
     ## mobidb_lite
     vars_in_idr_df = mobilite_idr_vars_count_df
-    vars_in_idr_df = idrvar_treshold_df_maker(vars_in_idr_df, 20)
+    ### vars_in_idr_df = idrvar_treshold_df_maker(vars_in_idr_df, 50)
     all_vars = pd.read_csv(cfg.data['vars'] + '/mobidb-lite-idrvars-percentage.csv')
     # all_vars = idrvar_treshold_df_maker(all_vars, 50)
     ## filtering only the disorder features mobidb lite and majority
@@ -75,6 +75,11 @@ def idrvar_treshold_df_maker(inpt_df, in_idr_treshhold):
     return df
 
 
+def ndd_var_lst():
+    ndd_var_lst = ndd_var['acc'].unique().tolist()
+    return ndd_var_lst
+
+
 ## NDD and brain original import
 ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
 ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
@@ -92,3 +97,6 @@ mobilite_var, brn_var, ndd_var = vars_multiple_df_generator(idrvar_treshold_df_m
 ndd_var_lst = ndd_var['acc'].unique().tolist()  # n: 56
 # now I'm gonna see if this proteins mostly belong to NDDs or no !
 df = all_vars_or_vars_inidr('all')
+
+
+
