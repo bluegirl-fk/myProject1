@@ -27,12 +27,9 @@ def vars_multiple_df_generator(input_df):
 
 def all_vars_or_vars_inidr(all_or_idr):
     # input "all" all vars are needed and input 'idr' when only variants inside idr are needed
-    vars_in_idr_df = pd.read_csv(cfg.data['vars'] + '/all-vars-all-features.csv')
+    vars_in_idr_df = dis_maj_filtered.loc[dis_maj_filtered['isin_idr'] == 1]
     all_vars = pd.read_csv(cfg.data['vars'] + '/all-vars-mrg-mobidb-with-isin_idr-column.csv')
-    ## filtering only the disorder majority
-    feaures_lst = ['prediction-disorder-th_50']
-    vars_in_idr_df = vars_in_idr_df[vars_in_idr_df.feature.isin(feaures_lst)]
-    all_vars = all_vars[all_vars.feature.isin(feaures_lst)]
+    all_vars = all_vars.loc[all_vars['feature'] == 'prediction-disorder-th_50']
     if all_or_idr == 'all':
         return vars_multiple_df_generator(all_vars)
     elif all_or_idr == 'idr':
@@ -61,7 +58,7 @@ def var_countcol_creator(df):  # a percentage column for variants in IDR / all V
     var_count_df = var_count_df.reset_index()
     var_count_df = var_count_df.rename(columns={'index': 'acc'})
     mrg_var_and_count_df = pd.merge(df, var_count_df, on='acc')
-    mrg_var_and_count_df = mrg_var_and_count_df.drop(columns=['Unnamed: 0', 'Unnamed: 0_x', 'Unnamed: 0_y', 'feature'])
+    mrg_var_and_count_df = mrg_var_and_count_df.drop(columns=['Unnamed: 0', 'Unnamed: 0_x', 'Unnamed: 0_y'])
     return mrg_var_and_count_df
 
 
