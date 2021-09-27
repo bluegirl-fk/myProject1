@@ -55,5 +55,4 @@ def xml_parser(xml_file_name):
 # del pr_vars_df['Unnamed: 0']
 # pr_vars_df.to_csv(cfg.data['xml-p'] + '/protein-vars.csv')
 
-# todo: check the final df against the ref lst and make sure all proteins are included, if not they should not be
-#  found in uniprot todo: make dict of acc and corresponding diseases
+# todo: make dict of acc and corresponding diseases
