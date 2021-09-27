@@ -25,23 +25,23 @@ def vars_multiple_df_generator(input_df):
     return input_df, brain_var_subdf, ndd_in_var_subdf
 
 
-def all_vars_or_vars_inidr(input):
-    # input "all" all vars are needed and input 'idr' when only variants inside idr are needed
-    # vars_in_idr_df = pd.read_csv(cfg.data['vars'] + '/all-vars-all-features.csv')
-    # all_vars = pd.read_csv(cfg.data['vars'] + '/all-vars-mrg-mobidb-with-isin_idr-column.csv')
-    ## mobidb_lite
-    vars_in_idr_df = mobilite_idr_vars_count_df
-    ### vars_in_idr_df = idrvar_treshold_df_maker(vars_in_idr_df, 50)
-    all_vars = pd.read_csv(cfg.data['vars'] + '/mobidb-lite-idrvars-percentage.csv')
-    # all_vars = idrvar_treshold_df_maker(all_vars, 50)
-    ## filtering only the disorder features mobidb lite and majority
-    # feaures_lst = ['prediction-disorder-mobidb_lite', 'prediction-disorder-th_50']
-    # vars_in_idr_df = vars_in_idr_df[vars_in_idr_df.feature.isin(feaures_lst)]
-    # all_vars = all_vars[all_vars.feature.isin(feaures_lst)]
-    if input == 'all':
-        return vars_multiple_df_generator(all_vars)
-    elif input == 'idr':
-        return vars_multiple_df_generator(vars_in_idr_df)
+# def all_vars_or_vars_inidr(input):
+#     # input "all" all vars are needed and input 'idr' when only variants inside idr are needed
+#     # vars_in_idr_df = pd.read_csv(cfg.data['vars'] + '/all-vars-all-features.csv')
+#     # all_vars = pd.read_csv(cfg.data['vars'] + '/all-vars-mrg-mobidb-with-isin_idr-column.csv')
+#     ## mobidb_lite
+#     vars_in_idr_df = mobilite_idr_vars_count_df
+#     ### vars_in_idr_df = idrvar_treshold_df_maker(vars_in_idr_df, 50)
+#     all_vars = pd.read_csv(cfg.data['vars'] + '/mobidb-lite-idrvars-percentage.csv')
+#     # all_vars = idrvar_treshold_df_maker(all_vars, 50)
+#     ## filtering only the disorder features mobidb lite and majority
+#     # feaures_lst = ['prediction-disorder-mobidb_lite', 'prediction-disorder-th_50']
+#     # vars_in_idr_df = vars_in_idr_df[vars_in_idr_df.feature.isin(feaures_lst)]
+#     # all_vars = all_vars[all_vars.feature.isin(feaures_lst)]
+#     if input == 'all':
+#         return vars_multiple_df_generator(all_vars)
+#     elif input == 'idr':
+#         return vars_multiple_df_generator(vars_in_idr_df)
 
 
 def df_feature_filterer(feature):  # this generates a filtered df with the desired mobidb feature filtered then it will
@@ -70,15 +70,6 @@ def var_idr_percentage_creator(df):  # a percentage column for variants in IDR /
     return mrg_var_and_percentage_df
 
 
-def idrvar_treshold_df_maker(inpt_df, in_idr_treshhold):
-    df = inpt_df.loc[inpt_df['percentage'] > in_idr_treshhold]
-    return df
-
-
-def ndd_var_lst():
-    ndd_var_lst = ndd_var['acc'].unique().tolist()
-    return ndd_var_lst
-
 
 ## NDD and brain original import
 ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
@@ -86,17 +77,7 @@ ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
 ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
 brain_prot_lst = brn.brain_pr_lst_generator()  # n: 8320
 
-mobidb_lite_var_count_df = var_idr_percentage_creator(df_feature_filterer('prediction-disorder-mobidb_lite'))
-mobidb_lite_var_count_df.to_csv(cfg.data['vars'] + '/mobidb-lite-idrvars-percentage.csv')
-mobilite_inidr_var_df = pd.read_csv(cfg.data['vars'] + '/muts-in-IDR-mobidb_lite.csv')
-mobilite_inidr_lst = mobilite_inidr_var_df['acc'].unique().tolist()
-mobilite_idr_vars_count_df = mobidb_lite_var_count_df.loc[mobidb_lite_var_count_df.acc.isin(mobilite_inidr_lst)]
 
-# creating dfs of human, brain and ndd with only proteins that have more than 50% of total vars in idr region
-mobilite_var, brn_var, ndd_var = vars_multiple_df_generator(idrvar_treshold_df_maker(mobidb_lite_var_count_df, 50))
-ndd_var_lst = ndd_var['acc'].unique().tolist()  # n: 56
-# now I'm gonna see if this proteins mostly belong to NDDs or no !
-df = all_vars_or_vars_inidr('all')
-
+disorder_majority = df_feature_filterer('prediction-disorder-th_50')
 
 
