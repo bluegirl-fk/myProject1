@@ -46,7 +46,7 @@ def df_feature_filterer(feature):  # this generates a filtered df with the desir
     return vars_my_feature
 
 
-def var_idr_percentage_creator(df):  # a percentage column for variants in IDR / all Vars
+def var_countcol_creator(df):  # a percentage column for variants in IDR / all Vars
     # input it the out put of df_feature_filtered method
     var_count_dic = (df.pivot_table(columns=['acc'], aggfunc='size')).to_dict()
     # dict values to list so that I could append other data to dict values
@@ -57,13 +57,19 @@ def var_idr_percentage_creator(df):  # a percentage column for variants in IDR /
         var_count_dic[k].append(each_acc_vars_in_idr_count)
     # dict to df
     var_count_df = pd.DataFrame.from_dict(var_count_dic, orient='index', columns=['total_vars', 'in_idr_vars'])
-    var_count_df['percentage'] = (var_count_df['in_idr_vars'] * 100) / var_count_df['total_vars']
+    var_count_df['out_idr_vars'] = (var_count_df['total_vars'] - var_count_df['in_idr_vars'])
     var_count_df = var_count_df.reset_index()
     var_count_df = var_count_df.rename(columns={'index': 'acc'})
-    mrg_var_and_percentage_df = pd.merge(df, var_count_df, on='acc')
-    mrg_var_and_percentage_df = mrg_var_and_percentage_df.drop(columns=['Unnamed: 0', 'Unnamed: 0_x', 'Unnamed: 0_y'])
-    return mrg_var_and_percentage_df
+    mrg_var_and_count_df = pd.merge(df, var_count_df, on='acc')
+    mrg_var_and_count_df = mrg_var_and_count_df.drop(columns=['Unnamed: 0', 'Unnamed: 0_x', 'Unnamed: 0_y', 'feature'])
+    return mrg_var_and_count_df
 
+
+def var_cnt_residue_normaliezer(df):  # gets df with count columns for vars in/out idr and normalize them based on
+    # number of disordered residues or non disordered, respectively
+    df['in_idr_vars'] = (df['in_idr_vars'] / df['content_count'])
+    df['out_idr_vars'] = (df['out_idr_vars'] / (df['length'] - df['content_count']))
+    return df
 
 
 ## NDD and brain original import
@@ -71,8 +77,6 @@ ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
 ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
 ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
 brain_prot_lst = brn.brain_pr_lst_generator()  # n: 8320
-
-
-disorder_majority = df_feature_filterer('prediction-disorder-th_50')
-
-
+## Mobidb disorder
+disorder_majority = var_cnt_residue_normaliezer(var_countcol_creator(df_feature_filterer('prediction-disorder-th_50')))
+dis_maj_filtered = disorder_majority.loc[disorder_majority['in_idr_vars'] >= disorder_majority['out_idr_vars']]
