@@ -25,23 +25,18 @@ def vars_multiple_df_generator(input_df):
     return input_df, brain_var_subdf, ndd_in_var_subdf
 
 
-# def all_vars_or_vars_inidr(input):
-#     # input "all" all vars are needed and input 'idr' when only variants inside idr are needed
-#     # vars_in_idr_df = pd.read_csv(cfg.data['vars'] + '/all-vars-all-features.csv')
-#     # all_vars = pd.read_csv(cfg.data['vars'] + '/all-vars-mrg-mobidb-with-isin_idr-column.csv')
-#     ## mobidb_lite
-#     vars_in_idr_df = mobilite_idr_vars_count_df
-#     ### vars_in_idr_df = idrvar_treshold_df_maker(vars_in_idr_df, 50)
-#     all_vars = pd.read_csv(cfg.data['vars'] + '/mobidb-lite-idrvars-percentage.csv')
-#     # all_vars = idrvar_treshold_df_maker(all_vars, 50)
-#     ## filtering only the disorder features mobidb lite and majority
-#     # feaures_lst = ['prediction-disorder-mobidb_lite', 'prediction-disorder-th_50']
-#     # vars_in_idr_df = vars_in_idr_df[vars_in_idr_df.feature.isin(feaures_lst)]
-#     # all_vars = all_vars[all_vars.feature.isin(feaures_lst)]
-#     if input == 'all':
-#         return vars_multiple_df_generator(all_vars)
-#     elif input == 'idr':
-#         return vars_multiple_df_generator(vars_in_idr_df)
+def all_vars_or_vars_inidr(all_or_idr):
+    # input "all" all vars are needed and input 'idr' when only variants inside idr are needed
+    vars_in_idr_df = pd.read_csv(cfg.data['vars'] + '/all-vars-all-features.csv')
+    all_vars = pd.read_csv(cfg.data['vars'] + '/all-vars-mrg-mobidb-with-isin_idr-column.csv')
+    ## filtering only the disorder majority
+    feaures_lst = ['prediction-disorder-th_50']
+    vars_in_idr_df = vars_in_idr_df[vars_in_idr_df.feature.isin(feaures_lst)]
+    all_vars = all_vars[all_vars.feature.isin(feaures_lst)]
+    if all_or_idr == 'all':
+        return vars_multiple_df_generator(all_vars)
+    elif all_or_idr == 'idr':
+        return vars_multiple_df_generator(vars_in_idr_df)
 
 
 def df_feature_filterer(feature):  # this generates a filtered df with the desired mobidb feature filtered then it will
