@@ -52,6 +52,7 @@ if __name__ == '__main__':
     # ptm_checked_dismaj_df = var_in_ptm_checker(dismaj_ptm_df, 'uniprot')
     # ptm_checked_dismaj_df.to_csv(cfg.data['ptm-u'] + '/uniprot-vars-inptm-checked.csv')
     ptm_checked_dismaj_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-vars-inptm-checked.csv')
+    del ptm_checked_dismaj_df['Unnamed: 0']
     var_in_ptm_df = ptm_checked_dismaj_df.loc[ptm_checked_dismaj_df['var_in_ptm'] == 1]  # why the 1 is not string!
     var_in_ptm_lst = var_in_ptm_df['acc'].unique().tolist()
 
