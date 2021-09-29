@@ -20,6 +20,7 @@ def var_in_ptm_checker(input_df):
 
 if __name__ == '__main__':
     ptms_df = pd.read_csv(cfg.data['ptm'] + '/mobidb-parsed-ptm-info.csv', usecols=['acc', 'ptm_pos'])
+    ptms_df = ptms_df[ptms_df['ptm_pos'].notna()]
     disorder_maj = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
     dismaj_ptm_df = pd.merge(disorder_maj, ptms_df, on='acc')
     del dismaj_ptm_df['Unnamed: 0']
