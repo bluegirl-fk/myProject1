@@ -5,7 +5,7 @@ import pandas as pd
 import dateutil
 
 
-def xml_parser(xml_file_name):
+def var_position_parser(xml_file_name):
     NS = {'uniprot': 'http://uniprot.org/uniprot'}
     # tree = ET.parse(cfg.data['xml'] + '/uniprot_example.xml')
     tree = ET.parse(cfg.data['xml'] + xml_file_name)
@@ -45,7 +45,7 @@ def xml_parser(xml_file_name):
     return acc_protinfo
 
 
-# acc_prot_info_lst = xml_parser('/uniprot-reflst-40001tilltheend.xml')
+# acc_prot_info_lst = var_position_parser('/uniprot-reflst-40001tilltheend.xml')
 # df = pd.DataFrame(acc_prot_info_lst, columns=['acc', 'var_id', 'description', 'orig_aa', 'var_aa', 'position'])
 # df.to_csv(cfg.data['xml-p'] + '/uniprot_variants-parsed-40001tillend.csv')
 ## merging two dataframes:
