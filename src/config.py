@@ -23,6 +23,7 @@ data = {
     'dis': absolute + 'data/Disprot',
     'jsn': absolute + 'data/json',
     'ptm': absolute + 'data/ptms',
+    'ptm-u': absolute + 'data/ptms/uniprot-ptms',
 
 
 }
