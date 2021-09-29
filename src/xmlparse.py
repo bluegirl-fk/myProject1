@@ -78,12 +78,12 @@ def ptm_parser(file_name):
                                 [acc, None, begin.attrib['position'] + '&' + end.attrib['status'], 'disulfide bond'])
 
 
-# df = pd.DataFrame(acc_ptm_lst, columns=['acc', 'description', 'pos', 'ptm_type'])
-ptm1 = pd.read_csv(cfg.data['ptm-u'] + '/uniprot_parsed-ptms-1to40k.csv')
-ptm2 = pd.read_csv(cfg.data['ptm-u'] + '/uniprot_parsed-ptms-40001totheend.csv')
-del ptm1['Unnamed: 0']
-del ptm2['Unnamed: 0']
-
-ptm_df = ptm1.append(ptm2, ignore_index=True)
-ptm_df.to_csv(cfg.data['ptm-u'] + '/uniprot-ptms-all.csv')
+# # df = pd.DataFrame(acc_ptm_lst, columns=['acc', 'description', 'pos', 'ptm_type'])
+# ptm1 = pd.read_csv(cfg.data['ptm-u'] + '/uniprot_parsed-ptms-1to40k.csv')
+# ptm2 = pd.read_csv(cfg.data['ptm-u'] + '/uniprot_parsed-ptms-40001totheend.csv')
+# del ptm1['Unnamed: 0']
+# del ptm2['Unnamed: 0']
+#
+# ptm_df = ptm1.append(ptm2, ignore_index=True)
+# ptm_df.to_csv(cfg.data['ptm-u'] + '/uniprot-ptms-all.csv')
 
