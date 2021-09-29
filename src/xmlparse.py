@@ -86,4 +86,6 @@ def ptm_parser(file_name):
 #
 # ptm_df = ptm1.append(ptm2, ignore_index=True)
 # ptm_df.to_csv(cfg.data['ptm-u'] + '/uniprot-ptms-all.csv')
-
+# ptm_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-ptms-all.csv')
+# ptm_df = ptm_df.rename(columns={'pos': 'ptm_pos'})
+# ptm_df.to_csv(cfg.data['ptm-u'] + '/uniprot-ptms-all.csv')
