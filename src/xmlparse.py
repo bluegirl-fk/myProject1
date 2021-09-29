@@ -45,14 +45,4 @@ def var_position_parser(xml_file_name):
     return acc_protinfo
 
 
-# acc_prot_info_lst = var_position_parser('/uniprot-reflst-40001tilltheend.xml')
-# df = pd.DataFrame(acc_prot_info_lst, columns=['acc', 'var_id', 'description', 'orig_aa', 'var_aa', 'position'])
-# df.to_csv(cfg.data['xml-p'] + '/uniprot_variants-parsed-40001tillend.csv')
-## merging two dataframes:
-# pr_vars_1to40k_df = pd.read_csv(cfg.data['xml-p'] + '/uniprot_variants-parsed-1to40000.csv')
-# pr_vars_40Ktoend_df = pd.read_csv(cfg.data['xml-p'] + '/uniprot_variants-parsed-40001tillend.csv')
-# pr_vars_df = pr_vars_1to40k_df.append(pr_vars_40Ktoend_df, ignore_index=True)
-# del pr_vars_df['Unnamed: 0']
-# pr_vars_df.to_csv(cfg.data['xml-p'] + '/protein-vars.csv')
-
-# todo: make dict of acc and corresponding diseases
+# #PTM parser
