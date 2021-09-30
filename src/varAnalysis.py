@@ -9,6 +9,7 @@ import config as cfg
 import brain as brn
 
 
+
 def vars_multiple_df_generator(input_df):
     # gets df as input (either merged mobidb with all variants or the variants in IDR), then creates ndd and brain subdf
     # based on proteins in the var dataset, basically deletes ACCs from ndd and brain that don't exist in the human var
