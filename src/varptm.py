@@ -44,7 +44,7 @@ def var_in_ptm_checker(input_df, resource):
 
 
 if __name__ == '__main__':
-    ptms_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-ptms-all.csv', usecols=['acc', 'ptm_pos', 'ptm_type'])
+    ptms_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-ptms-all.csv', usecols=['acc', 'ptm_pos', 'ptm_type', 'description'])
     disorder_maj = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv', usecols=
     ['acc', 'var_id', 'orig_aa', 'var_aa', 'position', 'isin_idr', 'total_vars', 'in_idr_vars', 'out_idr_vars'])
     dismaj_ptm_df = pd.merge(disorder_maj, ptms_df, on='acc')
@@ -53,7 +53,8 @@ if __name__ == '__main__':
     # ptm_checked_dismaj_df.to_csv(cfg.data['ptm-u'] + '/uniprot-vars-inptm-checked.csv')
     ptm_checked_dismaj_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-vars-inptm-checked.csv')
     del ptm_checked_dismaj_df['Unnamed: 0']
-    var_in_ptm_df = ptm_checked_dismaj_df.loc[ptm_checked_dismaj_df['var_in_ptm'] == 1]  # why the 1 is not string!
+    var_in_ptm_df = ptm_checked_dismaj_df.loc[ptm_checked_dismaj_df['var_in_ptm'] == 1]  # (3170,12)
+    # why the 1 is not string!
     var_in_ptm_lst = var_in_ptm_df['acc'].unique().tolist()
 
     ## NDDs with variation in PTM sites: n= 35

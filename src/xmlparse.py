@@ -52,7 +52,7 @@ def ptm_parser(file_name):
     tree = ET.parse(cfg.data['xml'] + file_name)
     root = tree.getroot()
     entries = root.findall('uniprot:entry', NS)
-    ptm_types = ['modified residue', 'glycosylation site', 'cross-link']  # disulfide bond not working
+    ptm_types = ['modified residue', 'glycosylation site', 'cross-link']
     acc_ptm_lst = []
     for entry in entries:
         acc = (entry.find('uniprot:accession', NS)).text

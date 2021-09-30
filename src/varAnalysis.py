@@ -64,8 +64,12 @@ def var_countcol_creator(df):  # a percentage column for variants in IDR / all V
 
 def var_cnt_residue_normaliezer(df):  # gets df with count columns for vars in/out idr and normalize them based on
     # number of disordered residues or non disordered, respectively
-    df['in_idr_vars'] = (df['in_idr_vars'] / df['content_count'])
-    df['out_idr_vars'] = (df['out_idr_vars'] / (df['length'] - df['content_count']))
+    df['in_idr_vars_perc'] = (df['in_idr_vars'] / df['content_count'])
+    df['out_idr_vars_perc'] = (df['out_idr_vars'] / (df['length'] - df['content_count']))
+    ## now we will divide each by sum of the calculated data for in+out IDRs to produce complementary % values for cols
+    sum_of_normalized_vars = df['in_idr_vars_perc']+df['out_idr_vars_perc']
+    df['in_idr_vars_perc'] = df['in_idr_vars_perc']/sum_of_normalized_vars
+    df['out_idr_vars_perc'] = df['out_idr_vars_perc']/sum_of_normalized_vars
     return df
 
 
@@ -75,9 +79,9 @@ ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
 ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
 brain_prot_lst = brn.brain_pr_lst_generator()  # n: 8320
 ## Mobidb disorder
-# disorder_majority = var_cnt_residue_normaliezer(var_countcol_creator(df_feature_filterer('prediction-disorder-th_50')))
-# disorder_majority.to_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
-disorder_majority = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
+disorder_majority = var_cnt_residue_normaliezer(var_countcol_creator(df_feature_filterer('prediction-disorder-th_50')))
+disorder_majority.to_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
+# disorder_majority = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
 
 # 4631 unique ACCs
 dis_maj_filtered = disorder_majority.loc[disorder_majority['in_idr_vars'] >= disorder_majority['out_idr_vars']]

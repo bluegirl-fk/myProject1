@@ -57,7 +57,6 @@ if __name__ == '__main__':
     # Dictionary with phen as key and their corresponding  list of ACCs as value
     phens_acc_dict_all = human_brain_acc_adder(phens_acc_dict_maker(phens_lst, ndd_allvar_subdf), 'all')
     phens_acc_dict_idr = human_brain_acc_adder(phens_acc_dict_maker(phens_lst, ndd_idrvar_subdf), 'idr')
-    # todo: change this class's code to have all and idr vars at the same time, purpose = to be divided by each other
 
     ## Intersection and Union
     phens_inters_all_df = phens_intersect_df_maker(phens_acc_dict_all)
