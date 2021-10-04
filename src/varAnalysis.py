@@ -7,7 +7,7 @@ import pandas as pd
 from pandas import DataFrame
 import config as cfg
 import brain as brn
-
+import seaborn as sns
 
 
 def vars_multiple_df_generator(input_df):
@@ -80,9 +80,11 @@ ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
 ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
 brain_prot_lst = brn.brain_pr_lst_generator()  # n: 8320
 ## Mobidb disorder
-disorder_majority = var_cnt_residue_normaliezer(var_countcol_creator(df_feature_filterer('prediction-disorder-th_50')))
-disorder_majority.to_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
-# disorder_majority = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
+# disorder_majority = var_cnt_residue_normaliezer(var_countcol_creator(df_feature_filterer('prediction-disorder-th_50')))
+# disorder_majority.to_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
+disorder_majority = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
 
 # 4631 unique ACCs
 dis_maj_filtered = disorder_majority.loc[disorder_majority['in_idr_vars'] >= disorder_majority['out_idr_vars']]
+
+
