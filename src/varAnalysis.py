@@ -28,9 +28,9 @@ def vars_multiple_df_generator(input_df):
 
 def all_vars_or_vars_inidr(all_or_idr):
     # input "all" all vars are needed and input 'idr' when only variants inside idr are needed
-    vars_in_idr_df = dis_maj_filtered.loc[dis_maj_filtered['isin_idr'] == 1]
     all_vars = pd.read_csv(cfg.data['vars'] + '/all-vars-mrg-mobidb-with-isin_idr-column.csv')
     all_vars = all_vars.loc[all_vars['feature'] == 'prediction-disorder-th_50']
+    vars_in_idr_df = all_vars.loc[all_vars['isin_idr'] == 1]
     if all_or_idr == 'all':
         return vars_multiple_df_generator(all_vars)
     elif all_or_idr == 'idr':
@@ -74,6 +74,30 @@ def var_cnt_residue_normaliezer(df):  # gets df with count columns for vars in/o
     return df
 
 
+def var_residue_stats_table_generator(input_vardf):
+    # the values of number of vars in idr and out idr, number of residues for vars inidr and outidr generated,
+    # converted to dict and then data frame, it was kept in mind that even though several vars could exist per protein,
+    # residues of disorder or order regions are counted once
+    vars_in_count = len(input_vardf.loc[input_vardf['isin_idr'] == 1])
+    vars_out_count = len(input_vardf.loc[input_vardf['isin_idr'] == 0])
+
+    inidr_vars_residue = input_vardf.loc[input_vardf['isin_idr'] == 1, ['acc', 'content_count']]
+    inidr_vars_residue = inidr_vars_residue.drop_duplicates(subset='acc')
+    inidr_vars_residue = int(inidr_vars_residue['content_count'].sum())
+
+    outidr_vars_residue = input_vardf.loc[input_vardf['isin_idr'] == 0, ['acc', 'length', 'content_count']]
+    outidr_vars_residue = outidr_vars_residue.drop_duplicates(subset='acc')
+    outidr_vars_residue['order_res'] = (outidr_vars_residue['length'] - outidr_vars_residue['content_count'])
+    outidr_vars_residue = int(outidr_vars_residue['order_res'].sum())
+    # length_df = input_vardf[['acc', 'length']]
+    # length = length_df['length'].sum()
+    vars_count_dict = {'vars_count': [vars_in_count, vars_out_count, (vars_in_count + vars_out_count)],
+                       'residues': [inidr_vars_residue, outidr_vars_residue,
+                                    (inidr_vars_residue + outidr_vars_residue)]}
+    vars_count_df = pd.DataFrame.from_dict(vars_count_dict, orient='index', columns=['disordered', 'ordered', 'sum'])
+    return vars_count_df
+
+
 ## NDD and brain original import
 ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
 ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
@@ -83,8 +107,11 @@ brain_prot_lst = brn.brain_pr_lst_generator()  # n: 8320
 # disorder_majority = var_cnt_residue_normaliezer(var_countcol_creator(df_feature_filterer('prediction-disorder-th_50')))
 # disorder_majority.to_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
 disorder_majority = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
+## Table of Vars inside and outside plus residues
+var_residue_sum_table = var_residue_stats_table_generator(disorder_majority)
+# def total_var_res_percentage(df): # to generate percentage for the whole dataset
 
 # 4631 unique ACCs
-dis_maj_filtered = disorder_majority.loc[disorder_majority['in_idr_vars'] >= disorder_majority['out_idr_vars']]
+# dis_maj_filtered = disorder_majority.loc[disorder_majority['in_idr_vars'] >= disorder_majority['out_idr_vars']]
 
 
