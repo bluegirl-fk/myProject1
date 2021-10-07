@@ -44,7 +44,8 @@ def var_in_ptm_checker(input_df, resource):
 
 
 if __name__ == '__main__':
-    ptms_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-ptms-all.csv', usecols=['acc', 'ptm_pos', 'ptm_type', 'description'])
+    ptms_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-ptms-all.csv',
+                          usecols=['acc', 'ptm_pos', 'ptm_type', 'description'])
     disorder_maj = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv', usecols=
     ['acc', 'var_id', 'orig_aa', 'var_aa', 'position', 'isin_idr', 'total_vars', 'in_idr_vars', 'out_idr_vars'])
     dismaj_ptm_df = pd.merge(disorder_maj, ptms_df, on='acc')
@@ -63,3 +64,5 @@ if __name__ == '__main__':
     ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
     ndd_var_in_ptm_lst = list(set(ndd_pr_lst).intersection(var_in_ptm_lst))  # n:49
     ndd_var_in_ptm_subdf = ndd_subdf[ndd_subdf.acc.isin(ndd_var_in_ptm_lst)]  # (191,3)
+
+    print(','.join(ndd_var_in_ptm_lst))
