@@ -64,5 +64,9 @@ if __name__ == '__main__':
     ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
     ndd_var_in_ptm_lst = list(set(ndd_pr_lst).intersection(var_in_ptm_lst))  # n:49
     ndd_var_in_ptm_subdf = ndd_subdf[ndd_subdf.acc.isin(ndd_var_in_ptm_lst)]  # (191,3)
-
     print(','.join(ndd_var_in_ptm_lst))
+    mrged_in_ptm_ndd_df = pd.merge(var_in_ptm_df, ndd_subdf, on='acc')
+    del mrged_in_ptm_ndd_df['Unnamed: 0']
+    ptm_type_count = mrged_in_ptm_ndd_df.groupby('ptm_type').count()
+    ptm_type_no_disulfide_count = mrged_in_ptm_ndd_df.loc[mrged_in_ptm_ndd_df['ptm_type'] != 'disulfide bond'].groupby('ptm_type').count()
+    # ptm_type_no_disulfide_count = ptm_type_no_disulfide_count.groupby('ptm_type').count()
