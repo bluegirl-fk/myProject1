@@ -4,6 +4,16 @@ import config as cfg
 disorder_vars = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv', usecols=
 ['acc', 'var_id', 'orig_aa', 'var_aa', 'position', 'isin_idr', 'total_vars', 'in_idr_vars', 'out_idr_vars'])
 phasepro = pd.read_csv(cfg.data['llps'] + '/phasepro.tsv', sep='\t')
-# phasepro.columns = ['Gene', 'Name', 'acc', 'Organism', 'Sequence', 'Gene_name', 'subgroup', 'index',
-#                     'Membrane cluster', 'Partner dependent', 'RNA dependancy', 'PTM dependancy',
-#                     'Domain-motif interaction', 'Discrete oligomerization']
+phasepro.columns = ['common_name', 'name', 'acc', 'organism', 'sequence', 'gene', 'taxon', 'id', 'segment',
+                    'boundaries', 'region', 'partners', 'determinants', 'forms', 'organelles', 'pmids', 'description',
+                    'experiment_llps', 'in_vivo', 'in_vitro', 'experiment_state', 'rna_req', 'ptm_affect', 'disease',
+                    'splice', 'interaction', 'membrane_cluster', 'partner_dep', 'rna_dep', 'ptm_dep',
+                    'domain-motif_interaction', 'discrete_oligo', 'under_annote', 'annotator', 'functional_class',
+                    'date']
+disorder_vars_lst = disorder_vars['acc'].unique().tolist()
+phasepro_lst = phasepro['acc'].unique().tolist()
+a = pd.merge(disorder_vars, phasepro, on='acc')
+ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
+b = pd.merge(ndd_subdf, phasepro, on='acc')
+b_lst = b['acc'].unique().tolist()
+print(','.join(b_lst))
