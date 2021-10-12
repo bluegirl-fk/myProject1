@@ -17,3 +17,5 @@ ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
 b = pd.merge(ndd_subdf, phasepro, on='acc')
 b_lst = b['acc'].unique().tolist()
 print(','.join(b_lst))
+
+phasep = pd.read_excel()

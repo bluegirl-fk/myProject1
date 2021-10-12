@@ -24,7 +24,9 @@ data = {
     'jsn': absolute + 'data/json',
     'ptm': absolute + 'data/ptms',
     'ptm-u': absolute + 'data/ptms/uniprot-ptms',
-    'llps': absolute + 'data/phasepro',
+    'fp': absolute + 'data/phasepro',
+    'fs': absolute + 'data/phasep',
+
 
 
 }
