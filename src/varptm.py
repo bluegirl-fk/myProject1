@@ -70,3 +70,4 @@ if __name__ == '__main__':
     ptm_type_count = mrged_in_ptm_ndd_df.groupby('ptm_type').count()
     ptm_type_no_disulfide_count = mrged_in_ptm_ndd_df.loc[mrged_in_ptm_ndd_df['ptm_type'] != 'disulfide bond'].groupby('ptm_type').count()
     # ptm_type_no_disulfide_count = ptm_type_no_disulfide_count.groupby('ptm_type').count()
+    print(','.join(ndd_var_in_ptm_lst))
