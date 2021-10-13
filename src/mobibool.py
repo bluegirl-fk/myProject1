@@ -111,7 +111,7 @@ def transmem_pr_percent_df_maker():
 
 if __name__ == '__main__':
     ## selected features  (10)
-    features_lst = ['prediction-disorder-mobidb_lite', 'prediction-low_complexity-merge',
+    features_lst = ['prediction-disorder-mobidb_lite', 'prediction-low_complexity-merge',''
                     'prediction-lip-anchor', 'homology-domain-merge',
                     'prediction-signal_peptide-uniprot', 'prediction-transmembrane-uniprot',
                     'curated-conformational_diversity-merge', 'derived-binding_mode_disorder_to_disorder-mobi',
