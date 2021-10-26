@@ -8,6 +8,7 @@ from pandas import DataFrame
 import config as cfg
 import brain as brn
 import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 def vars_multiple_df_generator(input_df):
@@ -68,9 +69,9 @@ def var_cnt_residue_normaliezer(df):  # gets df with count columns for vars in/o
     df['in_idr_vars_perc'] = (df['in_idr_vars'] / df['content_count'])
     df['out_idr_vars_perc'] = (df['out_idr_vars'] / (df['length'] - df['content_count']))
     ## now we will divide each by sum of the calculated data for in+out IDRs to produce complementary % values for cols
-    sum_of_normalized_vars = df['in_idr_vars_perc']+df['out_idr_vars_perc']
-    df['in_idr_vars_perc'] = df['in_idr_vars_perc']/sum_of_normalized_vars
-    df['out_idr_vars_perc'] = df['out_idr_vars_perc']/sum_of_normalized_vars
+    sum_of_normalized_vars = df['in_idr_vars_perc'] + df['out_idr_vars_perc']
+    df['in_idr_vars_perc'] = df['in_idr_vars_perc'] / sum_of_normalized_vars
+    df['out_idr_vars_perc'] = df['out_idr_vars_perc'] / sum_of_normalized_vars
     return df
 
 
@@ -98,6 +99,20 @@ def var_residue_stats_table_generator(input_vardf):
     return vars_count_df
 
 
+def draw_barplot(x, y, data, xticklabel, yscale):  # input is DF, not list
+    plt.figure(figsize=(12, 6))  # bigger figsize to have xticklabels shown
+    sns.set_style("ticks")
+    g = sns.barplot(x=x, y=y, data=data)
+    # sns.despine(trim=True, offset=2)
+    g.set_xticklabels(xticklabel, rotation=0, va="center", position=(0, -0.02))
+    sns.color_palette("pastel")
+    plt.yscale(yscale)
+    plt.tight_layout()
+    # plt.savefig(save_rout)
+    plt.show()
+    return
+
+
 ## NDD and brain original import
 ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
 ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
@@ -112,6 +127,12 @@ var_residue_sum_table = var_residue_stats_table_generator(disorder_majority)
 # def total_var_res_percentage(df): # to generate percentage for the whole dataset
 
 # 4631 unique ACCs
-# dis_maj_filtered = disorder_majority.loc[disorder_majority['in_idr_vars'] >= disorder_majority['out_idr_vars']]
+dis_maj_filtered = disorder_majority.loc[disorder_majority['in_idr_vars'] >= disorder_majority['out_idr_vars']]
+print(dis_maj_filtered['orig_aa'].value_counts()[:3].index.tolist())
+print(dis_maj_filtered['var_aa'].value_counts()[:3].index.tolist())
+a = dis_maj_filtered.groupby('orig_aa').count()
+a = a.reset_index()
+b = dis_maj_filtered.groupby('var_aa').count()
 
-
+# Distribution of altered residues, what about the new residues?
+draw_barplot(x='orig_aa', y='Unnamed: 0', data=a, xticklabel=a['orig_aa'].tolist(), yscale='linear')
