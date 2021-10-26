@@ -47,26 +47,30 @@ if __name__ == '__main__':
     ptms_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-ptms-all.csv',
                           usecols=['acc', 'ptm_pos', 'ptm_type', 'description'])
     disorder_maj = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv', usecols=
-    ['acc', 'var_id', 'orig_aa', 'var_aa', 'position', 'isin_idr', 'total_vars', 'in_idr_vars', 'out_idr_vars'])
+    ['acc', 'var_id', 'orig_aa', 'var_aa', 'position', 'isin_idr', 'total_vars'])
     dismaj_ptm_df = pd.merge(disorder_maj, ptms_df, on='acc')
 
     # ptm_checked_dismaj_df = var_in_ptm_checker(dismaj_ptm_df, 'uniprot')
     # ptm_checked_dismaj_df.to_csv(cfg.data['ptm-u'] + '/uniprot-vars-inptm-checked.csv')
     ptm_checked_dismaj_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-vars-inptm-checked.csv')
     del ptm_checked_dismaj_df['Unnamed: 0']
-    var_in_ptm_df = ptm_checked_dismaj_df.loc[ptm_checked_dismaj_df['var_in_ptm'] == 1]  # (3170,12)
+    var_in_ptm_df = ptm_checked_dismaj_df.loc[ptm_checked_dismaj_df['var_in_ptm'] == 1]  # (3170,12) vars not unique Prs
     # why the 1 is not string!
+    # 527 unique proteins
     var_in_ptm_lst = var_in_ptm_df['acc'].unique().tolist()
 
     ## NDDs with variation in PTM sites: n= 35
     ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
     ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
     ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
+    # number of NDD-associate proteins with var_position = ptm_position which can cause dif disorders, that's why the
+    # ndd_var_in_ptm_subdf has 191 rows
     ndd_var_in_ptm_lst = list(set(ndd_pr_lst).intersection(var_in_ptm_lst))  # n:49
     ndd_var_in_ptm_subdf = ndd_subdf[ndd_subdf.acc.isin(ndd_var_in_ptm_lst)]  # (191,3)
     print(','.join(ndd_var_in_ptm_lst))
     mrged_in_ptm_ndd_df = pd.merge(var_in_ptm_df, ndd_subdf, on='acc')
     del mrged_in_ptm_ndd_df['Unnamed: 0']
+
     ptm_type_count = mrged_in_ptm_ndd_df.groupby('ptm_type').count()
     ptm_type_no_disulfide_count = mrged_in_ptm_ndd_df.loc[mrged_in_ptm_ndd_df['ptm_type'] != 'disulfide bond'].groupby('ptm_type').count()
     # ptm_type_no_disulfide_count = ptm_type_no_disulfide_count.groupby('ptm_type').count()
