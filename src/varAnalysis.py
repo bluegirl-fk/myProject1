@@ -128,11 +128,11 @@ var_residue_sum_table = var_residue_stats_table_generator(disorder_majority)
 
 # 4631 unique ACCs
 dis_maj_filtered = disorder_majority.loc[disorder_majority['in_idr_vars'] >= disorder_majority['out_idr_vars']]
-print(dis_maj_filtered['orig_aa'].value_counts()[:3].index.tolist())
-print(dis_maj_filtered['var_aa'].value_counts()[:3].index.tolist())
-a = dis_maj_filtered.groupby('orig_aa').count()
-a = a.reset_index()
-b = dis_maj_filtered.groupby('var_aa').count()
+print(dis_maj_filtered['orig_aa'].value_counts()[:5].index.tolist())
+print(dis_maj_filtered['var_aa'].value_counts()[:5].index.tolist())
+orig_aa_count = dis_maj_filtered.groupby('orig_aa').count()
+orig_aa_count = orig_aa_count.reset_index()
+var_aa_count = dis_maj_filtered.groupby('var_aa').count()
 
 # Distribution of altered residues, what about the new residues?
-draw_barplot(x='orig_aa', y='Unnamed: 0', data=a, xticklabel=a['orig_aa'].tolist(), yscale='linear')
+draw_barplot(x='orig_aa', y='Unnamed: 0', data=orig_aa_count, xticklabel=orig_aa_count['orig_aa'].tolist(), yscale='linear')
