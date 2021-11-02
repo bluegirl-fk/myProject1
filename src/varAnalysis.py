@@ -119,11 +119,11 @@ ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
 ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
 brain_prot_lst = brn.brain_pr_lst_generator()  # n: 8320
 ## Mobidb disorder
-disorder_majority = var_cnt_residue_normaliezer(var_countcol_creator(df_feature_filterer('prediction-disorder-th_50')))
-# deleting proteins with content count of less than 20 residues
-disorder_majority = disorder_majority.loc[disorder_majority['content_count'] >= 20]
-disorder_majority.to_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
-# disorder_majority = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
+# disorder_majority = var_cnt_residue_normaliezer(var_countcol_creator(df_feature_filterer('prediction-disorder-th_50')))
+# # deleting proteins with content count of less than 20 residues
+# disorder_majority = disorder_majority.loc[disorder_majority['content_count'] >= 20]
+# disorder_majority.to_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
+disorder_majority = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
 
 ## Table of Vars inside and outside plus residues
 var_residue_sum_table = var_residue_stats_table_generator(disorder_majority)
@@ -140,3 +140,16 @@ var_aa_count = dis_maj_filtered.groupby('var_aa').count()
 # Distribution of altered residues, what about the new residues?
 # turn this into a method and change y columns name to count or something more relevant
 draw_barplot(x='orig_aa', y='acc', data=orig_aa_count, xticklabel=orig_aa_count['orig_aa'].tolist(), yscale='linear')
+
+# turn this into a method
+residue_df = dis_maj_filtered[['acc', 'var_id', 'orig_aa', 'var_aa']]
+aa_lst = residue_df['orig_aa'].unique().tolist()
+residue_df = residue_df.loc[residue_df.var_aa.isin(aa_lst)]
+residue_ser = residue_df.groupby(['orig_aa', 'var_aa']).size().to_frame(name = 'size').reset_index()
+residue_ser = pd.pivot_table(residue_ser, values='size', index='orig_aa', columns='var_aa')
+# a = sns.heatmap(residue_ser, annot=True)
+
+sns.set()
+sns.heatmap(residue_ser, linewidths=.5)
+plt.show()
+
