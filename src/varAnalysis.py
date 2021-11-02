@@ -122,6 +122,9 @@ brain_prot_lst = brn.brain_pr_lst_generator()  # n: 8320
 # disorder_majority = var_cnt_residue_normaliezer(var_countcol_creator(df_feature_filterer('prediction-disorder-th_50')))
 # disorder_majority.to_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
 disorder_majority = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
+## deleting proteins with content count of less than 20 residues
+disorder_majority = disorder_majority.loc[disorder_majority['content_count'] >= 20]
+
 ## Table of Vars inside and outside plus residues
 var_residue_sum_table = var_residue_stats_table_generator(disorder_majority)
 # def total_var_res_percentage(df): # to generate percentage for the whole dataset
