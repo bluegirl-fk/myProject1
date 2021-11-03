@@ -113,7 +113,7 @@ def draw_barplot(x, y, data, xticklabel, yscale):  # input is DF, not list
     return
 
 
-def residue_heatmapper(df, hmap_title):
+def residue_heatmapper(df, hmap_title, filename):
     # input df is disorder_majority or filtered_dis_maj if preferred
     res_df = df[['acc', 'var_id', 'orig_aa', 'var_aa']]
     aa_lst = res_df['orig_aa'].unique().tolist()
@@ -125,8 +125,12 @@ def residue_heatmapper(df, hmap_title):
     ax = plt.axes()
     ax.set_title('lalala')
     sns.heatmap(residue_pivot_df, linewidths=.5, cmap='viridis', vmin=0, vmax=1000, annot=True, fmt='g', ax=ax)
-    ax.set_title(hmap_title)
+    ax.set_title(hmap_title, fontsize=30)
+    plt.xlabel('Variant residues', fontsize=20)
+    plt.ylabel('Original residues', fontsize=20)
+    plt.savefig(cfg.plots['var-hms'] + '/' + filename + '.png', dpi=120)
     plt.show()
+    # plt.savefig(cfg.plots['var-hms'] + '/' + filename + '.png', dpi=120)
     return residue_pivot_df
 
 
@@ -157,16 +161,10 @@ var_aa_count = var_aa_count.reset_index()
 aa_lst = disorder_majority['orig_aa'].unique().tolist()
 var_aa_count = var_aa_count.loc[var_aa_count.var_aa.isin(aa_lst)]
 
-
 # Distribution of altered residues, what about the new residues?
 # turn this into a method and change y columns name to count or something more relevant
 # draw_barplot(x='orig_aa', y='acc', data=orig_aa_count, xticklabel=orig_aa_count['orig_aa'].tolist(), yscale='linear')
 # draw_barplot(x='var_aa', y='acc', data=var_aa_count, xticklabel=var_aa_count['var_aa'].tolist(), yscale='linear')
 
-
-# turn this into a method
-
-
-
-residue_heatmapper(disorder_majority, 'Residue Variations')
+residue_heatmapper(disorder_majority, 'Residue Variations', 'Res-var-disorder_majority')
 # residue_heatmapper(dis_maj_filtered)

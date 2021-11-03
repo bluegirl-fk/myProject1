@@ -56,6 +56,7 @@ plots = {
     'avv-cc': absolute + 'plots/variants/allVars/violinplot/cc',
     'avv-len': absolute + 'plots/variants/allVars/violinplot/length',
     'avar-bar': absolute + 'plots/variants/allVars/barplot',
+    'var-hms': absolute + 'plots/variants/heatmaps',
 
 
 }
