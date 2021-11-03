@@ -113,6 +113,23 @@ def draw_barplot(x, y, data, xticklabel, yscale):  # input is DF, not list
     return
 
 
+def residue_heatmapper(df, hmap_title):
+    # input df is disorder_majority or filtered_dis_maj if preferred
+    res_df = df[['acc', 'var_id', 'orig_aa', 'var_aa']]
+    aa_lst = res_df['orig_aa'].unique().tolist()
+    res_df = res_df.loc[res_df.var_aa.isin(aa_lst)]
+    residue_ser = res_df.groupby(['orig_aa', 'var_aa']).size().to_frame(name='size').reset_index()
+    residue_pivot_df = pd.pivot_table(residue_ser, values='size', index='orig_aa', columns='var_aa')
+    sns.set()
+    fig = plt.figure(figsize=(20, 15))
+    ax = plt.axes()
+    ax.set_title('lalala')
+    sns.heatmap(residue_pivot_df, linewidths=.5, cmap='viridis', vmin=0, vmax=1000, annot=True, fmt='g', ax=ax)
+    ax.set_title(hmap_title)
+    plt.show()
+    return residue_pivot_df
+
+
 ## NDD and brain original import
 ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
 ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
@@ -136,20 +153,20 @@ print(dis_maj_filtered['var_aa'].value_counts()[:5].index.tolist())
 orig_aa_count = dis_maj_filtered.groupby('orig_aa').count()
 orig_aa_count = orig_aa_count.reset_index()
 var_aa_count = dis_maj_filtered.groupby('var_aa').count()
+var_aa_count = var_aa_count.reset_index()
+aa_lst = disorder_majority['orig_aa'].unique().tolist()
+var_aa_count = var_aa_count.loc[var_aa_count.var_aa.isin(aa_lst)]
+
 
 # Distribution of altered residues, what about the new residues?
 # turn this into a method and change y columns name to count or something more relevant
-draw_barplot(x='orig_aa', y='acc', data=orig_aa_count, xticklabel=orig_aa_count['orig_aa'].tolist(), yscale='linear')
+# draw_barplot(x='orig_aa', y='acc', data=orig_aa_count, xticklabel=orig_aa_count['orig_aa'].tolist(), yscale='linear')
+# draw_barplot(x='var_aa', y='acc', data=var_aa_count, xticklabel=var_aa_count['var_aa'].tolist(), yscale='linear')
+
 
 # turn this into a method
-residue_df = dis_maj_filtered[['acc', 'var_id', 'orig_aa', 'var_aa']]
-aa_lst = residue_df['orig_aa'].unique().tolist()
-residue_df = residue_df.loc[residue_df.var_aa.isin(aa_lst)]
-residue_ser = residue_df.groupby(['orig_aa', 'var_aa']).size().to_frame(name = 'size').reset_index()
-residue_ser = pd.pivot_table(residue_ser, values='size', index='orig_aa', columns='var_aa')
-# a = sns.heatmap(residue_ser, annot=True)
 
-sns.set()
-sns.heatmap(residue_ser, linewidths=.5)
-plt.show()
 
+
+residue_heatmapper(disorder_majority, 'Residue Variations')
+# residue_heatmapper(dis_maj_filtered)
