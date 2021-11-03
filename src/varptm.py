@@ -43,36 +43,43 @@ def var_in_ptm_checker(input_df, source):
         return uniprot_var_in_ptm_checker(input_df)
 
 
-if __name__ == '__main__':
+def dismaj_var_in_ptm_df_generator():
+    # this is just to organize the code, disorder_majority and ptms df are being merged and then with
+    # var_in_ptm_checker a new df is produce that shows var positions that are in ptm sites (ptm pos)
     ptms_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-ptms-all.csv',
-                          usecols=['acc', 'ptm_pos', 'ptm_type', 'description'])  # (140538, 4)
+                          usecols=['acc', 'ptm_pos', 'description', 'ptm_type'])  # (140538, 4)
     disorder_maj = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv', usecols=
-    ['acc', 'var_id', 'orig_aa', 'var_aa', 'position', 'isin_idr', 'total_vars'])
-    # should I filter the var disorder df based on higher var in disorder fraction?
+    ['acc', 'var_id', 'orig_aa', 'var_aa', 'position', 'isin_idr', 'total_vars', 'content_count'])  # (66843, 7)
     dismaj_ptm_df = pd.merge(disorder_maj, ptms_df, on='acc')
+    ptm_checked_dismaj_df = var_in_ptm_checker(dismaj_ptm_df, 'uniprot')
+    ptm_checked_dismaj_df.to_csv(cfg.data['ptm-u'] + '/uniprot-vars-inptm-checked.csv')
+    return ptm_checked_dismaj_df
 
-    # ptm_checked_dismaj_df = var_in_ptm_checker(dismaj_ptm_df, 'uniprot')
-    # ptm_checked_dismaj_df.to_csv(cfg.data['ptm-u'] + '/uniprot-vars-inptm-checked.csv')
-    ptm_checked_dismaj_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-vars-inptm-checked.csv')
-    del ptm_checked_dismaj_df['Unnamed: 0']
-    var_in_ptm_df = ptm_checked_dismaj_df.loc[ptm_checked_dismaj_df['var_in_ptm'] == 1]  # (3170,12) vars
-    # 527 unique proteins
-    var_in_ptm_lst = var_in_ptm_df['acc'].unique().tolist()
 
-    ## NDDs with variation in PTM sites: n= 35
+def ndd_idrvar_in_ptm_lst_df_generator(all_ptm_checked_pr_lst):
     ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
-    ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
+    # phens_lst = ['ASD', 'EE', 'ID', 'DD', 'SCZ', 'NDDs', 'Control']
+    # ndd_subdf = ndd_subdf.loc[ndd_subdf.Phenotype.isin(phens_lst)]
     ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
-    # number of NDD-associate proteins with var_position = ptm_position which can cause dif disorders, that's why the
-    # ndd_var_in_ptm_subdf has 191 rows
-    ndd_var_in_ptm_lst = list(set(ndd_pr_lst).intersection(var_in_ptm_lst))  # n:49
-    ndd_var_in_ptm_subdf = ndd_subdf[ndd_subdf.acc.isin(ndd_var_in_ptm_lst)]  # (191,3)
-    print(','.join(ndd_var_in_ptm_lst))
-    mrged_in_ptm_ndd_df = pd.merge(var_in_ptm_df, ndd_subdf, on='acc')
-    del mrged_in_ptm_ndd_df['Unnamed: 0']
+    ptm_idr_var_pr_lst = list(set(ndd_pr_lst).intersection(all_ptm_checked_pr_lst))
+    ptm_idr_var_ndd_subdf = ndd_subdf[ndd_subdf.acc.isin(ptm_idr_var_pr_lst)]
+    return ptm_idr_var_pr_lst, ptm_idr_var_ndd_subdf
 
-    ptm_type_count = mrged_in_ptm_ndd_df.groupby('ptm_type').count()
-    ptm_type_no_disulfide_count = mrged_in_ptm_ndd_df.loc[mrged_in_ptm_ndd_df['ptm_type'] != 'disulfide bond'].groupby(
-        'ptm_type').count()
-    # ptm_type_no_disulfide_count = ptm_type_no_disulfide_count.groupby('ptm_type').count()
-    print('\n'.join(ndd_var_in_ptm_lst))
+
+if __name__ == '__main__':
+    # var_in_ptm_checked_df = dismaj_var_in_ptm_df_generator()
+    var_in_ptm_checked_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-vars-inptm-checked.csv')
+    # var_in_ptm_df = var_in_ptm_checked_df.loc[var_in_ptm_checked_df['var_in_ptm'] == 1]  # (3170,12) vars, 527 Prs
+    ptm_idr_var_all_df = var_in_ptm_checked_df.loc[(var_in_ptm_checked_df['var_in_ptm'] == 1) &
+                                                   (var_in_ptm_checked_df['isin_idr'] == 1)]  # (366, 13)
+    ptm_idr_var_all_pr_lst = ptm_idr_var_all_df['acc'].unique().tolist()  # 177 Prs.
+    ## for NDDs
+    ptm_idr_var_ndd_pr_lst, _ = ndd_idrvar_in_ptm_lst_df_generator(ptm_idr_var_all_pr_lst)  # 16 contributes to 77 rows
+    # in ndd phens col, meaning each pr is in charge of ~ 5 phens among all phens and not just my desired phenotypes
+    print('\n'.join(ptm_idr_var_ndd_pr_lst))
+    ptm_type_count = ptm_idr_var_all_df.groupby('ptm_type').count()
+
+    def ptm_type_seperator(inputdf):
+        ptms_disulfide_bonds_df = inputdf.loc[inputdf['ptm_type'] == 'disulfide bond']
+        the_rest_of_ptms_df = inputdf.loc[inputdf['ptm_type'] != 'disulfide bond']
+        return ptms_disulfide_bonds_df, the_rest_of_ptms_df

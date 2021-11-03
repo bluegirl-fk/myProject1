@@ -1,9 +1,9 @@
 import pandas as pd
 import config as cfg
 
-disorder_vars = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv', usecols=
+disorder_maj = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv', usecols=
 ['acc', 'var_id', 'orig_aa', 'var_aa', 'position', 'isin_idr', 'total_vars', 'in_idr_vars', 'out_idr_vars'])
-disorder_vars = disorder_vars.loc[disorder_vars['isin_idr'] == 1]
+disorder_vars = disorder_maj.loc[disorder_maj['isin_idr'] == 1]
 phasepro = pd.read_csv(cfg.data['fp'] + '/phasepro.tsv', sep='\t')
 phasepro.columns = ['common_name', 'name', 'acc', 'organism', 'sequence', 'gene', 'taxon', 'id', 'segment',
                     'boundaries', 'region', 'partners', 'determinants', 'forms', 'organelles', 'pmids', 'description',
