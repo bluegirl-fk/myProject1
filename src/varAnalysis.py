@@ -9,6 +9,7 @@ import config as cfg
 import brain as brn
 import seaborn as sns
 import matplotlib.pyplot as plt
+import matplotlib
 
 
 def vars_multiple_df_generator(input_df):
@@ -106,6 +107,7 @@ def draw_barplot(x, y, data, xticklabel, yscale):  # input is DF, not list
     # sns.despine(trim=True, offset=2)
     g.set_xticklabels(xticklabel, rotation=0, va="center", position=(0, -0.02))
     sns.color_palette("pastel")
+    g.bar_label(g.containers[0])
     plt.yscale(yscale)
     plt.tight_layout()
     # plt.savefig(save_rout)
@@ -161,9 +163,10 @@ var_aa_count = var_aa_count.reset_index()
 aa_lst = disorder_majority['orig_aa'].unique().tolist()
 var_aa_count = var_aa_count.loc[var_aa_count.var_aa.isin(aa_lst)]
 
+print('matplotlib: {}'.format(matplotlib.__version__))
+# TODO update matplotlib to try out value labels on bars
 # Distribution of altered residues, what about the new residues?
-# turn this into a method and change y columns name to count or something more relevant
-# draw_barplot(x='orig_aa', y='acc', data=orig_aa_count, xticklabel=orig_aa_count['orig_aa'].tolist(), yscale='linear')
+draw_barplot(x='orig_aa', y='acc', data=orig_aa_count, xticklabel=orig_aa_count['orig_aa'].tolist(), yscale='linear')
 # draw_barplot(x='var_aa', y='acc', data=var_aa_count, xticklabel=var_aa_count['var_aa'].tolist(), yscale='linear')
 
 residue_heatmapper(disorder_majority, 'Residue Variations', 'Res-var-disorder_majority')
