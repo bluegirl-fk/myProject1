@@ -162,12 +162,10 @@ var_aa_count = dis_maj_filtered.groupby('var_aa').count()
 var_aa_count = var_aa_count.reset_index()
 aa_lst = disorder_majority['orig_aa'].unique().tolist()
 var_aa_count = var_aa_count.loc[var_aa_count.var_aa.isin(aa_lst)]
-
 print('matplotlib: {}'.format(matplotlib.__version__))
 # TODO update matplotlib to try out value labels on bars
 # Distribution of altered residues, what about the new residues?
 draw_barplot(x='orig_aa', y='acc', data=orig_aa_count, xticklabel=orig_aa_count['orig_aa'].tolist(), yscale='linear')
 # draw_barplot(x='var_aa', y='acc', data=var_aa_count, xticklabel=var_aa_count['var_aa'].tolist(), yscale='linear')
-
 residue_heatmapper(disorder_majority, 'Residue Variations', 'Res-var-disorder_majority')
 # residue_heatmapper(dis_maj_filtered)
