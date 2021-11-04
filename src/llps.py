@@ -42,7 +42,7 @@ def phase_pro():
 
 def phasep():
     phasep = pd.read_excel(cfg.data['fs'] + '/High throughput Data V1.3.xlsx', engine='openpyxl')
-    phasep = phasep.drop(['No', 'protein material states', 'Mutation/disease'], axis=1)
+    phasep = phasep.drop(['No', 'protein material states', 'Mutation/disease', 'Organism'], axis=1)
     phasep_lst = phasep['UniprotEntry'].unique().tolist()
     return phasep, phasep_lst
 
@@ -60,6 +60,9 @@ def ndd_var_df():
 
 
 if __name__ == '__main__':
-    varin_phasep_df, ndd_varin_phasep_df = var_llps_df_merger('phasep')
-    varin_phasepro_df, ndd_varin_phasepro_df = var_llps_df_merger('phasepro')
-    # print(','.join(b_lst))
+    varin_phasep_df, ndd_varin_phasep_df = var_llps_df_merger('phasep')  # 2296 # 840
+    varin_phasepro_df, ndd_varin_phasepro_df = var_llps_df_merger('phasepro')  # 134 # 30
+    # lst of NDD proteins with var in IDR and involved in LLPS
+    ndd_varin_phasep_lst = ndd_varin_phasep_df['acc'].unique().tolist()  # 41
+    # ndd_varin_phasepro_lst = ndd_varin_phasepro_df['acc'].unique().tolist()  # 5
+    print('\n'.join(ndd_varin_phasep_lst))

@@ -96,3 +96,5 @@ if __name__ == '__main__':
     ndd_vars_in_ptm = var_in_ptm_checked_df.loc[(var_in_ptm_checked_df.acc.isin(ndd_pr_lst))
                                                 & (var_in_ptm_checked_df['var_in_ptm'] == 1)]  # (759, 13)
     ndd_vars_in_ptm_lst = ndd_vars_in_ptm['acc'].unique().tolist()  # 46
+
+    print('\n'.join(ndd_other_ptms_pr_lst))

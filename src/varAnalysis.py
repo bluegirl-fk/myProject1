@@ -107,7 +107,7 @@ def draw_barplot(x, y, data, xticklabel, yscale):  # input is DF, not list
     # sns.despine(trim=True, offset=2)
     g.set_xticklabels(xticklabel, rotation=0, va="center", position=(0, -0.02))
     sns.color_palette("pastel")
-    g.bar_label(g.containers[0])
+    # g.bar_label(g.containers[0])
     plt.yscale(yscale)
     plt.tight_layout()
     # plt.savefig(save_rout)
@@ -136,36 +136,39 @@ def residue_heatmapper(df, hmap_title, filename):
     return residue_pivot_df
 
 
-## NDD and brain original import
-ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
-ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
-ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
-brain_prot_lst = brn.brain_pr_lst_generator()  # n: 8320
-## Mobidb disorder
-# disorder_majority = var_cnt_residue_normaliezer(var_countcol_creator(df_feature_filterer('prediction-disorder-th_50')))
-# # deleting proteins with content count of less than 20 residues
-# disorder_majority = disorder_majority.loc[disorder_majority['content_count'] >= 20]
-# disorder_majority.to_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
-disorder_majority = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
+if __name__ == '__main__':
 
-## Table of Vars inside and outside plus residues
-var_residue_sum_table = var_residue_stats_table_generator(disorder_majority)
-# def total_var_res_percentage(df): # to generate percentage for the whole dataset
+    ## NDD and brain original import
+    ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
+    ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
+    ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
+    brain_prot_lst = brn.brain_pr_lst_generator()  # n: 8320
+    ## Mobidb disorder
+    ## doing same thing for mobidb
+    mobidb_lite = var_cnt_residue_normaliezer(var_countcol_creator(df_feature_filterer('prediction-disorder-mobidb_lite')))
+    # # deleting proteins with content count of less than 20 residues
+    # disorder_majority = disorder_majority.loc[disorder_majority['content_count'] >= 20]
+    mobidb_lite.to_csv(cfg.data['vars'] + '/mobidb_lite-inout-idr-vars-count-normalized.csv')
+    # disorder_majority = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
 
-# 4631 unique ACCs
-dis_maj_filtered = disorder_majority.loc[disorder_majority['in_idr_vars'] >= disorder_majority['out_idr_vars']]
-print(dis_maj_filtered['orig_aa'].value_counts()[:5].index.tolist())
-print(dis_maj_filtered['var_aa'].value_counts()[:5].index.tolist())
-orig_aa_count = dis_maj_filtered.groupby('orig_aa').count()
-orig_aa_count = orig_aa_count.reset_index()
-var_aa_count = dis_maj_filtered.groupby('var_aa').count()
-var_aa_count = var_aa_count.reset_index()
-aa_lst = disorder_majority['orig_aa'].unique().tolist()
-var_aa_count = var_aa_count.loc[var_aa_count.var_aa.isin(aa_lst)]
-print('matplotlib: {}'.format(matplotlib.__version__))
-# TODO update matplotlib to try out value labels on bars
-# Distribution of altered residues, what about the new residues?
-draw_barplot(x='orig_aa', y='acc', data=orig_aa_count, xticklabel=orig_aa_count['orig_aa'].tolist(), yscale='linear')
-# draw_barplot(x='var_aa', y='acc', data=var_aa_count, xticklabel=var_aa_count['var_aa'].tolist(), yscale='linear')
-residue_heatmapper(disorder_majority, 'Residue Variations', 'Res-var-disorder_majority')
-# residue_heatmapper(dis_maj_filtered)
+    ## Table of Vars inside and outside plus residues
+    var_residue_sum_table = var_residue_stats_table_generator(mobidb_lite)
+    # def total_var_res_percentage(df): # to generate percentage for the whole dataset
+
+    # 4631 unique ACCs
+    dis_maj_filtered = mobidb_lite.loc[mobidb_lite['in_idr_vars_perc'] >= mobidb_lite['out_idr_vars_perc']]
+    print(dis_maj_filtered['orig_aa'].value_counts()[:5].index.tolist())
+    print(dis_maj_filtered['var_aa'].value_counts()[:5].index.tolist())
+    orig_aa_count = dis_maj_filtered.groupby('orig_aa').count()
+    orig_aa_count = orig_aa_count.reset_index()
+    var_aa_count = dis_maj_filtered.groupby('var_aa').count()
+    var_aa_count = var_aa_count.reset_index()
+    aa_lst = mobidb_lite['orig_aa'].unique().tolist()
+    var_aa_count = var_aa_count.loc[var_aa_count.var_aa.isin(aa_lst)]
+    print('matplotlib: {}'.format(matplotlib.__version__))
+    # TODO update matplotlib to try out value labels on bars
+    # Distribution of altered residues, what about the new residues?
+    draw_barplot(x='orig_aa', y='acc', data=orig_aa_count, xticklabel=orig_aa_count['orig_aa'].tolist(), yscale='linear')
+    # draw_barplot(x='var_aa', y='acc', data=var_aa_count, xticklabel=var_aa_count['var_aa'].tolist(), yscale='linear')
+    residue_heatmapper(mobidb_lite, 'Residue Variations', 'Res-var-mobidb_lite')
+    # residue_heatmapper(dis_maj_filtered)
