@@ -94,4 +94,5 @@ if __name__ == '__main__':
     ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
     ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
     ndd_vars_in_ptm = var_in_ptm_checked_df.loc[(var_in_ptm_checked_df.acc.isin(ndd_pr_lst))
-                                                & (var_in_ptm_checked_df['var_in_ptm'] == 1)]
+                                                & (var_in_ptm_checked_df['var_in_ptm'] == 1)]  # (759, 13)
+    ndd_vars_in_ptm_lst = ndd_vars_in_ptm['acc'].unique().tolist()  # 46
