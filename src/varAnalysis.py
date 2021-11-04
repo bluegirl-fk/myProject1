@@ -67,8 +67,12 @@ def var_countcol_creator(df):  # a percentage column for variants in IDR / all V
 
 def var_cnt_residue_normaliezer(df):  # gets df with count columns for vars in/out idr and normalize them based on
     # number of disordered residues or non disordered, respectively
-    df['in_idr_vars_perc'] = (df['in_idr_vars'] / df['content_count'])
-    df['out_idr_vars_perc'] = (df['out_idr_vars'] / (df['length'] - df['content_count']))
+    ## this where method conditions is to prevent nan values for fully disordered proteins (length-content_count == 0)
+    df['in_idr_vars_perc'] = np.where((df['length'] == df['content_count']), 1, (df['in_idr_vars'] / df['content_count']))
+    df['out_idr_vars_perc'] = np.where((df['length'] == df['content_count']), 0, (df['out_idr_vars'] / (df['length'] - df['content_count'])))
+
+    # df['in_idr_vars_perc'] = (df['in_idr_vars'] / df['content_count'])
+    # df['out_idr_vars_perc'] = (df['out_idr_vars'] / (df['length'] - df['content_count']))
     ## now we will divide each by sum of the calculated data for in+out IDRs to produce complementary % values for cols
     sum_of_normalized_vars = df['in_idr_vars_perc'] + df['out_idr_vars_perc']
     df['in_idr_vars_perc'] = df['in_idr_vars_perc'] / sum_of_normalized_vars
@@ -145,30 +149,30 @@ if __name__ == '__main__':
     brain_prot_lst = brn.brain_pr_lst_generator()  # n: 8320
     ## Mobidb disorder
     ## doing same thing for mobidb
-    mobidb_lite = var_cnt_residue_normaliezer(var_countcol_creator(df_feature_filterer('prediction-disorder-mobidb_lite')))
+    disorder_majority = var_cnt_residue_normaliezer(var_countcol_creator(df_feature_filterer('Prediction-disorder-th_50')))
     # # deleting proteins with content count of less than 20 residues
-    # disorder_majority = disorder_majority.loc[disorder_majority['content_count'] >= 20]
-    mobidb_lite.to_csv(cfg.data['vars'] + '/mobidb_lite-inout-idr-vars-count-normalized.csv')
+    disorder_majority = disorder_majority.loc[disorder_majority['content_count'] > 20]
+    disorder_majority.to_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
     # disorder_majority = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
 
     ## Table of Vars inside and outside plus residues
-    var_residue_sum_table = var_residue_stats_table_generator(mobidb_lite)
+    var_residue_sum_table = var_residue_stats_table_generator(disorder_majority)
     # def total_var_res_percentage(df): # to generate percentage for the whole dataset
 
     # 4631 unique ACCs
-    mobidb_lite_filtered = mobidb_lite.loc[mobidb_lite['in_idr_vars_perc'] >= mobidb_lite['out_idr_vars_perc']]
-    print(mobidb_lite_filtered['orig_aa'].value_counts()[:5].index.tolist())
-    print(mobidb_lite_filtered['var_aa'].value_counts()[:5].index.tolist())
-    orig_aa_count = mobidb_lite_filtered.groupby('orig_aa').count()
+    dmajority_filtered = disorder_majority.loc[disorder_majority['in_idr_vars_perc'] >= disorder_majority['out_idr_vars_perc']]
+    print(dmajority_filtered['orig_aa'].value_counts()[:5].index.tolist())
+    print(dmajority_filtered['var_aa'].value_counts()[:5].index.tolist())
+    orig_aa_count = dmajority_filtered.groupby('orig_aa').count()
     orig_aa_count = orig_aa_count.reset_index()
-    var_aa_count = mobidb_lite_filtered.groupby('var_aa').count()
+    var_aa_count = dmajority_filtered.groupby('var_aa').count()
     var_aa_count = var_aa_count.reset_index()
-    aa_lst = mobidb_lite['orig_aa'].unique().tolist()
+    aa_lst = disorder_majority['orig_aa'].unique().tolist()
     var_aa_count = var_aa_count.loc[var_aa_count.var_aa.isin(aa_lst)]
     print('matplotlib: {}'.format(matplotlib.__version__))
     # TODO update matplotlib to try out value labels on bars
     # Distribution of altered residues, what about the new residues?
     draw_barplot(x='orig_aa', y='acc', data=orig_aa_count, xticklabel=orig_aa_count['orig_aa'].tolist(), yscale='linear')
     # draw_barplot(x='var_aa', y='acc', data=var_aa_count, xticklabel=var_aa_count['var_aa'].tolist(), yscale='linear')
-    residue_heatmapper(mobidb_lite, 'Residue Variations', 'Res-var-mobidb_lite')
+    residue_heatmapper(disorder_majority, 'Residue Variations', 'Res-var-mobidb_lite')
     # residue_heatmapper(dis_maj_filtered)
