@@ -148,8 +148,7 @@ if __name__ == '__main__':
     ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
     brain_prot_lst = brn.brain_pr_lst_generator()  # n: 8320
     ## Mobidb disorder
-    ## doing same thing for mobidb
-    disorder_majority = var_cnt_residue_normaliezer(var_countcol_creator(df_feature_filterer('Prediction-disorder-th_50')))
+    disorder_majority = var_cnt_residue_normaliezer(var_countcol_creator(df_feature_filterer('prediction-disorder-th_50')))
     # # deleting proteins with content count of less than 20 residues
     disorder_majority = disorder_majority.loc[disorder_majority['content_count'] > 20]
     disorder_majority.to_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
