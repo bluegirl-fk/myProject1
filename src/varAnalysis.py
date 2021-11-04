@@ -156,12 +156,12 @@ if __name__ == '__main__':
     # def total_var_res_percentage(df): # to generate percentage for the whole dataset
 
     # 4631 unique ACCs
-    dis_maj_filtered = mobidb_lite.loc[mobidb_lite['in_idr_vars_perc'] >= mobidb_lite['out_idr_vars_perc']]
-    print(dis_maj_filtered['orig_aa'].value_counts()[:5].index.tolist())
-    print(dis_maj_filtered['var_aa'].value_counts()[:5].index.tolist())
-    orig_aa_count = dis_maj_filtered.groupby('orig_aa').count()
+    mobidb_lite_filtered = mobidb_lite.loc[mobidb_lite['in_idr_vars_perc'] >= mobidb_lite['out_idr_vars_perc']]
+    print(mobidb_lite_filtered['orig_aa'].value_counts()[:5].index.tolist())
+    print(mobidb_lite_filtered['var_aa'].value_counts()[:5].index.tolist())
+    orig_aa_count = mobidb_lite_filtered.groupby('orig_aa').count()
     orig_aa_count = orig_aa_count.reset_index()
-    var_aa_count = dis_maj_filtered.groupby('var_aa').count()
+    var_aa_count = mobidb_lite_filtered.groupby('var_aa').count()
     var_aa_count = var_aa_count.reset_index()
     aa_lst = mobidb_lite['orig_aa'].unique().tolist()
     var_aa_count = var_aa_count.loc[var_aa_count.var_aa.isin(aa_lst)]
