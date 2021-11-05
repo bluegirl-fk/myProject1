@@ -174,3 +174,9 @@ if __name__ == '__main__':
     ndd_mobilite_vars_out = mobilite_vars_out.loc[mobilite_vars_out.acc.isin(ndd_pr_lst)]
     residue_heatmapper(ndd_mobilite_vars_in, 'Residue Variations(NDDs) - in disordered region', 'ndd-mobilite_vars_in1')
     residue_heatmapper(ndd_mobilite_vars_out, 'Residue Variations(NDDs)- in ordered region', 'ndd-mobilite_vars_out1')
+
+    # Test:
+    iris = sns.load_dataset("iris")
+    species = iris.pop("species")
+    g = sns.clustermap(iris)
+    plt.show()
