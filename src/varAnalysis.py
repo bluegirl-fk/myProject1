@@ -133,7 +133,6 @@ def residue_heatmapper(df, hmap_title, filename):
     sns.set(font_scale=1.7)
     fig = plt.figure(figsize=(20, 15))
     ax = plt.axes()
-    ax.set_title('lalala')
     g = sns.heatmap(residue_pivot_df, linewidths=.5, cmap='viridis', annot=True, fmt='g', ax=ax)
     ax.set_title(hmap_title, fontsize=40)
     plt.xlabel('Variant residues', fontsize=25)
