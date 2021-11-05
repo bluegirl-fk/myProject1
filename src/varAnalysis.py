@@ -160,18 +160,5 @@ if __name__ == '__main__':
 
     # 4631 unique ACCs
     dmajority_filtered = disorder_majority.loc[disorder_majority['in_idr_vars_perc'] >= disorder_majority['out_idr_vars_perc']]
-    print(dmajority_filtered['orig_aa'].value_counts()[:5].index.tolist())
-    print(dmajority_filtered['var_aa'].value_counts()[:5].index.tolist())
-    orig_aa_count = dmajority_filtered.groupby('orig_aa').count()
-    orig_aa_count = orig_aa_count.reset_index()
-    var_aa_count = dmajority_filtered.groupby('var_aa').count()
-    var_aa_count = var_aa_count.reset_index()
-    aa_lst = disorder_majority['orig_aa'].unique().tolist()
-    var_aa_count = var_aa_count.loc[var_aa_count.var_aa.isin(aa_lst)]
-    print('matplotlib: {}'.format(matplotlib.__version__))
-    # TODO update matplotlib to try out value labels on bars
-    # Distribution of altered residues, what about the new residues?
-    draw_barplot(x='orig_aa', y='acc', data=orig_aa_count, xticklabel=orig_aa_count['orig_aa'].tolist(), yscale='linear')
-    # draw_barplot(x='var_aa', y='acc', data=var_aa_count, xticklabel=var_aa_count['var_aa'].tolist(), yscale='linear')
     residue_heatmapper(disorder_majority, 'Residue Variations', 'Res-var-mobidb_lite')
     # residue_heatmapper(dis_maj_filtered)

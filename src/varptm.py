@@ -90,6 +90,7 @@ if __name__ == '__main__':
     # contributes to 77 rows in phens col, so each pr is in charge of ~5 phens among all phens and not just my phens
     print('\n'.join(in_ptm_idr_var_ndd_pr_lst))
     _, _, ndd_disulfide_pr_lst, ndd_other_ptms_pr_lst = ptm_divider(inptm_idr_var_ndd_df)  # 1  # 16
+
     ## NDD variants in ptm, even if not in disordered regions, can regulate IDP activation
     ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
     ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
