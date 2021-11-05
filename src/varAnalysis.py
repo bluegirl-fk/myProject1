@@ -126,14 +126,18 @@ def residue_heatmapper(df, hmap_title, filename):
     res_df = res_df.loc[res_df.var_aa.isin(aa_lst)]
     residue_ser = res_df.groupby(['orig_aa', 'var_aa']).size().to_frame(name='size').reset_index()
     residue_pivot_df = pd.pivot_table(residue_ser, values='size', index='orig_aa', columns='var_aa')
-    sns.set()
+    sns.set(font_scale=1.7)
     fig = plt.figure(figsize=(20, 15))
     ax = plt.axes()
     ax.set_title('lalala')
-    sns.heatmap(residue_pivot_df, linewidths=.5, cmap='viridis', vmin=0, vmax=1000, annot=True, fmt='g', ax=ax)
-    ax.set_title(hmap_title, fontsize=30)
-    plt.xlabel('Variant residues', fontsize=20)
-    plt.ylabel('Original residues', fontsize=20)
+    g = sns.heatmap(residue_pivot_df, linewidths=.5, cmap='viridis', annot=True, fmt='g', ax=ax)
+    ax.set_title(hmap_title, fontsize=40)
+    plt.xlabel('Variant residues', fontsize=25)
+    ax.xaxis.label.set_color('red')
+    plt.ylabel('Original residues', fontsize=25)
+    # ax.yaxis.label.set_color('blue')
+    # tick label color
+    ax.tick_params(axis='x', colors='red')
     plt.savefig(cfg.plots['var-hms'] + '/' + filename + '.png', dpi=120)
     plt.show()
     # plt.savefig(cfg.plots['var-hms'] + '/' + filename + '.png', dpi=120)
@@ -148,17 +152,17 @@ if __name__ == '__main__':
     ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
     brain_prot_lst = brn.brain_pr_lst_generator()  # n: 8320
     ## Mobidb disorder
-    disorder_majority = var_cnt_residue_normaliezer(var_countcol_creator(df_feature_filterer('prediction-disorder-th_50')))
-    # # deleting proteins with content count of less than 20 residues
-    disorder_majority = disorder_majority.loc[disorder_majority['content_count'] > 20]
-    disorder_majority.to_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
+    # mobidb_lite = var_cnt_residue_normaliezer(var_countcol_creator(df_feature_filterer('prediction-disorder-mobidb_lite')))
+    # mobidb_lite.to_csv(cfg.data['vars'] + '/mobidb_lite-inout-idr-vars-count-normalized.csv')
+    mobidb_lite = pd.read_csv(cfg.data['vars'] + '/mobidb_lite-inout-idr-vars-count-normalized.csv')
     # disorder_majority = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
 
     ## Table of Vars inside and outside plus residues
-    var_residue_sum_table = var_residue_stats_table_generator(disorder_majority)
+    var_residue_sum_table = var_residue_stats_table_generator(mobidb_lite)
     # def total_var_res_percentage(df): # to generate percentage for the whole dataset
 
     # 4631 unique ACCs
-    dmajority_filtered = disorder_majority.loc[disorder_majority['in_idr_vars_perc'] >= disorder_majority['out_idr_vars_perc']]
-    residue_heatmapper(disorder_majority, 'Residue Variations', 'Res-var-mobidb_lite')
-    # residue_heatmapper(dis_maj_filtered)
+    mobilite_vars_in = mobidb_lite.loc[mobidb_lite['isin_idr'] == 1]
+    mobilite_vars_out = mobidb_lite.loc[mobidb_lite['isin_idr'] == 0]
+    residue_heatmapper(mobilite_vars_in, 'Residue Variations - in disordered region', 'mobilite_vars_in')
+    residue_heatmapper(mobilite_vars_out, 'Residue Variations- in ordered region', 'mobilite_vars_out')
