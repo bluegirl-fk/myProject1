@@ -126,6 +126,10 @@ def residue_heatmapper(df, hmap_title, filename):
     res_df = res_df.loc[res_df.var_aa.isin(aa_lst)]
     residue_ser = res_df.groupby(['orig_aa', 'var_aa']).size().to_frame(name='size').reset_index()
     residue_pivot_df = pd.pivot_table(residue_ser, values='size', index='orig_aa', columns='var_aa')
+    aa_categ_order_x = ['C', 'M', 'V', 'L', 'I', 'W', 'Y', 'F', 'H', 'T', 'N', 'Q', 'K', 'R', 'D', 'E', 'A', 'S', 'G', 'P']
+    aa_categ_order_y = aa_categ_order_x.__reversed__()
+    residue_pivot_df = residue_pivot_df.reindex(columns=aa_categ_order_x)
+    residue_pivot_df = residue_pivot_df.reindex(aa_categ_order_y)
     sns.set(font_scale=1.7)
     fig = plt.figure(figsize=(20, 15))
     ax = plt.axes()
@@ -133,7 +137,7 @@ def residue_heatmapper(df, hmap_title, filename):
     g = sns.heatmap(residue_pivot_df, linewidths=.5, cmap='viridis', annot=True, fmt='g', ax=ax)
     ax.set_title(hmap_title, fontsize=40)
     plt.xlabel('Variant residues', fontsize=25)
-    ax.xaxis.label.set_color('red')
+    # ax.xaxis.label.set_color('red')
     plt.ylabel('Original residues', fontsize=25)
     # ax.yaxis.label.set_color('blue')
     # tick label color
@@ -164,5 +168,10 @@ if __name__ == '__main__':
     # 4631 unique ACCs
     mobilite_vars_in = mobidb_lite.loc[mobidb_lite['isin_idr'] == 1]
     mobilite_vars_out = mobidb_lite.loc[mobidb_lite['isin_idr'] == 0]
-    residue_heatmapper(mobilite_vars_in, 'Residue Variations - in disordered region', 'mobilite_vars_in')
-    residue_heatmapper(mobilite_vars_out, 'Residue Variations- in ordered region', 'mobilite_vars_out')
+    residue_heatmapper(mobilite_vars_in, 'Residue Variations - in disordered region', 'mobilite_vars_in1')
+    residue_heatmapper(mobilite_vars_out, 'Residue Variations- in ordered region', 'mobilite_vars_out1')
+    # for ndds
+    ndd_mobilite_vars_in = mobilite_vars_in.loc[mobilite_vars_in.acc.isin(ndd_pr_lst)]
+    ndd_mobilite_vars_out = mobilite_vars_out.loc[mobilite_vars_out.acc.isin(ndd_pr_lst)]
+    residue_heatmapper(ndd_mobilite_vars_in, 'Residue Variations(NDDs) - in disordered region', 'ndd-mobilite_vars_in1')
+    residue_heatmapper(ndd_mobilite_vars_out, 'Residue Variations(NDDs)- in ordered region', 'ndd-mobilite_vars_out1')
