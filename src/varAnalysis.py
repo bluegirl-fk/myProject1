@@ -9,7 +9,6 @@ import config as cfg
 import brain as brn
 import seaborn as sns
 import matplotlib.pyplot as plt
-import matplotlib
 
 
 def vars_multiple_df_generator(input_df):
@@ -130,10 +129,12 @@ def residue_heatmapper(df, hmap_title, filename):
     aa_categ_order_y = aa_categ_order_x.__reversed__()
     residue_pivot_df = residue_pivot_df.reindex(columns=aa_categ_order_x)
     residue_pivot_df = residue_pivot_df.reindex(aa_categ_order_y)
+    max_value = residue_pivot_df.max()
+    residue_pivot_df = residue_pivot_df.div(max_value).round(2)*100
     sns.set(font_scale=1.7)
     fig = plt.figure(figsize=(20, 15))
     ax = plt.axes()
-    g = sns.heatmap(residue_pivot_df, linewidths=.5, cmap='viridis', annot=True, fmt='g', ax=ax)
+    g = sns.heatmap(residue_pivot_df, linewidths=.5, cmap='viridis', annot=True, fmt='g', ax=ax, cbar_kws={'label': 'Residue transition percentage'})
     ax.set_title(hmap_title, fontsize=40)
     plt.xlabel('Variant residues', fontsize=25)
     # ax.xaxis.label.set_color('red')
@@ -167,16 +168,11 @@ if __name__ == '__main__':
     # 4631 unique ACCs
     mobilite_vars_in = mobidb_lite.loc[mobidb_lite['isin_idr'] == 1]
     mobilite_vars_out = mobidb_lite.loc[mobidb_lite['isin_idr'] == 0]
-    residue_heatmapper(mobilite_vars_in, 'Residue Variations - in disordered region', 'mobilite_vars_in1')
-    residue_heatmapper(mobilite_vars_out, 'Residue Variations- in ordered region', 'mobilite_vars_out1')
+    residue_heatmapper(mobilite_vars_in, 'Residue Variations - in disordered region', 'mobilite_vars_in')
+    residue_heatmapper(mobilite_vars_out, 'Residue Variations- in ordered region', 'mobilite_vars_out')
     # for ndds
     ndd_mobilite_vars_in = mobilite_vars_in.loc[mobilite_vars_in.acc.isin(ndd_pr_lst)]
     ndd_mobilite_vars_out = mobilite_vars_out.loc[mobilite_vars_out.acc.isin(ndd_pr_lst)]
-    residue_heatmapper(ndd_mobilite_vars_in, 'Residue Variations(NDDs) - in disordered region', 'ndd-mobilite_vars_in1')
-    residue_heatmapper(ndd_mobilite_vars_out, 'Residue Variations(NDDs)- in ordered region', 'ndd-mobilite_vars_out1')
+    residue_heatmapper(ndd_mobilite_vars_in, 'Residue Variations(NDDs) - in disordered region', 'ndd-mobilite_vars_in')
+    residue_heatmapper(ndd_mobilite_vars_out, 'Residue Variations(NDDs)- in ordered region', 'ndd-mobilite_vars_out')
 
-    # Test:
-    iris = sns.load_dataset("iris")
-    species = iris.pop("species")
-    g = sns.clustermap(iris)
-    plt.show()

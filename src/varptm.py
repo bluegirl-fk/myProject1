@@ -22,6 +22,7 @@ def uniprot_var_in_ptm_checker(df):  # input is merged 1-variants+in/out disorde
     array_isin = []
     for index, row in df.iterrows():
         if '&' not in row.ptm_pos:
+            #todo here maybe change ptm pos into list of +=- 3 values
             if str(row.position) == str(row.ptm_pos):
                 array_isin.append('1')
             else:
