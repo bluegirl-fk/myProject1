@@ -120,21 +120,22 @@ def draw_barplot(x, y, data, xticklabel, yscale):  # input is DF, not list
 
 def residue_heatmapper(df_lst, hmap_title_lst, filename):
     # input df is disorder_majority or filtered_dis_maj if preferred
-    new_pivot_df_lst = heatmap_pivotdf_maker(df_lst)
+    new_pivot_df_lst, aa_symbols_lst = heatmap_pivotdf_maker(df_lst)
     sns.set(font_scale=2.7)
     fig, axes = plt.subplots(len(new_pivot_df_lst), 1, figsize=(30, 20 * len(new_pivot_df_lst)))
     for i, (ax, d, t) in enumerate(zip(axes.reshape(-1), new_pivot_df_lst, hmap_title_lst)):
-        sb = sns.heatmap(d, cmap="viridis", annot=True, fmt='g', linewidth=0.5, ax=ax, square=True,
-                         cbar_kws={'label': 'Residue transition percentage'}
+        sb = sns.heatmap(d, cmap="viridis", annot=True, fmt='g', linewidth=0.9, ax=ax, square=True,
+                         cbar_kws={'label': 'Transition percentage'}
                          )
         ax.set_title(t, fontsize=40)
         ax.set_xlabel('Variant residues', fontsize=30)
         ax.set_ylabel('Original residues', fontsize=30)
         ax.tick_params(axis='x', colors='red')
+        ax.set_xticklabels(aa_symbols_lst)
 
-        if i < (len(new_pivot_df_lst) - 1):
-            sb.set(xticklabels=[])
-            sb.set(xlabel=None)
+        # if i < (len(new_pivot_df_lst) - 1):
+        #     sb.set(xticklabels=[])
+        #     sb.set(xlabel=None)
     plt.tight_layout()
     plt.savefig(cfg.plots['var-hms'] + '/' + filename + '.png', dpi=120)
     plt.show()
@@ -167,7 +168,7 @@ def heatmap_pivotdf_maker(df_lst):
         new_pivot_df_lst.append(residue_pivot_df)
     difference_df = new_pivot_df_lst[0].subtract(new_pivot_df_lst[1])
     new_pivot_df_lst.append(difference_df)
-    return new_pivot_df_lst
+    return new_pivot_df_lst, aa_categ_order_x
 
 if __name__ == '__main__':
 
@@ -191,7 +192,7 @@ if __name__ == '__main__':
     mobilite_vars_out = mobidb_lite.loc[mobidb_lite['isin_idr'] == 0]
     ndd_mobilite_vars_in = mobilite_vars_in.loc[mobilite_vars_in.acc.isin(ndd_pr_lst)]
     ndd_mobilite_vars_out = mobilite_vars_out.loc[mobilite_vars_out.acc.isin(ndd_pr_lst)]
-    residue_heatmapper([ndd_mobilite_vars_in, mobilite_vars_in], ['Residue Variations - in IDRs (NDDs)', 'Residue Variations- in IDRs (Homo sapiens)', 'Difference (NDD - Homo sapiens)'], 'test1')
+    residue_heatmapper([ndd_mobilite_vars_in, mobilite_vars_in], ['Residue Variations - in IDRs (NDDs)', 'Residue Variations- in IDRs (Homo sapiens)', 'Difference (NDD - Homo sapiens)'], 'heatmap-inidr-HS&NDD')
     # residue_heatmapper(mobilite_vars_out, 'Residue Variations- in ordered region', 'mobilite_vars_out')
     # for ndds
 
