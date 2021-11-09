@@ -53,7 +53,6 @@ def dismaj_var_in_ptm_df_generator():
     # var_in_ptm_checker a new df is produce that shows var positions that are in ptm sites (ptm pos)
     ptms_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-ptms-all.csv',
                           usecols=['acc', 'ptm_pos', 'description', 'ptm_type'])  # (140538, 4)
-    ptms_df = ptms_df.head(1000)
     disorder_maj = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv', usecols=
     ['acc', 'var_id', 'orig_aa', 'var_aa', 'position', 'isin_idr', 'total_vars', 'content_count'])  # (66843, 7)
     dismaj_ptm_df = pd.merge(disorder_maj, ptms_df, on='acc')
