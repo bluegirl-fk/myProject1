@@ -120,18 +120,11 @@ def draw_barplot(x, y, data, xticklabel, yscale):  # input is DF, not list
 
 def residue_heatmapper(df, hmap_title, filename):
     # input df is disorder_majority or filtered_dis_maj if preferred
-    res_df = df[['acc', 'var_id', 'orig_aa', 'var_aa']]
-    aa_lst = res_df['orig_aa'].unique().tolist()
-    res_df = res_df.loc[res_df.var_aa.isin(aa_lst)]
-    residue_ser = res_df.groupby(['orig_aa', 'var_aa']).size().to_frame(name='size').reset_index()
-    residue_pivot_df = pd.pivot_table(residue_ser, values='size', index='orig_aa', columns='var_aa')
-    aa_categ_order_x = ['C', 'M', 'V', 'L', 'I', 'W', 'Y', 'F', 'H', 'T', 'N', 'Q', 'K', 'R', 'D', 'E', 'A', 'S', 'G', 'P']
-    aa_categ_order_y = aa_categ_order_x.__reversed__()
-    residue_pivot_df = residue_pivot_df.reindex(columns=aa_categ_order_x)
-    residue_pivot_df = residue_pivot_df.reindex(aa_categ_order_y)
-    max_value = residue_pivot_df.max()
-    residue_pivot_df = residue_pivot_df.div(max_value).round(2)*100
+    residue_pivot_df = heatmap_pivotdf_maker(df)
     sns.set(font_scale=1.7)
+
+
+
     fig = plt.figure(figsize=(20, 15))
     ax = plt.axes()
     g = sns.heatmap(residue_pivot_df, linewidths=.5, cmap='viridis', annot=True, fmt='g', ax=ax, cbar_kws={'label': 'Residue transition percentage'})
@@ -147,6 +140,21 @@ def residue_heatmapper(df, hmap_title, filename):
     # plt.savefig(cfg.plots['var-hms'] + '/' + filename + '.png', dpi=120)
     return residue_pivot_df
 
+
+def heatmap_pivotdf_maker(df):
+    res_df = df[['acc', 'var_id', 'orig_aa', 'var_aa']]
+    aa_lst = res_df['orig_aa'].unique().tolist()
+    res_df = res_df.loc[res_df.var_aa.isin(aa_lst)]
+    residue_ser = res_df.groupby(['orig_aa', 'var_aa']).size().to_frame(name='size').reset_index()
+    residue_pivot_df = pd.pivot_table(residue_ser, values='size', index='orig_aa', columns='var_aa')
+    aa_categ_order_x = ['C', 'M', 'V', 'L', 'I', 'W', 'Y', 'F', 'H', 'T', 'N', 'Q', 'K', 'R', 'D', 'E', 'A', 'S', 'G',
+                        'P']
+    aa_categ_order_y = aa_categ_order_x.__reversed__()
+    residue_pivot_df = residue_pivot_df.reindex(columns=aa_categ_order_x)
+    residue_pivot_df = residue_pivot_df.reindex(aa_categ_order_y)
+    max_value = residue_pivot_df.max()
+    residue_pivot_df = residue_pivot_df.div(max_value).round(2) * 100
+    return residue_pivot_df
 
 if __name__ == '__main__':
 
