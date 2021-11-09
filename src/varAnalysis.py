@@ -67,8 +67,10 @@ def var_countcol_creator(df):  # a percentage column for variants in IDR / all V
 def var_cnt_residue_normaliezer(df):  # gets df with count columns for vars in/out idr and normalize them based on
     # number of disordered residues or non disordered, respectively
     ## this where method conditions is to prevent nan values for fully disordered proteins (length-content_count == 0)
-    df['in_idr_vars_perc'] = np.where((df['length'] == df['content_count']), 1, (df['in_idr_vars'] / df['content_count']))
-    df['out_idr_vars_perc'] = np.where((df['length'] == df['content_count']), 0, (df['out_idr_vars'] / (df['length'] - df['content_count'])))
+    df['in_idr_vars_perc'] = np.where((df['length'] == df['content_count']), 1,
+                                      (df['in_idr_vars'] / df['content_count']))
+    df['out_idr_vars_perc'] = np.where((df['length'] == df['content_count']), 0,
+                                       (df['out_idr_vars'] / (df['length'] - df['content_count'])))
 
     # df['in_idr_vars_perc'] = (df['in_idr_vars'] / df['content_count'])
     # df['out_idr_vars_perc'] = (df['out_idr_vars'] / (df['length'] - df['content_count']))
@@ -140,7 +142,6 @@ def residue_heatmapper(df_lst, hmap_title_lst, filename):
     plt.savefig(cfg.plots['var-hms'] + '/' + filename + '.png', dpi=120)
     plt.show()
 
-
     # ax.set_title(hmap_title, fontsize=40)
     # plt.xlabel('Variant residues', fontsize=25)
     # # ax.xaxis.label.set_color('red')
@@ -157,7 +158,8 @@ def heatmap_pivotdf_maker(df_lst):
         res_df = res_df.loc[res_df.var_aa.isin(aa_lst)]
         residue_ser = res_df.groupby(['orig_aa', 'var_aa']).size().to_frame(name='size').reset_index()
         residue_pivot_df = pd.pivot_table(residue_ser, values='size', index='orig_aa', columns='var_aa')
-        aa_categ_order_x = ['C', 'M', 'V', 'L', 'I', 'W', 'Y', 'F', 'H', 'T', 'N', 'Q', 'K', 'R', 'D', 'E', 'A', 'S', 'G',
+        aa_categ_order_x = ['C', 'M', 'V', 'L', 'I', 'W', 'Y', 'F', 'H', 'T', 'N', 'Q', 'K', 'R', 'D', 'E', 'A', 'S',
+                            'G',
                             'P']
         aa_categ_order_y = aa_categ_order_x.__reversed__()
         residue_pivot_df = residue_pivot_df.reindex(columns=aa_categ_order_x)
@@ -170,8 +172,8 @@ def heatmap_pivotdf_maker(df_lst):
     new_pivot_df_lst.append(difference_df)
     return new_pivot_df_lst, aa_categ_order_x
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     ## NDD and brain original import
     ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
     ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
@@ -192,10 +194,15 @@ if __name__ == '__main__':
     mobilite_vars_out = mobidb_lite.loc[mobidb_lite['isin_idr'] == 0]
     ndd_mobilite_vars_in = mobilite_vars_in.loc[mobilite_vars_in.acc.isin(ndd_pr_lst)]
     ndd_mobilite_vars_out = mobilite_vars_out.loc[mobilite_vars_out.acc.isin(ndd_pr_lst)]
-    residue_heatmapper([ndd_mobilite_vars_in, mobilite_vars_in], ['Residue Variations - in IDRs (NDDs)', 'Residue Variations- in IDRs (Homo sapiens)', 'Difference (NDD - Homo sapiens)'], 'heatmap-inidr-HS&NDD')
+    residue_heatmapper([ndd_mobilite_vars_in, mobilite_vars_in], ['Residue Variations - in IDRs (NDDs)',
+                                                                  'Residue Variations- in IDRs (Homo sapiens)',
+                                                                  'Difference (NDD - Homo sapiens)'],
+                                                                'heatmap-inidr-HS&NDD')
+    residue_heatmapper([mobilite_vars_in, mobilite_vars_out],
+                       ['Residue Variations - in IDRs (Homo sapiens)', 'Residue Variations- in ORs (Homo sapiens)',
+                        'Difference (in IDRs - in ORs)'], 'heatmap-inoutidr-HS')
     # residue_heatmapper(mobilite_vars_out, 'Residue Variations- in ordered region', 'mobilite_vars_out')
     # for ndds
 
     # residue_heatmapper(ndd_mobilite_vars_in, 'Residue Variations(NDDs) - in disordered region', 'ndd-mobilite_vars_in')
     # residue_heatmapper(ndd_mobilite_vars_out, 'Residue Variations(NDDs)- in ordered region', 'ndd-mobilite_vars_out')
-
