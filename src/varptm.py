@@ -25,7 +25,7 @@ def uniprot_var_in_ptm_checker(df):  # input is merged 1-variants+in/out disorde
         if '&' not in row.ptm_pos:
             # here we fist make a list of ptm_pos with range of 3 AAs before and after the ptm-point (not for disulfide)
             ptm_pos_tmp_lst = []
-            ptm_pos_tmp_lst = np.arange(int(row.ptm_pos)-3, int(row.ptm_pos)+4)
+            ptm_pos_tmp_lst = np.arange(int(row.ptm_pos) - 3, int(row.ptm_pos) + 4)
             # (delete negative numbers later)
             if row.position in ptm_pos_tmp_lst:
                 array_isin.append('1')
@@ -81,27 +81,27 @@ def ptm_divider(inputdf):
 
 
 if __name__ == '__main__':
-    var_in_ptm_checked_df = dismaj_var_in_ptm_df_generator()
-    var_in_ptm_checked_df.to_csv(cfg.data['ptm-u'] + '/uniprot-vars-inptm-checked+-3res.csv')
-    var_in_ptm_checked_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-vars-inptm-checked+-3res.csv')
-    var_in_ptm_df = var_in_ptm_checked_df.loc[var_in_ptm_checked_df['var_in_ptm'] == 1]  # (3170,12) vars, 527 Prs
+    # var_in_ptm_checked_df = dismaj_var_in_ptm_df_generator()
+    # var_in_ptm_checked_df.to_csv(cfg.data['ptm-u'] + '/uniprot-vars-inptm-checked+-3res.csv')
+    var_in_ptm_checked_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-vars-inptm-checked+-3res.csv')  # (1392057, 13)
+    var_in_ptm_df = var_in_ptm_checked_df.loc[var_in_ptm_checked_df['var_in_ptm'] == 1]  # (6419, 13) vars, 527 Prs
     inptm_idr_var_all_df = var_in_ptm_checked_df.loc[(var_in_ptm_checked_df['var_in_ptm'] == 1) &
-                                                     (var_in_ptm_checked_df['isin_idr'] == 1)]  # (366, 13)
-    inptm_idr_var_all_pr_lst = inptm_idr_var_all_df['acc'].unique().tolist()  # 177 Prs.
-    _, _, all_disulfide_pr_lst, all_other_ptms_pr_lst = ptm_divider(inptm_idr_var_all_df)  # 19 # 159
+                                                     (var_in_ptm_checked_df['isin_idr'] == 1)]  # (2126, 13)
+    # (find also ptms in disorder, without considering variations)
+    inptm_idr_var_all_pr_lst = inptm_idr_var_all_df['acc'].unique().tolist()  # 808 Prs.
+    _, _, all_disulfide_pr_lst, all_other_ptms_pr_lst = ptm_divider(inptm_idr_var_all_df)  # 19 # 790
     ptm_type_count = inptm_idr_var_all_df.groupby('ptm_type').count()
     ## for NDDs
-    in_ptm_idr_var_ndd_pr_lst, _, inptm_idr_var_ndd_df = ndd_idrvar_in_ptm_lst_df_generator(inptm_idr_var_all_pr_lst,
-                                                                                            inptm_idr_var_all_df) # 16
+    in_ptm_idr_var_ndd_pr_lst, _, inptm_idr_var_ndd_df = ndd_idrvar_in_ptm_lst_df_generator \
+        (inptm_idr_var_all_pr_lst, inptm_idr_var_all_df)  # 76 # (365, 13)
     # contributes to 77 rows in phens col, so each pr is in charge of ~5 phens among all phens and not just my phens
     print('\n'.join(in_ptm_idr_var_ndd_pr_lst))
-    _, _, ndd_disulfide_pr_lst, ndd_other_ptms_pr_lst = ptm_divider(inptm_idr_var_ndd_df)  # 1  # 16
+    _, _, ndd_disulfide_pr_lst, ndd_other_ptms_pr_lst = ptm_divider(inptm_idr_var_ndd_df)  # 1  # 76
 
     ## NDD variants in ptm, even if not in disordered regions, can regulate IDP activation
     ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
     ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
     ndd_vars_in_ptm = var_in_ptm_checked_df.loc[(var_in_ptm_checked_df.acc.isin(ndd_pr_lst))
-                                                & (var_in_ptm_checked_df['var_in_ptm'] == 1)]  # (759, 13)
-    ndd_vars_in_ptm_lst = ndd_vars_in_ptm['acc'].unique().tolist()  # 46
-
+                                                & (var_in_ptm_checked_df['var_in_ptm'] == 1)]  # (1244, 13)
+    ndd_vars_in_ptm_lst = ndd_vars_in_ptm['acc'].unique().tolist()  # 127
     print('\n'.join(ndd_other_ptms_pr_lst))

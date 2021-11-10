@@ -201,8 +201,7 @@ if __name__ == '__main__':
     residue_heatmapper([mobilite_vars_in, mobilite_vars_out],
                        ['Residue Variations - in IDRs (Homo sapiens)', 'Residue Variations- in ORs (Homo sapiens)',
                         'Difference (in IDRs - in ORs)'], 'heatmap-inoutidr-HS')
-    # residue_heatmapper(mobilite_vars_out, 'Residue Variations- in ordered region', 'mobilite_vars_out')
-    # for ndds
-
-    # residue_heatmapper(ndd_mobilite_vars_in, 'Residue Variations(NDDs) - in disordered region', 'ndd-mobilite_vars_in')
-    # residue_heatmapper(ndd_mobilite_vars_out, 'Residue Variations(NDDs)- in ordered region', 'ndd-mobilite_vars_out')
+    # residue_heatmapper(mobilite_vars_out, 'Residue Variations- in ordered region', 'mobilite_vars_out') for ndds
+    # todo make sure the heatmap is drawn based on var_ids not accs residue_heatmapper(ndd_mobilite_vars_in,
+    # 'Residue Variations(NDDs) - in disordered region', 'ndd-mobilite_vars_in') residue_heatmapper(
+    #  ndd_mobilite_vars_out, 'Residue Variations(NDDs)- in ordered region', 'ndd-mobilite_vars_out')
