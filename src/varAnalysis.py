@@ -9,6 +9,7 @@ import config as cfg
 import brain as brn
 import seaborn as sns
 import matplotlib.pyplot as plt
+import collections
 
 
 def vars_multiple_df_generator(input_df):
@@ -194,6 +195,11 @@ if __name__ == '__main__':
     mobilite_vars_out = mobidb_lite.loc[mobidb_lite['isin_idr'] == 0]
     ndd_mobilite_vars_in = mobilite_vars_in.loc[mobilite_vars_in.acc.isin(ndd_pr_lst)]
     ndd_mobilite_vars_out = mobilite_vars_out.loc[mobilite_vars_out.acc.isin(ndd_pr_lst)]
+    ## Variants description (in disorder)
+    ndd_vars_in_descriptions = ndd_mobilite_vars_in['description'].unique().tolist()
+    desc_counter = collections.Counter(ndd_vars_in_descriptions)
+    # from: https://stackoverflow.com/questions/2161752/how-to-count-the-frequency-of-the-elements-in-an-unordered-list
+    print(desc_counter)  # later you can somehow categorize them based on type of pathology and stuff
 
     ## heatmaps
     residue_heatmapper([ndd_mobilite_vars_in, mobilite_vars_in], ['Residue Variations - in IDRs (NDDs)',
