@@ -105,3 +105,5 @@ if __name__ == '__main__':
                                                 & (var_in_ptm_checked_df['var_in_ptm'] == 1)]  # (1244, 13)
     ndd_vars_in_ptm_lst = ndd_vars_in_ptm['acc'].unique().tolist()  # 127
     print('\n'.join(ndd_other_ptms_pr_lst))
+
+    # cm: maybe find ptms and disease (vars), and checked the relation with disorder and LLPS

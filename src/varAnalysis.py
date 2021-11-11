@@ -199,6 +199,7 @@ if __name__ == '__main__':
     ndd_vars_in_descriptions = ndd_mobilite_vars_in['description'].unique().tolist()
     desc_counter = collections.Counter(ndd_vars_in_descriptions)
     # from: https://stackoverflow.com/questions/2161752/how-to-count-the-frequency-of-the-elements-in-an-unordered-list
+    # parse uniprot-xml keyword disease part
     print(desc_counter)  # later you can somehow categorize them based on type of pathology and stuff
 
     ## heatmaps
