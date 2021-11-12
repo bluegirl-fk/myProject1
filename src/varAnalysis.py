@@ -10,6 +10,7 @@ import brain as brn
 import seaborn as sns
 import matplotlib.pyplot as plt
 import collections
+from itertools import product
 
 
 def vars_multiple_df_generator(input_df):
@@ -152,6 +153,7 @@ def residue_heatmapper(df_lst, hmap_title_lst, filename):
 
 
 def heatmap_pivotdf_maker(df_lst):
+    # todo check if the transitions are counted correctly, because the numbers here are different
     new_pivot_df_lst = []
     for df in df_lst:
         res_df = df[['acc', 'var_id', 'orig_aa', 'var_aa']]
@@ -166,7 +168,8 @@ def heatmap_pivotdf_maker(df_lst):
         residue_pivot_df = residue_pivot_df.reindex(columns=aa_categ_order_x)
         residue_pivot_df = residue_pivot_df.reindex(aa_categ_order_y)
         max_value = residue_pivot_df.max()
-        residue_pivot_df = residue_pivot_df.div(max_value).round(2) * 100
+        print(max_value)
+        residue_pivot_df = (residue_pivot_df.div(max_value)).round(3) * 100
         residue_pivot_df = residue_pivot_df.apply(pd.to_numeric)
         new_pivot_df_lst.append(residue_pivot_df)
     difference_df = new_pivot_df_lst[0].subtract(new_pivot_df_lst[1])
@@ -191,8 +194,8 @@ if __name__ == '__main__':
     # def total_var_res_percentage(df): # to generate percentage for the whole dataset
 
     # 4631 unique ACCs
-    mobilite_vars_in = mobidb_lite.loc[mobidb_lite['isin_idr'] == 1]
-    mobilite_vars_out = mobidb_lite.loc[mobidb_lite['isin_idr'] == 0]
+    mobilite_vars_in = mobidb_lite.loc[mobidb_lite['isin_idr'] == 1]  # (8120, 18)
+    mobilite_vars_out = mobidb_lite.loc[mobidb_lite['isin_idr'] == 0]  # (37672, 18)
     ndd_mobilite_vars_in = mobilite_vars_in.loc[mobilite_vars_in.acc.isin(ndd_pr_lst)]
     ndd_mobilite_vars_out = mobilite_vars_out.loc[mobilite_vars_out.acc.isin(ndd_pr_lst)]
     ## Variants description (in disorder)
@@ -202,14 +205,23 @@ if __name__ == '__main__':
     # parse uniprot-xml keyword disease part
     print(desc_counter)  # later you can somehow categorize them based on type of pathology and stuff
 
+    print(mobilite_vars_in['orig_aa'].value_counts()[:5].index.tolist())
+    print(mobilite_vars_out['var_aa'].value_counts()[:5].index.tolist())
+    # most_occuring_aa_transition_inIDR = mobilite_vars_in.groupby(['orig_aa', 'var_aa']).size().idxmax(5)
+
+    # aa_transition_inIDR = list(product(mobilite_vars_in['orig_aa'], mobilite_vars_in['var_aa']))
+    # aa_transition_inIDR = collections.Counter(aa_transition_inIDR)
+    # most_occuring_aa_transitions = aa_transition_inIDR.most_common(10)
+
     ## heatmaps
-    residue_heatmapper([ndd_mobilite_vars_in, mobilite_vars_in], ['Residue Variations - in IDRs (NDDs)',
+    residue_heatmapper([ndd_mobilite_vars_in, mobilite_vars_in], ['Residue Variations1 - in IDRs (NDDs)',
                                                                   'Residue Variations- in IDRs (Homo sapiens)',
                                                                   'Difference (NDD - Homo sapiens)'],
-                                                                'heatmap-inidr-HS&NDD')
+                       'heatmap-inidr-HS&NDD1')
     residue_heatmapper([mobilite_vars_in, mobilite_vars_out],
-                       ['Residue Variations - in IDRs (Homo sapiens)', 'Residue Variations- in ORs (Homo sapiens)',
-                        'Difference (in IDRs - in ORs)'], 'heatmap-inoutidr-HS')
-    # residue_heatmapper(mobilite_vars_out, 'Residue Variations- in ordered region', 'mobilite_vars_out') for ndds
+                       ['Residue Variations1 - in IDRs (Homo sapiens)', 'Residue Variations- in ORs (Homo sapiens)',
+                        'Difference (in IDRs - in ORs)'], 'heatmap-inoutidr-HS1')
 
-
+    lst, _ = heatmap_pivotdf_maker([mobilite_vars_in, mobilite_vars_out])
+    df1 = lst[0]
+    df2 = lst[1]
