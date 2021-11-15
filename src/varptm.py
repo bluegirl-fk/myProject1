@@ -160,11 +160,9 @@ if __name__ == '__main__':
     ['acc', 'var_id', 'orig_aa', 'var_aa', 'position', 'isin_idr', 'total_vars', 'content_count', 'startend'])
     ptms_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-ptms-all.csv',
                           usecols=['acc', 'ptm_pos', 'description', 'ptm_type'])  # (140538, 4)
-    ptm_in_idr_checked_df = mutidr_bool_array_maker()
-    ptm_in_idr_checked_df.to_csv(cfg.data['ptm'] + '/ptm_in_idr_checked_(uniprot)-with-disulfide.csv')
+    # ptm_in_idr_checked_df = mutidr_bool_array_maker()
+    ptm_in_idr_checked_df = pd.read_csv(cfg.data['ptm'] + '/ptm_in_idr_checked_(uniprot)-with-disulfide.csv')
     ptm_in_disorder_df = ptm_in_idr_checked_df.loc[ptm_in_idr_checked_df['ptm_inidr'] == 1]
 
-    # 49.7% of ptm are if disorders, but this should be more, and the probable reason could be because the disorder df
-    # here is disorder majority which means some proteins are deleted and ony the ones with cc > 20 residues are kept,
-    # also the disulfide bonds were not taken into account before
+    # remember that you are using filtered dismaj based on cc > 20 residues
     # todo: retry with normal disorder majority, also organize the code and method()
