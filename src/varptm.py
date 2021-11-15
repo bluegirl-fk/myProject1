@@ -163,6 +163,8 @@ if __name__ == '__main__':
     # ptm_in_idr_checked_df = mutidr_bool_array_maker()
     ptm_in_idr_checked_df = pd.read_csv(cfg.data['ptm'] + '/ptm_in_idr_checked_(uniprot)-with-disulfide.csv')
     ptm_in_disorder_df = ptm_in_idr_checked_df.loc[ptm_in_idr_checked_df['ptm_inidr'] == 1]
-
+    disulfide_in_disorder = ptm_in_disorder_df.loc[ptm_in_disorder_df['ptm_type'] == 'disulfide bond']
+    disulfide_in_disorder_pr_lst = disulfide_in_disorder['acc'].unique().tolist()  # 524 proteins
     # remember that you are using filtered dismaj based on cc > 20 residues
     # todo: retry with normal disorder majority, also organize the code and method()
+    # also this part should come at first, so fist ptm in disorder, then var in ptm
