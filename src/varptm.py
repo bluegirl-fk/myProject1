@@ -80,6 +80,49 @@ def ptm_divider(inputdf):
     return disulfide_bonds_df, the_rest_of_ptms_df, disulfide_bonds_pr_lst, the_rest_of_ptms_pr_lst
 
 
+## from here on, the methods are for checking if PTM is in disorder
+# (previous one was giving away var in ptm, and isin_idr separately)
+
+
+def expand_regions(region_ranges_lst):
+    transformed_regions = []
+    region_ranges_lst = region_ranges_lst.split(',')
+    # region_ranges_lst = list(region_ranges_lst)
+    for region in region_ranges_lst:
+        start = int(region.split('..')[0])
+        end = int(region.split('..')[1])
+        while start <= end:
+            transformed_regions.append(start)
+            start += 1
+    return set(transformed_regions)
+
+
+def mutidr_bool_array_maker():
+    ## checks if ptm position is in startend disorder region of mobidb or not
+    # makke merged df to be checked for ptm in disorder
+    ptms_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-ptms-all.csv',
+                          usecols=['acc', 'ptm_pos', 'description', 'ptm_type'])  # (140538, 4)
+    ptms_df = ptms_df.loc[ptms_df['ptm_type'] != 'disulfide bond']
+    disorder_maj = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv', usecols=
+    ['acc', 'var_id', 'orig_aa', 'var_aa', 'position', 'isin_idr', 'total_vars', 'content_count', 'startend'])
+    disorder_maj = disorder_maj.rename(columns={'start..end': 'startend'})
+    dismaj_ptm_df = pd.merge(disorder_maj, ptms_df, on='acc')
+    # starts here
+    # todo (disulfides not considered yet), do it later
+    array_is_in = []
+    for index, row in dismaj_ptm_df.iterrows():
+        print('1')
+        lst_disorder_region = list(expand_regions(row.startend))
+        print('2')
+        if int(row.ptm_pos) in lst_disorder_region:
+            array_is_in.append('1')
+        else:
+            print('3')
+            array_is_in.append('0')
+    dismaj_ptm_df['ptm_inidr'] = array_is_in
+    return dismaj_ptm_df
+
+
 if __name__ == '__main__':
     # var_in_ptm_checked_df = dismaj_var_in_ptm_df_generator()
     # var_in_ptm_checked_df.to_csv(cfg.data['ptm-u'] + '/uniprot-vars-inptm-checked+-3res.csv')
@@ -95,7 +138,7 @@ if __name__ == '__main__':
     in_ptm_idr_var_ndd_pr_lst, _, inptm_idr_var_ndd_df = ndd_idrvar_in_ptm_lst_df_generator \
         (inptm_idr_var_all_pr_lst, inptm_idr_var_all_df)  # 76 # (365, 13)
     # contributes to 77 rows in phens col, so each pr is in charge of ~5 phens among all phens and not just my phens
-    print('\n'.join(in_ptm_idr_var_ndd_pr_lst))
+    # print('\n'.join(in_ptm_idr_var_ndd_pr_lst))
     _, _, ndd_disulfide_pr_lst, ndd_other_ptms_pr_lst = ptm_divider(inptm_idr_var_ndd_df)  # 1  # 76
 
     ## NDD variants in ptm, even if not in disordered regions, can regulate IDP activation
@@ -104,6 +147,16 @@ if __name__ == '__main__':
     ndd_vars_in_ptm = var_in_ptm_checked_df.loc[(var_in_ptm_checked_df.acc.isin(ndd_pr_lst))
                                                 & (var_in_ptm_checked_df['var_in_ptm'] == 1)]  # (1244, 13)
     ndd_vars_in_ptm_lst = ndd_vars_in_ptm['acc'].unique().tolist()  # 127
-    print('\n'.join(ndd_other_ptms_pr_lst))
+    # print('\n'.join(ndd_other_ptms_pr_lst))
 
     # cm: maybe find ptms and disease (vars), and checked the relation with disorder and LLPS
+    disorder_maj = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv', usecols=
+    ['acc', 'var_id', 'orig_aa', 'var_aa', 'position', 'isin_idr', 'total_vars', 'content_count', 'startend'])
+    ptms_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-ptms-all.csv',
+                          usecols=['acc', 'ptm_pos', 'description', 'ptm_type'])  # (140538, 4)
+    # ptm_in_idr_checked_df = mutidr_bool_array_maker()
+    ptm_in_idr_checked_df = pd.read_csv(cfg.data['ptm'] + '/ptm_in_idr_checked_(uniprot).csv')
+    ptm_in_disorder_df = ptm_in_idr_checked_df.loc[ptm_in_idr_checked_df['ptm_inidr'] == 1]
+    # 49.7% of ptm are if disorders, but this should be more, and the probable reason could be because the disorder df
+    # here is disorder majority which means some proteins are deleted and ony the ones with cc > 20 residues are kept
+    # todo: retry with normal disorder majority, also organize the code and method()
