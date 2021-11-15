@@ -102,23 +102,29 @@ def mutidr_bool_array_maker():
     # makke merged df to be checked for ptm in disorder
     ptms_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-ptms-all.csv',
                           usecols=['acc', 'ptm_pos', 'description', 'ptm_type'])  # (140538, 4)
-    ptms_df = ptms_df.loc[ptms_df['ptm_type'] != 'disulfide bond']
     disorder_maj = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv', usecols=
     ['acc', 'var_id', 'orig_aa', 'var_aa', 'position', 'isin_idr', 'total_vars', 'content_count', 'startend'])
-    disorder_maj = disorder_maj.rename(columns={'start..end': 'startend'})
     dismaj_ptm_df = pd.merge(disorder_maj, ptms_df, on='acc')
     # starts here
-    # todo (disulfides not considered yet), do it later
     array_is_in = []
     for index, row in dismaj_ptm_df.iterrows():
-        print('1')
-        lst_disorder_region = list(expand_regions(row.startend))
-        print('2')
-        if int(row.ptm_pos) in lst_disorder_region:
-            array_is_in.append('1')
-        else:
-            print('3')
-            array_is_in.append('0')
+        if '&' not in row.ptm_pos:
+            print('one')
+            lst_disorder_region = list(expand_regions(row.startend))
+            if int(row.ptm_pos) in lst_disorder_region:
+                array_is_in.append('1')
+            else:
+                array_is_in.append('0')
+        elif '&' in row.ptm_pos:
+            print('two')
+            lst_ptm_pos = list(set(str(row.ptm_pos).split('&')))
+            lst_disorder_region = list(expand_regions(row.startend))
+            lst_disorder_region = [str(i) for i in lst_disorder_region]
+            if len(list(set(lst_ptm_pos) & set(lst_disorder_region))) >= 1:  # at least have one value in common
+                array_is_in.append('1')
+            else:
+                array_is_in.append('0')
+
     dismaj_ptm_df['ptm_inidr'] = array_is_in
     return dismaj_ptm_df
 
@@ -154,9 +160,11 @@ if __name__ == '__main__':
     ['acc', 'var_id', 'orig_aa', 'var_aa', 'position', 'isin_idr', 'total_vars', 'content_count', 'startend'])
     ptms_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-ptms-all.csv',
                           usecols=['acc', 'ptm_pos', 'description', 'ptm_type'])  # (140538, 4)
-    # ptm_in_idr_checked_df = mutidr_bool_array_maker()
-    ptm_in_idr_checked_df = pd.read_csv(cfg.data['ptm'] + '/ptm_in_idr_checked_(uniprot).csv')
+    ptm_in_idr_checked_df = mutidr_bool_array_maker()
+    ptm_in_idr_checked_df.to_csv(cfg.data['ptm'] + '/ptm_in_idr_checked_(uniprot)-with-disulfide.csv')
     ptm_in_disorder_df = ptm_in_idr_checked_df.loc[ptm_in_idr_checked_df['ptm_inidr'] == 1]
+
     # 49.7% of ptm are if disorders, but this should be more, and the probable reason could be because the disorder df
-    # here is disorder majority which means some proteins are deleted and ony the ones with cc > 20 residues are kept
+    # here is disorder majority which means some proteins are deleted and ony the ones with cc > 20 residues are kept,
+    # also the disulfide bonds were not taken into account before
     # todo: retry with normal disorder majority, also organize the code and method()

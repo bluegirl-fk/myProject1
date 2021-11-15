@@ -70,3 +70,4 @@ if __name__ == '__main__':
     # proteins high-confidence associate to MLOs have more PTMs
     # see your disease proteins are mostly in which llps category, (driver/scaffold, other types ...)
     # this paper : https://www.sciencedirect.com/science/article/pii/S2001037021002804
+# see this protein opened in mobidb in your df and compare
