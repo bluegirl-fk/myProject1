@@ -66,3 +66,7 @@ if __name__ == '__main__':
     ndd_varin_phasep_lst = ndd_varin_phasep_df['acc'].unique().tolist()  # 41
     # ndd_varin_phasepro_lst = ndd_varin_phasepro_df['acc'].unique().tolist()  # 5
     print('\n'.join(ndd_varin_phasep_lst))
+    # check if llps proteins have more disordered regions (maybe), more low complexity
+    # proteins high-confidence associate to MLOs have more PTMs
+    # see your disease proteins are mostly in which llps category, (driver/scaffold, other types ...)
+    # this paper : https://www.sciencedirect.com/science/article/pii/S2001037021002804
