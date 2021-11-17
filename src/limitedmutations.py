@@ -33,6 +33,6 @@ if __name__ == '__main__':
     print('\n'.join(cgenes))
     g4dn_annots = pd.read_csv(cfg.data['gene4'] + '/All_De_novo_mutations_and_annotations_1.2.txt',
                               sep='\t', encoding='cp1252', low_memory=False)
-    candidate_annots = g4dn_annots.loc[g4dn_annots['Gene.refGene'].isin(cgenes)]
+    candidalte_annots = g4dn_annots.loc[g4dn_annots['Gene.refGene'].isin(cgenes)]
     candidate_annots = candidate_annots.loc[candidate_annots['Func.refGene'] == 'exonic']
     candidate_annots.to_csv(cfg.data['gene4'] + '/candidate_genes_annotations.csv')

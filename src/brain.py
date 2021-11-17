@@ -34,8 +34,7 @@ def brain_pr_lst_generator():
     norm_tissue_cols_lst = normal_tissue_df.columns.tolist()
 
     brain_areas_lst = ['hypothalamus', 'hippocampus', 'cerebral cortex', 'cerebellum', 'choroid plexus',
-                       'dorsal raphe',
-                       'pituitary gland', 'caudate']
+                       'dorsal raphe', 'pituitary gland', 'caudate']
     # to be filtered based on only brain parts (discarding other tissues)
     brain_filtered_df = pd.DataFrame(columns=norm_tissue_cols_lst)  # defining empty df to be filled
     for each_area in brain_areas_lst:
@@ -64,10 +63,13 @@ def brain_pr_lst_generator():
     return brain_uniprot_lst
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
     # if this number is not enough, you can try to include other brain dataframes as well, e.g: Brainspan
     # brain_pr_lst = brain_pr_lst_generator()
-
+    brain_df = pd.read_table(cfg.data['brain'] + '/proteinatlas.tsv', error_bad_lines=False, sep='\t')
+    normal_tissue_df = pd.read_table(cfg.data['brain'] + '/normal_tissue.tsv', error_bad_lines=False, sep='\t')
+    normal_tissue_lst = normal_tissue_df['Level'].unique().tolist()
+    br_new = pd.read_table(cfg.data['brain'] + '/brain_category_rna_Any_Region.tsv', sep='\t')
 
 
 

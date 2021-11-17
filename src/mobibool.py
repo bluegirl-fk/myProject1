@@ -140,77 +140,79 @@ if __name__ == '__main__':
     ## import dfs # (mobidb)
     # mobidb = pd.read_csv(cfg.data['phens'] + '/mobidb-results+ndd-tsv-damiano-shared.tsv')
     # # NDD , could also specify index_col= ..., and pass a list for multiple idxs
-    # ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
-    # ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
-    # ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins  => these are all, not the selected phens
-    # ## brain
-    # brain_prot_lst = bd.brain_pr_lst_generator()  # n: 8320
-    # brain_subdf = DataFrame(brain_prot_lst, columns=['acc'])
-    # # mutual_brain_ndd_prs_lst = [i for i in brain_prot_lst if i in ndd_pr_lst]  # 455
-
-    ## Mobidb, Brain and Ndd dfs with all variations (in/out of IDR)
-    mobidb, brain_subdf, ndd_subdf = var.all_vars_or_vars_inidr('all')
-
-    # new mobidb with one column for phens of NDD, human, and brain
-    mobidb = mobi_phens_col_maker(mobidb, brain_subdf, ndd_subdf)
-    mobidb.to_csv(cfg.data['vars'] + '/all-vars-mobidb-plus-phenotype-column.csv')
-
-    mobi_feature_df = mobidb[mobidb.feature.isin(features_lst)]
-    # multi-idx-dfs
-    mobi_disorder_df, mobi_cont_count_df, mobi_length_df = multidx_df_maker(
-        [mobi_feature_df, mobidb], ['acc', 'feature', 'phenotype'])
-    ## Boxplots
-    # content count
-    for key in feature_dict.keys():
-        box_plotter(data=mobi_cont_count_df.loc[(slice(None), key), phens_lst],
-                    save_route=(cfg.plots['avb-cc'] + '/' + key + '-cc' + '.png'),
-                    title=feature_dict[key][0], ylabel='Residues count', ylim=feature_dict[key][1])
-    # content fraction
-    for key in feature_dict.keys():
-        box_plotter(data=mobi_disorder_df.loc[(slice(None), key), phens_lst],
-                    save_route=(cfg.plots['avb-cf'] + '/' + key + '-cf' + '.png'),
-                    title=feature_dict[key][0], ylabel='Content (%)', ylim=feature_dict[key][2])
-    # Length
-    box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-                save_route=(cfg.plots['avb-len'] + '/' + 'len4200' + '.png'),
-                title='Protein sequence length', ylabel='Residues count', ylim=4200)
-    ## Violin plots
-    # content count
-    for key in feature_dict.keys():
-        violin_plotter(data=mobi_cont_count_df.loc[(slice(None), key), phens_lst],
-                       save_route=(cfg.plots['avv-cc'] + '/' + key + '-cc' + '.png'),
-                       title=feature_dict[key][0], ylabel='Residues count', ylim=feature_dict[key][1])
-    # content fraction
-    for key in feature_dict.keys():
-        violin_plotter(data=mobi_disorder_df.loc[(slice(None), key), phens_lst],
-                       save_route=(cfg.plots['avv-cf'] + '/' + key + '-cf' + '.png'),
-                       title=feature_dict[key][0], ylabel='Content (%)', ylim=feature_dict[key][2])
-    # Length
-    violin_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
-                   save_route=(cfg.plots['avv-len'] + '/' + 'len4200' + '.png'),
-                   title='Protein sequence length', ylabel='Residues count', ylim=4200)
-
-    ## writing data statistics to CSV
-    pd.set_option('display.max_columns', None)
-    pd.set_option('display.max_rows', None)
-    for each_f in features_lst:
-        mobi_disorder_df.loc[(slice(None), each_f), phens_lst].describe().T. \
-            to_csv(cfg.data['all-var-desc-cf'] + '/' + each_f + '-cf.csv')
-        mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
-            to_csv(cfg.data['all-var-desc-cc'] + '/' + each_f + '-cc.csv')
-    mobi_length_df.loc[slice(None), phens_lst].describe().T.to_csv(cfg.data['all-var-desc-len'] + '/length-stats.csv')
-
-    sig_pep_percent_df = sig_pep_percent_df_maker()
-    transmem_pr_percent_df = transmem_pr_percent_df_maker()
-
-    ## Barplots
-    # Signal peptide
-    draw_barplot(x='Phenotypes', y='Signal peptide percentage', data=sig_pep_percent_df, xticklabel=phens_lst,
-                 yscale='linear', save_rout=cfg.plots['avar-bar'] + '/sig-peptide-percent.png')
-    draw_barplot(x='Phenotypes', y='Signal peptide count', data=sig_pep_percent_df, xticklabel=phens_lst,
-                 yscale='log', save_rout=cfg.plots['avar-bar'] + '/sig-peptide-count.png')
-    # Transmembrane protein
-    draw_barplot(x='Phenotypes', y='Transmembrane protein percentage', data=transmem_pr_percent_df, xticklabel=phens_lst,
-                 yscale='linear', save_rout=cfg.plots['avar-bar'] + '/transmemb-prots-percent.png')
-    draw_barplot(x='Phenotypes', y='Transmembrane protein count', data=transmem_pr_percent_df, xticklabel=phens_lst,
-                 yscale='log', save_rout=cfg.plots['avar-bar'] + '/transmemb-prots-count.png')
+    ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
+    ndd_subdf = ndd_subdf.drop_duplicates()  # (4531, 3)
+    ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins  => these are all, not the selected phens
+    ndd_only_phens = ndd_subdf.loc[ndd_subdf.Phenotype.isin(phens_lst[2:])]
+    ndd_only_phens = ndd_only_phens['acc'].unique().tolist()  # 13061
+    # # ## brain
+    # # brain_prot_lst = bd.brain_pr_lst_generator()  # n: 8320
+    # # brain_subdf = DataFrame(brain_prot_lst, columns=['acc'])
+    # # # mutual_brain_ndd_prs_lst = [i for i in brain_prot_lst if i in ndd_pr_lst]  # 455
+    #
+    # ## Mobidb, Brain and Ndd dfs with all variations (in/out of IDR)
+    # mobidb, brain_subdf, ndd_subdf = var.all_vars_or_vars_inidr('all')
+    #
+    # # new mobidb with one column for phens of NDD, human, and brain
+    # mobidb = mobi_phens_col_maker(mobidb, brain_subdf, ndd_subdf)
+    # mobidb.to_csv(cfg.data['vars'] + '/all-vars-mobidb-plus-phenotype-column.csv')
+    #
+    # mobi_feature_df = mobidb[mobidb.feature.isin(features_lst)]
+    # # multi-idx-dfs
+    # mobi_disorder_df, mobi_cont_count_df, mobi_length_df = multidx_df_maker(
+    #     [mobi_feature_df, mobidb], ['acc', 'feature', 'phenotype'])
+    # ## Boxplots
+    # # content count
+    # for key in feature_dict.keys():
+    #     box_plotter(data=mobi_cont_count_df.loc[(slice(None), key), phens_lst],
+    #                 save_route=(cfg.plots['avb-cc'] + '/' + key + '-cc' + '.png'),
+    #                 title=feature_dict[key][0], ylabel='Residues count', ylim=feature_dict[key][1])
+    # # content fraction
+    # for key in feature_dict.keys():
+    #     box_plotter(data=mobi_disorder_df.loc[(slice(None), key), phens_lst],
+    #                 save_route=(cfg.plots['avb-cf'] + '/' + key + '-cf' + '.png'),
+    #                 title=feature_dict[key][0], ylabel='Content (%)', ylim=feature_dict[key][2])
+    # # Length
+    # box_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
+    #             save_route=(cfg.plots['avb-len'] + '/' + 'len4200' + '.png'),
+    #             title='Protein sequence length', ylabel='Residues count', ylim=4200)
+    # ## Violin plots
+    # # content count
+    # for key in feature_dict.keys():
+    #     violin_plotter(data=mobi_cont_count_df.loc[(slice(None), key), phens_lst],
+    #                    save_route=(cfg.plots['avv-cc'] + '/' + key + '-cc' + '.png'),
+    #                    title=feature_dict[key][0], ylabel='Residues count', ylim=feature_dict[key][1])
+    # # content fraction
+    # for key in feature_dict.keys():
+    #     violin_plotter(data=mobi_disorder_df.loc[(slice(None), key), phens_lst],
+    #                    save_route=(cfg.plots['avv-cf'] + '/' + key + '-cf' + '.png'),
+    #                    title=feature_dict[key][0], ylabel='Content (%)', ylim=feature_dict[key][2])
+    # # Length
+    # violin_plotter(data=mobi_length_df.loc[(slice(None)), phens_lst],
+    #                save_route=(cfg.plots['avv-len'] + '/' + 'len4200' + '.png'),
+    #                title='Protein sequence length', ylabel='Residues count', ylim=4200)
+    #
+    # ## writing data statistics to CSV
+    # pd.set_option('display.max_columns', None)
+    # pd.set_option('display.max_rows', None)
+    # for each_f in features_lst:
+    #     mobi_disorder_df.loc[(slice(None), each_f), phens_lst].describe().T. \
+    #         to_csv(cfg.data['all-var-desc-cf'] + '/' + each_f + '-cf.csv')
+    #     mobi_cont_count_df.loc[(slice(None), each_f), phens_lst].describe().T. \
+    #         to_csv(cfg.data['all-var-desc-cc'] + '/' + each_f + '-cc.csv')
+    # mobi_length_df.loc[slice(None), phens_lst].describe().T.to_csv(cfg.data['all-var-desc-len'] + '/length-stats.csv')
+    #
+    # sig_pep_percent_df = sig_pep_percent_df_maker()
+    # transmem_pr_percent_df = transmem_pr_percent_df_maker()
+    #
+    # ## Barplots
+    # # Signal peptide
+    # draw_barplot(x='Phenotypes', y='Signal peptide percentage', data=sig_pep_percent_df, xticklabel=phens_lst,
+    #              yscale='linear', save_rout=cfg.plots['avar-bar'] + '/sig-peptide-percent.png')
+    # draw_barplot(x='Phenotypes', y='Signal peptide count', data=sig_pep_percent_df, xticklabel=phens_lst,
+    #              yscale='log', save_rout=cfg.plots['avar-bar'] + '/sig-peptide-count.png')
+    # # Transmembrane protein
+    # draw_barplot(x='Phenotypes', y='Transmembrane protein percentage', data=transmem_pr_percent_df, xticklabel=phens_lst,
+    #              yscale='linear', save_rout=cfg.plots['avar-bar'] + '/transmemb-prots-percent.png')
+    # draw_barplot(x='Phenotypes', y='Transmembrane protein count', data=transmem_pr_percent_df, xticklabel=phens_lst,
+    #              yscale='log', save_rout=cfg.plots['avar-bar'] + '/transmemb-prots-count.png')
