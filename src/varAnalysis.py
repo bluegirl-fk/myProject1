@@ -69,6 +69,7 @@ def var_countcol_creator(df):  # a percentage column for variants in IDR / all V
 def var_cnt_residue_normaliezer(df):  # gets df with count columns for vars in/out idr and normalize them based on
     # number of disordered residues or non disordered, respectively
     ## this where method conditions is to prevent nan values for fully disordered proteins (length-content_count == 0)
+    # in other proteins cases it just divides number of vars on number of residues
     df['in_idr_vars_perc'] = np.where((df['length'] == df['content_count']), 1,
                                       (df['in_idr_vars'] / df['content_count']))
     df['out_idr_vars_perc'] = np.where((df['length'] == df['content_count']), 0,
@@ -100,7 +101,7 @@ def var_residue_stats_table_generator(input_vardf):
     outidr_vars_residue = int(outidr_vars_residue['order_res'].sum())
     # length_df = input_vardf[['acc', 'length']]
     # length = length_df['length'].sum()
-    vars_count_dict = {'vars_count': [vars_in_count, vars_out_count, (vars_in_count + vars_out_count)],
+    vars_count_dict = {'variants count': [vars_in_count, vars_out_count, (vars_in_count + vars_out_count)],
                        'residues': [inidr_vars_residue, outidr_vars_residue,
                                     (inidr_vars_residue + outidr_vars_residue)]}
     vars_count_df = pd.DataFrame.from_dict(vars_count_dict, orient='index', columns=['disordered', 'ordered', 'sum'])
