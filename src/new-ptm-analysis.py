@@ -131,3 +131,36 @@ def ptmIDR_bool_array_maker():
 
 
 if __name__ == '__main__':
+    ptms_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-ptms-all.csv',
+                          usecols=['acc', 'ptm_pos', 'description', 'ptm_type'])  # (140538, 4)
+    ptms_all_lst = ptms_df['acc'].unique().tolist()
+    ## PTM in disorder
+    ptm_in_idr_checked_df = pd.read_csv(cfg.data['ptm'] + '/ptm_in_idr_checked_(uniprot)-with-disulfide.csv')
+    ptm_inidr_df = ptm_in_idr_checked_df.loc[ptm_in_idr_checked_df['ptm_inidr'] == 1]  # 362784
+    ## PTM site +-3 in var position
+    ptm_var_checked_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-vars-inptm-checked+-3res.csv')  # (1392057, 13)
+    var_in_ptm_df = ptm_var_checked_df.loc[ptm_var_checked_df['var_in_ptm'] == 1]  # (6419, 13) vars, 527 Prs
+    ## merged PTM in disorder in var
+    ptm_in_idr_in_var_mrg = pd.merge(ptm_inidr_df, var_in_ptm_df[['var_id', 'var_in_ptm']], on='var_id')
+    ptm_idr_var_lst = ptm_in_idr_in_var_mrg['acc'].unique().tolist()  # 1288
+    ## divided ptms into disulfide bonds and the rest of ptm types
+    _, _, ss_bond_pr_lst, other_ptms_pr_lst = ptm_divider(ptm_in_idr_in_var_mrg)  # 165 # 1234
+
+    ### NDDs
+    ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
+    ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
+    ## PTM in disorder
+    ndd_ptm_idr_checked_df = ptm_in_idr_checked_df.loc[ptm_in_idr_checked_df.acc.isin(ndd_pr_lst)]  # (303357, 14)
+    ndd_ptm_inidr_df = ndd_ptm_idr_checked_df.loc[ndd_ptm_idr_checked_df['ptm_inidr'] == 1]  # (67608)
+    ## PTM site +-3 in var position
+    ndd_ptm_var_checked_df = ptm_var_checked_df.loc[ptm_var_checked_df.acc.isin(ndd_pr_lst)]  # (303357, 13)
+    ndd_var_in_ptm_df = ndd_ptm_var_checked_df.loc[ndd_ptm_var_checked_df['var_in_ptm'] == 1]  # (1244, 12)
+    ## merged PTM in disorder in var
+    ndd_ptm_idr_var_mrg = pd.merge(ndd_ptm_inidr_df, ndd_var_in_ptm_df[['var_id', 'var_in_ptm']], on='var_id')
+    ndd_ptm_idr_var_lst = ndd_ptm_idr_var_mrg['acc'].unique().tolist()  # 121
+    ## divided ptms into disulfide bonds and the rest of ptm types
+    _, _, ndd_ss_bond_pr_lst, ndd_other_ptms_pr_lst = ptm_divider(ndd_ptm_idr_var_mrg)  # 9 # 119
+
+    ## the ptm division could be performed during other states of analysis as well, shown always in a chart
+
+
