@@ -60,14 +60,29 @@ def ndd_var_df():
 
 
 if __name__ == '__main__':
+    ## the two llps datasets have 28 proteins in common
+
     varin_phasep_df, ndd_varin_phasep_df = var_llps_df_merger('phasep')  # 2296 # 840
     varin_phasepro_df, ndd_varin_phasepro_df = var_llps_df_merger('phasepro')  # 134 # 30
     # lst of NDD proteins with var in IDR and involved in LLPS
+    hs_varin_phasep_lst =varin_phasep_df['acc'].unique().tolist()  # 640
+    hs_varin_phasepro_lst =varin_phasepro_df['acc'].unique().tolist()  # 23
     ndd_varin_phasep_lst = ndd_varin_phasep_df['acc'].unique().tolist()  # 41
+    ndd_varin_phasepro_lst = ndd_varin_phasepro_df['acc'].unique().tolist() # 5
     # ndd_varin_phasepro_lst = ndd_varin_phasepro_df['acc'].unique().tolist()  # 5
     print('\n'.join(ndd_varin_phasep_lst))
     # check if llps proteins have more disordered regions (maybe), more low complexity
     # proteins high-confidence associate to MLOs have more PTMs
     # see your disease proteins are mostly in which llps category, (driver/scaffold, other types ...)
     # this paper : https://www.sciencedirect.com/science/article/pii/S2001037021002804
-# see this protein opened in mobidb in your df and compare
+    # see this protein opened in mobidb in your df and compare
+    fpro_df, fpro_lst = phase_pro()  # 120 proteins
+    fsep_df, fsep_lst = phasep()  # 2572
+    # see where this proteins are involves, the ones related to ndds, for fpro they are 5 and not in a patway together,
+    # but all important and since are not assigned to a disease in the fpro, this can gives ideas where to look.
+    # the ndd proteins var in idr in llps based on fsep are 30 and in a network, so even better!
+    # in the end you can merge them in a list or something, giveout as a database
+    mlo_disease = pd.read_csv(cfg.data['mlo-d'] + '/mlodisdb_components.csv')
+    # from https://academic.oup.com/bib/article/22/4/bbaa271/5943794
+    mlo_dis = pd.read_excel(cfg.data['mlo-d'] + '/mlodisdb_relations_all.xlsx', engine='openpyxl')
+
