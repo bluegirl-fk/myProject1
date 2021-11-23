@@ -97,7 +97,7 @@ def expand_regions(region_ranges_lst):
     return set(transformed_regions)
 
 
-def mutidr_bool_array_maker():
+def ptmIDR_bool_array_maker():
     ## checks if ptm position is in startend disorder region of mobidb or not
     # makke merged df to be checked for ptm in disorder
     ptms_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-ptms-all.csv',
@@ -160,11 +160,13 @@ if __name__ == '__main__':
     ['acc', 'var_id', 'orig_aa', 'var_aa', 'position', 'isin_idr', 'total_vars', 'content_count', 'startend'])
     ptms_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-ptms-all.csv',
                           usecols=['acc', 'ptm_pos', 'description', 'ptm_type'])  # (140538, 4)
-    # ptm_in_idr_checked_df = mutidr_bool_array_maker()
+    ptms_all_lst = ptms_df['acc'].unique().tolist()
+    # ptm_in_idr_checked_df = ptmIDR_bool_array_maker()
     ptm_in_idr_checked_df = pd.read_csv(cfg.data['ptm'] + '/ptm_in_idr_checked_(uniprot)-with-disulfide.csv')
     ptm_in_disorder_df = ptm_in_idr_checked_df.loc[ptm_in_idr_checked_df['ptm_inidr'] == 1]
+
     disulfide_in_disorder = ptm_in_disorder_df.loc[ptm_in_disorder_df['ptm_type'] == 'disulfide bond']
     disulfide_in_disorder_pr_lst = disulfide_in_disorder['acc'].unique().tolist()  # 524 proteins
     # remember that you are using filtered dismaj based on cc > 20 residues
     # todo: retry with normal disorder majority, also organize the code and method()
-    # also this part should come at first, so fist ptm in disorder, then var in ptm
+    # also this part should come at first, so first ptm in disorder, then var in ptm
