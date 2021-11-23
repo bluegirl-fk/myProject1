@@ -80,8 +80,10 @@ if __name__ == '__main__':
     fsep_df, fsep_lst = phasep()  # 2572
     # see where this proteins are involves, the ones related to ndds, for fpro they are 5 and not in a patway together,
     # but all important and since are not assigned to a disease in the fpro, this can gives ideas where to look.
-    # the ndd proteins var in idr in llps based on fsep are 30 and in a network, so even better!
+    # the ndd proteins var in idr in llps based on fsep are 30-40 and in a network, so even better!
     # in the end you can merge them in a list or something, giveout as a database
+    # or try the one which is merged, form the above like if they fix the server!
+
     mlo_disease = pd.read_csv(cfg.data['mlo-d'] + '/mlodisdb_components.csv')
     # from https://academic.oup.com/bib/article/22/4/bbaa271/5943794
     # mlo-dis database not so powerful, could be done better
