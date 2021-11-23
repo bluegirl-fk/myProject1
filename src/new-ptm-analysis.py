@@ -1,3 +1,4 @@
+# generated on November 23rd to have the previous varptm class more organized
 import pandas as pd
 import config as cfg
 import numpy as np
@@ -130,46 +131,3 @@ def ptmIDR_bool_array_maker():
 
 
 if __name__ == '__main__':
-    # var_in_ptm_checked_df = dismaj_var_in_ptm_df_generator()
-    # var_in_ptm_checked_df.to_csv(cfg.data['ptm-u'] + '/uniprot-vars-inptm-checked+-3res.csv')
-    var_in_ptm_checked_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-vars-inptm-checked+-3res.csv')  # (1392057, 13)
-    var_in_ptm_df = var_in_ptm_checked_df.loc[var_in_ptm_checked_df['var_in_ptm'] == 1]  # (6419, 13) vars, 527 Prs
-    inptm_idr_var_all_df = var_in_ptm_checked_df.loc[(var_in_ptm_checked_df['var_in_ptm'] == 1) &
-                                                     (var_in_ptm_checked_df['isin_idr'] == 1)]  # (2126, 13)
-    # (find also ptms in disorder, without considering variations)
-    inptm_idr_var_all_pr_lst = inptm_idr_var_all_df['acc'].unique().tolist()  # 808 Prs.
-    _, _, all_disulfide_pr_lst, all_other_ptms_pr_lst = ptm_divider(inptm_idr_var_all_df)  # 19 # 790
-    ptm_type_count = inptm_idr_var_all_df.groupby('ptm_type').count()
-    ## for NDDs
-    in_ptm_idr_var_ndd_pr_lst, _, inptm_idr_var_ndd_df = ndd_idrvar_in_ptm_lst_df_generator \
-        (inptm_idr_var_all_pr_lst, inptm_idr_var_all_df)  # 76 # (365, 13)
-    # contributes to 77 rows in phens col, so each pr is in charge of ~5 phens among all phens and not just my phens
-    # print('\n'.join(in_ptm_idr_var_ndd_pr_lst))
-    _, _, ndd_disulfide_pr_lst, ndd_other_ptms_pr_lst = ptm_divider(inptm_idr_var_ndd_df)  # 1  # 76
-
-    ## NDD variants in ptm, even if not in disordered regions, can regulate IDP activation
-    ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
-    ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
-    ndd_vars_in_ptm = var_in_ptm_checked_df.loc[(var_in_ptm_checked_df.acc.isin(ndd_pr_lst))
-                                                & (var_in_ptm_checked_df['var_in_ptm'] == 1)]  # (1244, 13)
-    ndd_vars_in_ptm_lst = ndd_vars_in_ptm['acc'].unique().tolist()  # 127
-    # print('\n'.join(ndd_other_ptms_pr_lst))
-
-    # cm: maybe find ptms and disease (vars), and checked the relation with disorder and LLPS
-    disorder_maj = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv', usecols=
-    ['acc', 'var_id', 'orig_aa', 'var_aa', 'position', 'isin_idr', 'total_vars', 'content_count', 'startend'])
-    ptms_df = pd.read_csv(cfg.data['ptm-u'] + '/uniprot-ptms-all.csv',
-                          usecols=['acc', 'ptm_pos', 'description', 'ptm_type'])  # (140538, 4)
-    ptms_all_lst = ptms_df['acc'].unique().tolist()
-    # ptm_in_idr_checked_df = ptmIDR_bool_array_maker()
-    ptm_in_idr_checked_df = pd.read_csv(cfg.data['ptm'] + '/ptm_in_idr_checked_(uniprot)-with-disulfide.csv')
-    ptm_in_disorder_df = ptm_in_idr_checked_df.loc[ptm_in_idr_checked_df['ptm_inidr'] == 1]  # 362784
-    ptm_in_idr_in_var_mrg = pd.merge(ptm_in_disorder_df, var_in_ptm_df[['var_id', 'var_in_ptm']], on='var_id')
-    lst_a = ptm_in_idr_in_var_mrg['acc'].unique().tolist()  # 1288
-    # maybe make a new one
-
-    disulfide_in_disorder = ptm_in_disorder_df.loc[ptm_in_disorder_df['ptm_type'] == 'disulfide bond']
-    disulfide_in_disorder_pr_lst = disulfide_in_disorder['acc'].unique().tolist()  # 524 proteins
-    # remember that you are using filtered dismaj based on cc > 20 residues
-    # todo: retry with normal disorder majority, also organize the code and method()
-    # also this part should come at first, so first ptm in disorder, then var in ptm
