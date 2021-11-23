@@ -84,5 +84,6 @@ if __name__ == '__main__':
     # in the end you can merge them in a list or something, giveout as a database
     mlo_disease = pd.read_csv(cfg.data['mlo-d'] + '/mlodisdb_components.csv')
     # from https://academic.oup.com/bib/article/22/4/bbaa271/5943794
+    # mlo-dis database not so powerful, could be done better
     mlo_dis = pd.read_excel(cfg.data['mlo-d'] + '/mlodisdb_relations_all.xlsx', engine='openpyxl')
 
