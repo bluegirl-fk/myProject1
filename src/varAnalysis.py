@@ -211,16 +211,19 @@ if __name__ == '__main__':
     print(mobilite_vars_out['var_aa'].value_counts()[:5].index.tolist())
     # most_occuring_aa_transition_inIDR = mobilite_vars_in.groupby(['orig_aa', 'var_aa']).size().idxmax(5)
 
-
     ## heatmaps
     residue_heatmapper([ndd_mobilite_vars_in, mobilite_vars_in], ['Residue Variations1 - in IDRs (NDDs)',
                                                                   'Residue Variations- in IDRs (Homo sapiens)',
                                                                   'Difference (NDD - Homo sapiens)'],
-                       'heatmap-inidr-HS&NDD1')
+                       'heatmap-inidr-HS&NDD')
+
+
+    # patho_vars_lst = hvar.pathologic_varid_lst()
+    # mobilite_vars_in = mobilite_vars_in.loc[mobilite_vars_in.var_id.isin(patho_vars_lst)]
+    # print(mobilite_vars_in.head(10))
+    # mobilite_vars_out = mobilite_vars_out.loc[mobilite_vars_out.var_id.isin(patho_vars_lst)]
     residue_heatmapper([mobilite_vars_in, mobilite_vars_out],
                        ['Residue Variations1 - in IDRs (Homo sapiens)', 'Residue Variations- in ORs (Homo sapiens)',
                         'Difference (in IDRs - in ORs)'], 'heatmap-inoutidr-HS1')
 
-    lst, _ = heatmap_pivotdf_maker([mobilite_vars_in, mobilite_vars_out])
-    df1 = lst[0]
-    df2 = lst[1]
+
