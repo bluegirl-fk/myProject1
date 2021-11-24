@@ -211,10 +211,6 @@ if __name__ == '__main__':
     print(mobilite_vars_out['var_aa'].value_counts()[:5].index.tolist())
     # most_occuring_aa_transition_inIDR = mobilite_vars_in.groupby(['orig_aa', 'var_aa']).size().idxmax(5)
 
-    # aa_transition_inIDR = list(product(mobilite_vars_in['orig_aa'], mobilite_vars_in['var_aa']))
-    # aa_transition_inIDR = collections.Counter(aa_transition_inIDR)
-    # most_occuring_aa_transitions = aa_transition_inIDR.most_common(10)
-    # todo prbably this is the correct way to count the variants
 
     ## heatmaps
     residue_heatmapper([ndd_mobilite_vars_in, mobilite_vars_in], ['Residue Variations1 - in IDRs (NDDs)',
