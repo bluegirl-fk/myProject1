@@ -11,6 +11,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import collections
 from itertools import product
+import humsavar as hvar
 
 
 def vars_multiple_df_generator(input_df):

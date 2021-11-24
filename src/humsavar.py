@@ -51,9 +51,20 @@ def isin_idr_col_adder(df):
     return df
 
 
+def pathologic_varid_lst():
+    hmvar = pd.read_csv(cfg.data[''] + '/new-humsavar.csv')
+    hmvar_pathologic = hmvar.loc[hmvar['category'] != 'LB/B']
+    hmvar_pat_varid_lst = hmvar_pathologic['AC'].unique().tolist()
+    return hmvar_pat_varid_lst
+
+
 if __name__ == '__main__':
-    hmvar = humsavar_pos_adder()
-    hmvar.to_csv(cfg.data[''] + '/new-humsavar.csv')
+    # hmvar = humsavar_pos_adder()
+    # hmvar.to_csv(cfg.data[''] + '/new-humsavar.csv')
+    hmvar = pd.read_csv(cfg.data[''] + '/new-humsavar.csv')
+    hmvar_pathologic = hmvar.loc[hmvar['category'] != 'LB/B']
+    hmvar_pat_varid_lst = hmvar_pathologic['AC'].unique().tolist()
+
     mobidb = pd.read_csv(cfg.data['phens'] + '/mobidb-results+ndd-tsv-damiano-shared.tsv')
     mobidb = mobidb.rename(columns={'start..end' : 'startend'})
     # hmvar_mrg = pd.merge(mobidb, hmvar, left_on='acc', right_on='AC')
