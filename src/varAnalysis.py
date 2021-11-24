@@ -217,11 +217,6 @@ if __name__ == '__main__':
                                                                   'Difference (NDD - Homo sapiens)'],
                        'heatmap-inidr-HS&NDD')
 
-
-    # patho_vars_lst = hvar.pathologic_varid_lst()
-    # mobilite_vars_in = mobilite_vars_in.loc[mobilite_vars_in.var_id.isin(patho_vars_lst)]
-    # print(mobilite_vars_in.head(10))
-    # mobilite_vars_out = mobilite_vars_out.loc[mobilite_vars_out.var_id.isin(patho_vars_lst)]
     residue_heatmapper([mobilite_vars_in, mobilite_vars_out],
                        ['Residue Variations1 - in IDRs (Homo sapiens)', 'Residue Variations- in ORs (Homo sapiens)',
                         'Difference (in IDRs - in ORs)'], 'heatmap-inoutidr-HS1')
