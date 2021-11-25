@@ -127,10 +127,10 @@ def draw_barplot(x, y, data, xticklabel, yscale):  # input is DF, not list
 def residue_heatmapper(df_lst, hmap_title_lst, filename):
     # input df is disorder_majority or filtered_dis_maj if preferred
     new_pivot_df_lst, aa_symbols_lst = heatmap_pivotdf_maker(df_lst)
-    sns.set(font_scale=2.7)
+    sns.set(font_scale=2.5)
     fig, axes = plt.subplots(len(new_pivot_df_lst), 1, figsize=(30, 20 * len(new_pivot_df_lst)))
     for i, (ax, d, t) in enumerate(zip(axes.reshape(-1), new_pivot_df_lst, hmap_title_lst)):
-        sb = sns.heatmap(d, cmap="viridis", annot=True, fmt='g', linewidth=0.9, ax=ax, square=True,
+        sb = sns.heatmap(d, cmap="viridis", annot=True, fmt='g', linewidth=1.0, ax=ax, square=True,
                          cbar_kws={'label': 'Transition percentage'}
                          )
         ax.set_title(t, fontsize=40)
@@ -169,8 +169,9 @@ def heatmap_pivotdf_maker(df_lst):
         aa_categ_order_y = aa_categ_order_x.__reversed__()
         residue_pivot_df = residue_pivot_df.reindex(columns=aa_categ_order_x)
         residue_pivot_df = residue_pivot_df.reindex(aa_categ_order_y)
-        max_value = residue_pivot_df.max()
-        print(max_value)
+        # max_value = residue_pivot_df.max() # this finds max of each column and the result percentage is comparative
+        # only for each column
+        max_value = residue_ser['size'].max()
         residue_pivot_df = (residue_pivot_df.div(max_value)).round(3) * 100
         residue_pivot_df = residue_pivot_df.apply(pd.to_numeric)
         new_pivot_df_lst.append(residue_pivot_df)
@@ -189,7 +190,7 @@ if __name__ == '__main__':
     # mobidb_lite = var_cnt_residue_normaliezer(var_countcol_creator(df_feature_filterer('prediction-disorder-mobidb_lite')))
     # mobidb_lite.to_csv(cfg.data['vars'] + '/mobidb_lite-inout-idr-vars-count-normalized.csv')
     mobidb_lite = pd.read_csv(cfg.data['vars'] + '/mobidb_lite-inout-idr-vars-count-normalized.csv')
-    # disorder_majority = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
+    disorder_majority = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
 
     ## Table of Vars inside and outside plus residues
     var_residue_sum_table = var_residue_stats_table_generator(mobidb_lite)
@@ -214,11 +215,11 @@ if __name__ == '__main__':
     ## heatmaps
     residue_heatmapper([ndd_mobilite_vars_in, mobilite_vars_in], ['Residue Variations1 - in IDRs (NDDs)',
                                                                   'Residue Variations- in IDRs (Homo sapiens)',
-                                                                  'Difference (NDD - Homo sapiens)'],
+                                                                  'Difference (NDD - Homo sapiens)-fixed'],
                        'heatmap-inidr-HS&NDD')
 
     residue_heatmapper([mobilite_vars_in, mobilite_vars_out],
                        ['Residue Variations1 - in IDRs (Homo sapiens)', 'Residue Variations- in ORs (Homo sapiens)',
-                        'Difference (in IDRs - in ORs)'], 'heatmap-inoutidr-HS1')
+                        'Difference (in IDRs - in ORs)'], 'heatmap-inoutidr-HS1-fixed')
 
 

@@ -162,5 +162,6 @@ if __name__ == '__main__':
     _, _, ndd_ss_bond_pr_lst, ndd_other_ptms_pr_lst = ptm_divider(ndd_ptm_idr_var_mrg)  # 9 # 119
 
     ## the ptm division could be performed during other states of analysis as well, shown always in a chart
+    print('\n'.join(ss_bond_pr_lst))
 
 
