@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 def residue_heatmapper(df_lst, hmap_title_lst, filename):
     # input df is disorder_majority or filtered_dis_maj if preferred
     new_pivot_df_lst, aa_symbols_lst = heatmap_pivotdf_maker(df_lst)
-    sns.set(font_scale=2.7)
+    sns.set(font_scale=2.4)
     fig, axes = plt.subplots(len(new_pivot_df_lst), 1, figsize=(30, 20 * len(new_pivot_df_lst)))
     for i, (ax, d, t) in enumerate(zip(axes.reshape(-1), new_pivot_df_lst, hmap_title_lst)):
         sb = sns.heatmap(d, cmap="viridis", annot=True, fmt='g', linewidth=0.9, ax=ax, square=True,
@@ -49,7 +49,7 @@ def heatmap_pivotdf_maker(df_lst):
         aa_categ_order_y = aa_categ_order_x.__reversed__()
         residue_pivot_df = residue_pivot_df.reindex(columns=aa_categ_order_x)
         residue_pivot_df = residue_pivot_df.reindex(aa_categ_order_y)
-        max_value = residue_ser['size'].max()
+        # max_value = residue_ser['size'].max()
         print(max_value)
         residue_pivot_df = (residue_pivot_df.div(max_value)).round(3) * 100
         residue_pivot_df = residue_pivot_df.apply(pd.to_numeric)
@@ -96,3 +96,4 @@ if __name__ == '__main__':
     residue_pivot_df = residue_pivot_df.apply(pd.to_numeric)
 
     # todo turn this into a method to be used in varanalysis
+

@@ -127,10 +127,10 @@ def draw_barplot(x, y, data, xticklabel, yscale):  # input is DF, not list
 def residue_heatmapper(df_lst, hmap_title_lst, filename):
     # input df is disorder_majority or filtered_dis_maj if preferred
     new_pivot_df_lst, aa_symbols_lst = heatmap_pivotdf_maker(df_lst)
-    sns.set(font_scale=2.5)
+    sns.set(font_scale=2.4)
     fig, axes = plt.subplots(len(new_pivot_df_lst), 1, figsize=(30, 20 * len(new_pivot_df_lst)))
     for i, (ax, d, t) in enumerate(zip(axes.reshape(-1), new_pivot_df_lst, hmap_title_lst)):
-        sb = sns.heatmap(d, cmap="viridis", annot=True, fmt='g', linewidth=1.0, ax=ax, square=True,
+        sb = sns.heatmap(d, cmap="viridis", annot=True, fmt='g', linewidth=1.1, linecolor='black', ax=ax, square=True,
                          cbar_kws={'label': 'Transition percentage'}
                          )
         ax.set_title(t, fontsize=40)
@@ -159,13 +159,12 @@ def heatmap_pivotdf_maker(df_lst):
     new_pivot_df_lst = []
     for df in df_lst:
         res_df = df[['acc', 'var_id', 'orig_aa', 'var_aa']]
-        aa_lst = res_df['orig_aa'].unique().tolist()
-        res_df = res_df.loc[res_df.var_aa.isin(aa_lst)]
-        residue_ser = res_df.groupby(['orig_aa', 'var_aa']).size().to_frame(name='size').reset_index()
-        residue_pivot_df = pd.pivot_table(residue_ser, values='size', index='orig_aa', columns='var_aa')
         aa_categ_order_x = ['C', 'M', 'V', 'L', 'I', 'W', 'Y', 'F', 'H', 'T', 'N', 'Q', 'K', 'R', 'D', 'E', 'A', 'S',
                             'G',
                             'P']
+        res_df = res_df.loc[res_df.var_aa.isin(aa_categ_order_x)]
+        residue_ser = res_df.groupby(['orig_aa', 'var_aa']).size().to_frame(name='size').reset_index()
+        residue_pivot_df = pd.pivot_table(residue_ser, values='size', index='orig_aa', columns='var_aa')
         aa_categ_order_y = aa_categ_order_x.__reversed__()
         residue_pivot_df = residue_pivot_df.reindex(columns=aa_categ_order_x)
         residue_pivot_df = residue_pivot_df.reindex(aa_categ_order_y)
@@ -215,8 +214,8 @@ if __name__ == '__main__':
     ## heatmaps
     residue_heatmapper([ndd_mobilite_vars_in, mobilite_vars_in], ['Residue Variations1 - in IDRs (NDDs)',
                                                                   'Residue Variations- in IDRs (Homo sapiens)',
-                                                                  'Difference (NDD - Homo sapiens)-fixed'],
-                       'heatmap-inidr-HS&NDD')
+                                                                  'Difference (NDD - Homo sapiens)'],
+                       'heatmap-inidr-HS&NDD-fixed')
 
     residue_heatmapper([mobilite_vars_in, mobilite_vars_out],
                        ['Residue Variations1 - in IDRs (Homo sapiens)', 'Residue Variations- in ORs (Homo sapiens)',
