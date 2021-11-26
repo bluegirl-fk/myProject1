@@ -164,5 +164,7 @@ if __name__ == '__main__':
     _, _, ndd_ss_idr_var_pr_lst, ndd_other_ptms_idr_var_pr_lst = ptm_divider(ndd_ptm_idr_var_mrg)  # 9 # 119
 
     print('\n'.join(ss_idr_var_pr_lst))
+    alphafold_mrg = pd.read_csv(cfg.data['vars'] + '/alphafold-vars-with-isin-column-NEWmobidb')
+
 
 

@@ -51,34 +51,34 @@ def in_idr_df_generator(dfs_lst):
 
 
 ## mobidb, filtered based on mobidblite and disorder majority
-# mobidb = pd.read_csv(cfg.data['phens'] + '/mobidb-results+ndd-tsv-damiano-shared.tsv')
+mobidb = pd.read_csv(cfg.data['phens'] + '/mobidb-results+ndd-tsv-damiano-shared.tsv')
 # mobi with alphafold
-mobidb = pd.read_csv(cfg.data[''] + '/mobidb_result_2021-11-26T14_41_41.412Z.tsv', sep='\t')
+# mobidb = pd.read_csv(cfg.data[''] + '/mobidb_result_2021-11-26T14_41_41.412Z.tsv', sep='\t')
 mobidb = mobidb.rename(columns={'start..end': 'startend'})
 mobidb_lite = mobidb.loc[mobidb['feature'] == 'prediction-disorder-mobidb_lite']
 disorder_majority = mobidb.loc[mobidb['feature'] == 'prediction-disorder-th_50']
-alphafold = mobidb.loc[mobidb['feature'] == 'prediction-plddt-alphafold']
+# alphafold = mobidb.loc[mobidb['feature'] == 'prediction-plddt-alphafold']
 ## Variants df, (12 proteins not in mobidb)
 var_prs_df = pd.read_csv(cfg.data['xml-p'] + '/protein-vars.csv')
 vars_mrg = pd.merge(mobidb, var_prs_df, on='acc')  # all vars without mobidb feature filtration
-vars_mrg.to_csv(cfg.data['vars'] + '/all-variants-mobidb-mergedNEWmobidb.csv')
+vars_mrg.to_csv(cfg.data['vars'] + '/all-variants-mobidb-merged.csv')
 ## Merged DFs
 # mobidb_lite
 mobidb_lite_mrg = pd.merge(mobidb_lite, var_prs_df, on='acc')
 # Disorder_majority
 disorder_majority_mrg = pd.merge(disorder_majority, var_prs_df, on='acc')
 # alphafold
-alphafold_mrg = pd.merge(alphafold, var_prs_df, on='acc')
+# alphafold_mrg = pd.merge(alphafold, var_prs_df, on='acc')
 ## adding isin_idr bool array
-[alphafold_mrg, mobidb_lite_mrg, disorder_majority_mrg, vars_mrg] = isin_idr_col_adder([alphafold_mrg, mobidb_lite_mrg, disorder_majority_mrg, vars_mrg])
+[mobidb_lite_mrg, disorder_majority_mrg, vars_mrg] = isin_idr_col_adder([mobidb_lite_mrg, disorder_majority_mrg, vars_mrg])
 ## DFs with muts only inside IDR
 # alphafold_mut_in_df ,lite_mut_in_df, dismaj_mut_in_df, vars_in_df = in_idr_df_generator([alphafold_mrg, mobidb_lite_mrg, disorder_majority_mrg, vars_mrg])
 ## to CSV
 ##isin_idr column
-mobidb_lite_mrg.to_csv(cfg.data['vars'] + '/mobidblite-vars-with-isin-columnNEWmobidb.csv')
-disorder_majority_mrg.to_csv(cfg.data['vars'] + '/dismajority-vars-with-isin-column-NEWmobidb.csv')
-alphafold_mrg.to_csv(cfg.data['vars'] + '/alphafold-vars-with-isin-column-NEWmobidb')
-vars_mrg.to_csv(cfg.data['vars'] + '/all-vars-mrg-mobidb-with-isin_idr-column-NEWmobidb.csv')
+mobidb_lite_mrg.to_csv(cfg.data['vars'] + '/mobidblite-vars-with-isin-column.csv')
+disorder_majority_mrg.to_csv(cfg.data['vars'] + '/dismajority-vars-with-isin-column.csv')
+# alphafold_mrg.to_csv(cfg.data['vars'] + '/alphafold-vars-with-isin-column')
+vars_mrg.to_csv(cfg.data['vars'] + '/all-vars-mrg-mobidb-with-isin_idr-column.csv')
 # inIDR
 # lite_mut_in_df.to_csv(cfg.data['vars'] + '/muts-in-IDR-mobidb_liteNEW.csv')
 # dismaj_mut_in_df.to_csv(cfg.data['vars'] + '/muts-in-IDR-disorder_majorityNEW.csv')
