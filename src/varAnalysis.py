@@ -190,6 +190,7 @@ if __name__ == '__main__':
     # mobidb_lite.to_csv(cfg.data['vars'] + '/mobidb_lite-inout-idr-vars-count-normalized.csv')
     mobidb_lite = pd.read_csv(cfg.data['vars'] + '/mobidb_lite-inout-idr-vars-count-normalized.csv')
     disorder_majority = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
+    ndd_mobilite = mobidb_lite.loc[mobidb_lite.acc.isin(ndd_pr_lst)]
 
     ## Table of Vars inside and outside plus residues
     var_residue_sum_table = var_residue_stats_table_generator(mobidb_lite)
@@ -220,5 +221,9 @@ if __name__ == '__main__':
     residue_heatmapper([mobilite_vars_in, mobilite_vars_out],
                        ['Residue Variations1 - in IDRs (Homo sapiens)', 'Residue Variations- in ORs (Homo sapiens)',
                         'Difference (in IDRs - in ORs)'], 'heatmap-inoutidr-HS1-fixed')
+
+    residue_heatmapper([ndd_mobilite, mobilite_vars_in],
+                       ['NDDs - all variants', 'Homo sapiens - in IDR variants',
+                        'Difference'], 'heatmap-all-NDD-vs-HSinIDR')
 
 
