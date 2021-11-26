@@ -164,7 +164,11 @@ if __name__ == '__main__':
     _, _, ndd_ss_idr_var_pr_lst, ndd_other_ptms_idr_var_pr_lst = ptm_divider(ndd_ptm_idr_var_mrg)  # 9 # 119
 
     print('\n'.join(ss_idr_var_pr_lst))
+    ## see if they really are in disorder according to alphafold or no
     alphafold_mrg = pd.read_csv(cfg.data['vars'] + '/alphafold-vars-with-isin-column-NEWmobidb')
+    ss_alphafold = alphafold_mrg.loc[alphafold_mrg.acc.isin(ss_inidr_pr_lst)]
+    ss_alphafold = ss_alphafold['acc'].unique().tolist()
+
 
 
 
