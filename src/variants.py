@@ -72,7 +72,7 @@ disorder_majority_mrg = pd.merge(disorder_majority, var_prs_df, on='acc')
 ## adding isin_idr bool array
 [mobidb_lite_mrg, disorder_majority_mrg, vars_mrg] = isin_idr_col_adder([mobidb_lite_mrg, disorder_majority_mrg, vars_mrg])
 ## DFs with muts only inside IDR
-# alphafold_mut_in_df ,lite_mut_in_df, dismaj_mut_in_df, vars_in_df = in_idr_df_generator([alphafold_mrg, mobidb_lite_mrg, disorder_majority_mrg, vars_mrg])
+lite_mut_in_df, dismaj_mut_in_df, vars_in_df = in_idr_df_generator([mobidb_lite_mrg, disorder_majority_mrg, vars_mrg])
 ## to CSV
 ##isin_idr column
 mobidb_lite_mrg.to_csv(cfg.data['vars'] + '/mobidblite-vars-with-isin-column.csv')
@@ -80,6 +80,6 @@ disorder_majority_mrg.to_csv(cfg.data['vars'] + '/dismajority-vars-with-isin-col
 # alphafold_mrg.to_csv(cfg.data['vars'] + '/alphafold-vars-with-isin-column')
 vars_mrg.to_csv(cfg.data['vars'] + '/all-vars-mrg-mobidb-with-isin_idr-column.csv')
 # inIDR
-# lite_mut_in_df.to_csv(cfg.data['vars'] + '/muts-in-IDR-mobidb_liteNEW.csv')
-# dismaj_mut_in_df.to_csv(cfg.data['vars'] + '/muts-in-IDR-disorder_majorityNEW.csv')
-# vars_in_df.to_csv(cfg.data['vars'] + '/all-vars-all-featuresNEW.csv')
+lite_mut_in_df.to_csv(cfg.data['vars'] + '/muts-in-IDR-mobidb_lite.csv')
+dismaj_mut_in_df.to_csv(cfg.data['vars'] + '/muts-in-IDR-disorder_majority.csv')
+vars_in_df.to_csv(cfg.data['vars'] + '/all-vars-all-features.csv')

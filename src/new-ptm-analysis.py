@@ -167,7 +167,10 @@ if __name__ == '__main__':
     ## see if they really are in disorder according to alphafold or no
     alphafold_mrg = pd.read_csv(cfg.data['vars'] + '/alphafold-vars-with-isin-column-NEWmobidb')
     ss_alphafold = alphafold_mrg.loc[alphafold_mrg.acc.isin(ss_inidr_pr_lst)]
-    ss_alphafold = ss_alphafold['acc'].unique().tolist()  # 522
+    ss_alphafold_lst = ss_alphafold['acc'].unique().tolist()  # 522
+    print('\n'.join(ss_alphafold_lst))
+    # do the whole thing with alphafold maybe, instead of only the last step
+    a = [x for x in ss_inidr_pr_lst if x not in ss_alphafold_lst]
 
 
 
