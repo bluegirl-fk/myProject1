@@ -20,6 +20,8 @@ def vars_multiple_df_generator(input_df):
     # list, then these dfs will be used in mobibool or protanalysis
     var_pr_lst = input_df['acc'].unique().tolist()
     ## ndds in variants
+    ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
+    ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
     ndd_in_var = list(set(ndd_pr_lst).intersection(var_pr_lst))
     ndd_in_var_subdf = ndd_subdf[ndd_subdf.acc.isin(ndd_in_var)]
     # del ndd_in_var_subdf['Unnamed: 0']
