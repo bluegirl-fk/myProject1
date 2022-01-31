@@ -26,6 +26,7 @@ def vars_multiple_df_generator(input_df):
     ndd_in_var_subdf = ndd_subdf[ndd_subdf.acc.isin(ndd_in_var)]
     # del ndd_in_var_subdf['Unnamed: 0']
     ## Brain
+    brain_prot_lst = brn.brain_pr_lst_generator()  # n: 8320
     brain_var_lst = list(set(brain_prot_lst).intersection(var_pr_lst))
     brain_var_subdf = DataFrame(brain_var_lst, columns=['acc'])
 
