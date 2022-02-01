@@ -194,40 +194,32 @@ if __name__ == '__main__':
     mobidb_lite = pd.read_csv(cfg.data['vars'] + '/mobidb_lite-inout-idr-vars-count-normalized.csv')
     disorder_majority = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv')
     ndd_mobilite = mobidb_lite.loc[mobidb_lite.acc.isin(ndd_pr_lst)]
+    ndd_dismaj = disorder_majority.loc[disorder_majority.acc.isin(ndd_pr_lst)]
 
     ## Table of Vars inside and outside plus residues
     var_residue_sum_table = var_residue_stats_table_generator(mobidb_lite)
     # def total_var_res_percentage(df): # to generate percentage for the whole dataset
 
     # 4631 unique ACCs
-    mobilite_vars_in = mobidb_lite.loc[mobidb_lite['isin_idr'] == 1]  # (8120, 18)
-    mobilite_vars_out = mobidb_lite.loc[mobidb_lite['isin_idr'] == 0]  # (37672, 18)
-    ndd_mobilite_vars_in = mobilite_vars_in.loc[mobilite_vars_in.acc.isin(ndd_pr_lst)]
-    ndd_mobilite_vars_out = mobilite_vars_out.loc[mobilite_vars_out.acc.isin(ndd_pr_lst)]
+    dismaj_vars_in = disorder_majority.loc[disorder_majority['isin_idr'] == 1]  # (8120, 18)
+    ndd_dismaj_vars_in = dismaj_vars_in.loc[dismaj_vars_in.acc.isin(ndd_pr_lst)]
+
+    # mobilite_vars_out = mobidb_lite.loc[mobidb_lite['isin_idr'] == 0]  # (37672, 18)
+    # ndd_mobilite_vars_out = mobilite_vars_out.loc[mobilite_vars_out.acc.isin(ndd_pr_lst)]
+
     ## Variants description (in disorder)
-    ndd_vars_in_descriptions = ndd_mobilite_vars_in['description'].unique().tolist()
+    ndd_vars_in_descriptions = ndd_dismaj_vars_in['description'].unique().tolist()
     desc_counter = collections.Counter(ndd_vars_in_descriptions)
     # from: https://stackoverflow.com/questions/2161752/how-to-count-the-frequency-of-the-elements-in-an-unordered-list
     # parse uniprot-xml keyword disease part
     print(desc_counter)  # later you can somehow categorize them based on type of pathology and stuff
 
-    print(mobilite_vars_in['orig_aa'].value_counts()[:5].index.tolist())
-    print(mobilite_vars_out['var_aa'].value_counts()[:5].index.tolist())
+    print(dismaj_vars_in['orig_aa'].value_counts()[:5].index.tolist())
     # most_occuring_aa_transition_inIDR = mobilite_vars_in.groupby(['orig_aa', 'var_aa']).size().idxmax(5)
 
     ## heatmaps
-    residue_heatmapper([ndd_mobilite_vars_in, mobilite_vars_in], ['Residue Variations - in IDRs (NDDs)',
+    residue_heatmapper([ndd_dismaj_vars_in, dismaj_vars_in], ['Residue Variations - in IDRs (NDDs)',
                                                                   'Residue Variations- in IDRs (Homo sapiens)',
                                                                   'Difference (NDD - Homo sapiens)'],
-                       'heatmap-inidr-HS&NDD-mobilite-fb1')
+                       'heatmap-inidr-HS&NDD-dismaj-fb1')
 
-    # residue_heatmapper([mobilite_vars_in, mobilite_vars_out],
-    #                    ['Residue Variations - in IDRs (Homo sapiens)', 'Residue Variations- in ORs (Homo sapiens)',
-    #                     'Difference (in IDRs - in ORs)'], 'heatmap-inoutidr-HS1-fixed')
-
-    # residue_heatmapper([ndd_mobilite, mobilite_vars_in],
-    #                    ['NDDs - all variants', 'Homo sapiens - in IDR variants',
-    #                     'Difference'], 'heatmap-all-NDD-vs-HSinIDR')
-
-# first from my laptop
-# second commit from my laptop
