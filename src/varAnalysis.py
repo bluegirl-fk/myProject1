@@ -219,7 +219,7 @@ if __name__ == '__main__':
     residue_heatmapper([ndd_mobilite_vars_in, mobilite_vars_in], ['Residue Variations - in IDRs (NDDs)',
                                                                   'Residue Variations- in IDRs (Homo sapiens)',
                                                                   'Difference (NDD - Homo sapiens)'],
-                       'heatmap-inidr-HS&NDD-fb1')
+                       'heatmap-inidr-HS&NDD-mobilite-fb1')
 
     # residue_heatmapper([mobilite_vars_in, mobilite_vars_out],
     #                    ['Residue Variations - in IDRs (Homo sapiens)', 'Residue Variations- in ORs (Homo sapiens)',
