@@ -216,18 +216,18 @@ if __name__ == '__main__':
     # most_occuring_aa_transition_inIDR = mobilite_vars_in.groupby(['orig_aa', 'var_aa']).size().idxmax(5)
 
     ## heatmaps
-    residue_heatmapper([ndd_mobilite_vars_in, mobilite_vars_in], ['Residue Variations1 - in IDRs (NDDs)',
+    residue_heatmapper([ndd_mobilite_vars_in, mobilite_vars_in], ['Residue Variations - in IDRs (NDDs)',
                                                                   'Residue Variations- in IDRs (Homo sapiens)',
                                                                   'Difference (NDD - Homo sapiens)'],
-                       'heatmap-inidr-HS&NDD-fixed')
+                       'heatmap-inidr-HS&NDD-fb1')
 
-    residue_heatmapper([mobilite_vars_in, mobilite_vars_out],
-                       ['Residue Variations1 - in IDRs (Homo sapiens)', 'Residue Variations- in ORs (Homo sapiens)',
-                        'Difference (in IDRs - in ORs)'], 'heatmap-inoutidr-HS1-fixed')
+    # residue_heatmapper([mobilite_vars_in, mobilite_vars_out],
+    #                    ['Residue Variations - in IDRs (Homo sapiens)', 'Residue Variations- in ORs (Homo sapiens)',
+    #                     'Difference (in IDRs - in ORs)'], 'heatmap-inoutidr-HS1-fixed')
 
-    residue_heatmapper([ndd_mobilite, mobilite_vars_in],
-                       ['NDDs - all variants', 'Homo sapiens - in IDR variants',
-                        'Difference'], 'heatmap-all-NDD-vs-HSinIDR')
+    # residue_heatmapper([ndd_mobilite, mobilite_vars_in],
+    #                    ['NDDs - all variants', 'Homo sapiens - in IDR variants',
+    #                     'Difference'], 'heatmap-all-NDD-vs-HSinIDR')
 
 # first from my laptop
 # second commit from my laptop
