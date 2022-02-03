@@ -75,9 +75,9 @@ def ndd_idrvar_in_ptm_lst_df_generator(all_ptm_checked_pr_lst, all_ptm_var_filte
 def ptm_divider(inputdf):
     disulfide_bonds_df = inputdf.loc[inputdf['ptm_type'] == 'disulfide bond']
     the_rest_of_ptms_df = inputdf.loc[inputdf['ptm_type'] != 'disulfide bond']
-    disulfide_bonds_pr_lst = disulfide_bonds_df['acc'].unique().tolist()
-    the_rest_of_ptms_pr_lst = the_rest_of_ptms_df['acc'].unique().tolist()
-    return disulfide_bonds_df, the_rest_of_ptms_df, disulfide_bonds_pr_lst, the_rest_of_ptms_pr_lst
+    disulfide_bonds_vid_lst = disulfide_bonds_df['var_id'].unique().tolist()
+    the_rest_of_ptms_vid_lst = the_rest_of_ptms_df['var_id'].unique().tolist()
+    return disulfide_bonds_df, the_rest_of_ptms_df, disulfide_bonds_vid_lst, the_rest_of_ptms_vid_lst
 
 
 ## from here on, the methods are for checking if PTM is in disorder
@@ -138,14 +138,14 @@ if __name__ == '__main__':
                                                      (var_in_ptm_checked_df['isin_idr'] == 1)]  # (2126, 13)
     # (find also ptms in disorder, without considering variations)
     inptm_idr_var_all_pr_lst = inptm_idr_var_all_df['acc'].unique().tolist()  # 808 Prs.
-    _, _, all_disulfide_pr_lst, all_other_ptms_pr_lst = ptm_divider(inptm_idr_var_all_df)  # 19 # 790
+    _, _, all_disulfide_vid_lst, all_other_ptms_vid_lst = ptm_divider(inptm_idr_var_all_df)  # 19 # 790
     ptm_type_count = inptm_idr_var_all_df.groupby('ptm_type').count()
     ## for NDDs
     in_ptm_idr_var_ndd_pr_lst, _, inptm_idr_var_ndd_df = ndd_idrvar_in_ptm_lst_df_generator \
         (inptm_idr_var_all_pr_lst, inptm_idr_var_all_df)  # 76 # (365, 13)
     # contributes to 77 rows in phens col, so each pr is in charge of ~5 phens among all phens and not just my phens
     # print('\n'.join(in_ptm_idr_var_ndd_pr_lst))
-    _, _, ndd_disulfide_pr_lst, ndd_other_ptms_pr_lst = ptm_divider(inptm_idr_var_ndd_df)  # 1  # 76
+    _, _, ndd_disulfide_vid_lst, ndd_other_ptms_vid_lst = ptm_divider(inptm_idr_var_ndd_df)  # 1  # 76
 
     ## NDD variants in ptm, even if not in disordered regions, can regulate IDP activation
     ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
