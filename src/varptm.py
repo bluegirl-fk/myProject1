@@ -173,3 +173,17 @@ if __name__ == '__main__':
     # remember that you are using filtered dismaj based on cc > 20 residues
     # todo: retry with normal disorder majority, also organize the code and method()
     # also this part should come at first, so first ptm in disorder, then var in ptm
+
+    ## list of Vars in PTMs
+    # a = var_in_ptm_checked_df.loc[var_in_ptm_checked_df['var_in_ptm'] == 1]
+    # print('\n'.join((a['var_id']).unique().tolist()))
+    # ## list of Vars in IDR
+    # b = var_in_ptm_checked_df.loc[var_in_ptm_checked_df['isin_idr'] == 1]
+    # print('\n'.join((b['var_id']).unique().tolist()))
+    ## Variants in IDR in PTM
+    # c = var_in_ptm_checked_df.loc[(var_in_ptm_checked_df['isin_idr'] == 1) & (var_in_ptm_checked_df['var_in_ptm']==1)]
+    # print('\n'.join((c['var_id']).unique().tolist()))
+    ## ndd variants
+    ndd_variants = inptm_idr_var_all_df.loc[inptm_idr_var_all_df.acc.isin(in_ptm_idr_var_ndd_pr_lst)]
+    # print('\n'.join((ndd_variants['var_id']).unique().tolist()))
+    print(len((ndd_variants['var_id']).unique().tolist()))
