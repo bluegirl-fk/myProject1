@@ -88,7 +88,7 @@ def var_cnt_residue_normaliezer(df):  # gets df with count columns for vars in/o
     return df
 
 
-def var_residue_stats_table_generator(input_vardf):
+def var_residue_stats_table_generator(input_vardf, inp_var):
     # the values of number of vars in idr and out idr, number of residues for vars inidr and outidr generated,
     # converted to dict and then data frame, it was kept in mind that even though several vars could exist per protein,
     # residues of disorder or order regions are counted once
@@ -105,7 +105,7 @@ def var_residue_stats_table_generator(input_vardf):
     outidr_vars_residue = int(outidr_vars_residue['order_res'].sum())
     # length_df = input_vardf[['acc', 'length']]
     # length = length_df['length'].sum()
-    vars_count_dict = {'variants count': [vars_in_count, vars_out_count, (vars_in_count + vars_out_count)],
+    vars_count_dict = {inp_var+' variants count': [vars_in_count, vars_out_count, (vars_in_count + vars_out_count)],
                        'residues': [inidr_vars_residue, outidr_vars_residue,
                                     (inidr_vars_residue + outidr_vars_residue)]}
     vars_count_df = pd.DataFrame.from_dict(vars_count_dict, orient='index', columns=['disordered', 'ordered', 'sum'])
@@ -197,7 +197,8 @@ if __name__ == '__main__':
     ndd_dismaj = disorder_majority.loc[disorder_majority.acc.isin(ndd_pr_lst)]
 
     ## Table of Vars inside and outside plus residues
-    var_residue_sum_table = var_residue_stats_table_generator(mobidb_lite)
+    var_residue_sum_table_all = var_residue_stats_table_generator(disorder_majority, 'all')
+    var_residue_sum_table_ndd = var_residue_stats_table_generator(ndd_dismaj, 'NDD')
     # def total_var_res_percentage(df): # to generate percentage for the whole dataset
 
     # 4631 unique ACCs
