@@ -184,6 +184,6 @@ if __name__ == '__main__':
     # c = var_in_ptm_checked_df.loc[(var_in_ptm_checked_df['isin_idr'] == 1) & (var_in_ptm_checked_df['var_in_ptm']==1)]
     # print('\n'.join((c['var_id']).unique().tolist()))
     ## ndd variants
-    ndd_variants = inptm_idr_var_all_df.loc[inptm_idr_var_all_df.acc.isin(in_ptm_idr_var_ndd_pr_lst)]
-    # print('\n'.join((ndd_variants['var_id']).unique().tolist()))
-    print(len((ndd_variants['var_id']).unique().tolist()))
+    ndd_variants = var_in_ptm_checked_df.loc[var_in_ptm_checked_df.acc.isin(ndd_pr_lst)]
+    print('\n'.join((ndd_variants['var_id']).unique().tolist()))
+    # print(len((ndd_variants['var_id']).unique().tolist()))

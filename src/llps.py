@@ -69,9 +69,9 @@ if __name__ == '__main__':
     hs_varin_phasepro_lst =varin_phasepro_df['acc'].unique().tolist()  # 23
     ndd_varin_phasep_lst = ndd_varin_phasep_df['acc'].unique().tolist()  # 41
     ndd_varin_phasepro_lst = ndd_varin_phasepro_df['acc'].unique().tolist() # 5
-    # ndd_varin_phasepro_lst = ndd_varin_phasepro_df['acc'].unique().tolist()  # 5
-    print('\n'.join(ndd_varin_phasepro_lst))
-    print('\n'.join(ndd_varin_phasep_lst))
+
+    # print('\n'.join(ndd_varin_phasepro_lst))
+    # print('\n'.join(ndd_varin_phasep_lst))
     # check if llps proteins have more disordered regions (maybe), more low complexity
     # proteins high-confidence associate to MLOs have more PTMs
     # see your disease proteins are mostly in which llps category, (driver/scaffold, other types ...)
@@ -89,4 +89,12 @@ if __name__ == '__main__':
     # from https://academic.oup.com/bib/article/22/4/bbaa271/5943794
     # mlo-dis database not so powerful, could be done better
     mlo_dis = pd.read_excel(cfg.data['mlo-d'] + '/mlodisdb_relations_all.xlsx', engine='openpyxl')
+
+    ## new mlo dis based on my ndds, var in idr ndds, merged two llps dfs
+    ndd_llps_merged_lst = ndd_varin_phasep_lst + ndd_varin_phasepro_lst
+    mlo_disease_ndd = mlo_disease.loc[mlo_disease.Entry.isin(ndd_llps_merged_lst)]
+
+    ## file from this paper:https://www.sciencedirect.com/science/article/pii/S2001037021002804
+    ## challenge, open this file correctly, for now not very necessary
+    mlo = pd.read_excel(cfg.data['mlo']+'/complementary-data-paper-S2001037021002804.xlsx', engine='openpyxl')
 
