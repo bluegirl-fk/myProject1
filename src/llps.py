@@ -1,6 +1,7 @@
 import pandas as pd
 import config as cfg
-
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 def var_llps_df_merger(source):
     # df with checked vars for being in idr or not (based on disorder majority consensus)
@@ -65,10 +66,10 @@ if __name__ == '__main__':
     varin_phasep_df, ndd_varin_phasep_df = var_llps_df_merger('phasep')  # 2296 # 840
     varin_phasepro_df, ndd_varin_phasepro_df = var_llps_df_merger('phasepro')  # 134 # 30
     # lst of NDD proteins with var in IDR and involved in LLPS
-    hs_varin_phasep_lst =varin_phasep_df['acc'].unique().tolist()  # 640
-    hs_varin_phasepro_lst =varin_phasepro_df['acc'].unique().tolist()  # 23
+    hs_varin_phasep_lst = varin_phasep_df['acc'].unique().tolist()  # 640
+    hs_varin_phasepro_lst = varin_phasepro_df['acc'].unique().tolist()  # 23
     ndd_varin_phasep_lst = ndd_varin_phasep_df['acc'].unique().tolist()  # 41
-    ndd_varin_phasepro_lst = ndd_varin_phasepro_df['acc'].unique().tolist() # 5
+    ndd_varin_phasepro_lst = ndd_varin_phasepro_df['acc'].unique().tolist()  # 5
 
     # print('\n'.join(ndd_varin_phasepro_lst))
     # print('\n'.join(ndd_varin_phasep_lst))
@@ -92,9 +93,26 @@ if __name__ == '__main__':
 
     ## new mlo dis based on my ndds, var in idr ndds, merged two llps dfs
     ndd_llps_merged_lst = ndd_varin_phasep_lst + ndd_varin_phasepro_lst
+    print('\n'.join(ndd_llps_merged_lst))
     mlo_disease_ndd = mlo_disease.loc[mlo_disease.Entry.isin(ndd_llps_merged_lst)]
 
     ## file from this paper:https://www.sciencedirect.com/science/article/pii/S2001037021002804
     ## challenge, open this file correctly, for now not very necessary
-    mlo = pd.read_excel(cfg.data['mlo']+'/complementary-data-paper-S2001037021002804.xlsx', engine='openpyxl')
+    # mlo = pd.read_excel(cfg.data['mlo']+'/complementary-data-paper-S2001037021002804.xlsx', engine='openpyxl')
+    ## STRING analysis of ndd_llps_merged_lst with 46 total proteins
+    molecular_function = pd.read_csv(cfg.data['fs-str'] + '/enrichment.Function.tsv', sep='\t')
+    cell_process = pd.read_csv(cfg.data['fs-str'] + '/enrichment.Process.tsv', sep='\t')
+    # count number of variants in llps dataset
+    disorder_majority = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv', usecols=['acc', 'in_idr_vars_perc'])
+    llps_ndd_dismaj = disorder_majority.loc[disorder_majority.acc.isin(ndd_llps_merged_lst)]
+    llps_ndd_dismaj = llps_ndd_dismaj.drop_duplicates()
+
+    ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
+    ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
+    ndd_dismaj = disorder_majority.loc[disorder_majority.acc.isin(ndd_pr_lst)]
+    ndd_dismaj = ndd_dismaj.drop_duplicates()
+    g = sns.violinplot(x=llps_ndd_dismaj['in_idr_vars_perc'])
+    g.set_xlim(0, 1)
+    plt.show()
+
 

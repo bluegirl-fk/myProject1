@@ -26,10 +26,9 @@ data = {
     'ptm-u': absolute + 'data/ptms/uniprot-ptms',
     'fp': absolute + 'data/llps/phasepro',
     'fs': absolute + 'data/llps/phasep',
-    'mlo-d':absolute + 'data/llps/mlo-dis',
-    'mlo':absolute + 'data/llps/insight-into-llps',
-
-
+    'mlo-d': absolute + 'data/llps/mlo-dis',
+    'mlo': absolute + 'data/llps/insight-into-llps',
+    'fs-str': absolute + 'data/llps/string',
 
 }
 plots = {
@@ -59,6 +58,5 @@ plots = {
     'avv-len': absolute + 'plots/variants/allVars/violinplot/length',
     'avar-bar': absolute + 'plots/variants/allVars/barplot',
     'var-hms': absolute + 'plots/variants/heatmaps',
-
 
 }
