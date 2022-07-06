@@ -29,6 +29,7 @@ data = {
     'mlo-d': absolute + 'data/llps/mlo-dis',
     'mlo': absolute + 'data/llps/insight-into-llps',
     'fs-str': absolute + 'data/llps/string',
+    'clin': absolute + 'data/clinvar',
 
 }
 plots = {

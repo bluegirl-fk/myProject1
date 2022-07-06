@@ -74,4 +74,3 @@ if __name__ == '__main__':
 
 
 
-# TODO : do things based on new brain !

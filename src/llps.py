@@ -106,12 +106,14 @@ if __name__ == '__main__':
     disorder_majority = pd.read_csv(cfg.data['vars'] + '/disorder-majority-inout-idr-vars-count-normalized.csv', usecols=['acc', 'in_idr_vars_perc'])
     llps_ndd_dismaj = disorder_majority.loc[disorder_majority.acc.isin(ndd_llps_merged_lst)]
     llps_ndd_dismaj = llps_ndd_dismaj.drop_duplicates()
+    llps_ndd_dismaj = llps_ndd_dismaj.rename(columns={"in_idr_vars_perc": "IDR variant fraction (NDD-associated Proteins with LLPS roles)"})
 
     ndd_subdf = pd.read_csv(cfg.data['phens-fdr'] + '/acc-phen-5percentFDR.csv')
     ndd_pr_lst = ndd_subdf['acc'].unique().tolist()  # 1308 proteins
     ndd_dismaj = disorder_majority.loc[disorder_majority.acc.isin(ndd_pr_lst)]
     ndd_dismaj = ndd_dismaj.drop_duplicates()
-    g = sns.violinplot(x=llps_ndd_dismaj['in_idr_vars_perc'])
+    ndd_dismaj = ndd_dismaj.rename(columns={"in_idr_vars_perc": "IDR variant fraction (All NDD-associated proteins)"})
+    g = sns.violinplot(x=ndd_dismaj['IDR variant fraction (All NDD-associated proteins)'])
     g.set_xlim(0, 1)
     plt.show()
 
