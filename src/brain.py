@@ -7,11 +7,6 @@ import sys
 import re
 
 
-def main():
-    print("Bizzzz!!!")
-    return
-
-
 def delimiter_split(delimiter, list):
     new_lst = []
     for i in list:
@@ -70,7 +65,3 @@ if __name__ == '__main__':
     normal_tissue_df = pd.read_table(cfg.data['brain'] + '/normal_tissue.tsv', error_bad_lines=False, sep='\t')
     normal_tissue_lst = normal_tissue_df['Level'].unique().tolist()
     br_new = pd.read_table(cfg.data['brain'] + '/brain_category_rna_Any_Region.tsv', sep='\t')
-
-
-
-
